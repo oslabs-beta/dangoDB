@@ -40,17 +40,18 @@ class Connection {
       this.connected = false;   
       console.log('closed connection');
     } else {
-      console.log('did not work');
+      console.log('does not connect');
     } 
   }
 }
-/* TEST */
-const test = new Connection(
-  'mongodb+srv://wgreco13:g3HUuathwbVEisEj@cluster0.adcc3.mongodb.net/dangoDB?authMechanism=SCRAM-SHA-1'
-);
 
-await test.connect();
-test.disconnect(); 
+/* TEST */
+// const test = new Connection(
+//   'mongodb+srv://wgreco13:g3HUuathwbVEisEj@cluster0.adcc3.mongodb.net/dangoDB?authMechanism=SCRAM-SHA-1'
+// );
+
+// await test.connect();
+// test.disconnect(); 
 // export new Connection('mongodb+srv://wgreco13:g3HUuathwbVEisEj@cluster0.adcc3.mongodb.net/dangoDB?authMechanism=SCRAM-SHA-1');
 
 
