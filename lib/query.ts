@@ -43,10 +43,24 @@ class Query {
 
       await this.connection.disconnect();
     } catch (error) {
-      throw new Error(`Error in findOne function. ${error}`);
+      throw new Error(`Error in find function. ${error}`);
     }
   }
 
+  public async dropCollection() {
+    // when testing, create a new collection with garbage documents and pass that in Query object
+    try {
+      const db = await this.connection.connect();
+
+      const collection = db.collection(this.collectionName);
+      const data = await collection.drop();
+      console.log(data);
+
+    } catch (error) {
+      //  need to update error handling
+        throw new Error(`Error in dropCollection function. ${error}`);
+      }
+  }
   
   public async deleteOne(queryObject: Record<string, unknown>) {
     try {
@@ -55,14 +69,31 @@ class Query {
       const collection = db.collection(this.collectionName);
       const data = await collection.deleteOne(queryObject); // returns number of deleted documents
       console.log(data);
-      const returnObj = { deletedCount: data };
-      console.log(returnObj);
+      const formattedReturnObj = { deletedCount: data };
+      console.log(formattedReturnObj);
   
       await this.connection.disconnect();
     } catch (error) {
     //  need to update error handling
       throw new Error(`Error in deleteOne function. ${error}`);
     }
+  }
+
+  public async deleteMany(queryObject: Record<string, unknown>) {
+    // tested on non-existent documents, and multiple documents
+    try {
+      const db = await this.connection.connect();
+
+      const collection = db.collection(this.collectionName);
+      const data = await collection.deleteMany(queryObject); // returns number of deleted documents
+      console.log(data);
+      const formattedReturnObj = { deletedCount: data };
+      console.log(formattedReturnObj);
+
+    } catch (error) {
+      //  need to update error handling
+        throw new Error(`Error in deleteMany function. ${error}`);
+      }
   }
 
   // need to modify 2nd param to be Record or Array, check mongoose docs
@@ -102,22 +133,26 @@ class Query {
       await this.connection.disconnect();
     } catch (error) {
       //  need to update error handling
-        throw new Error(`Error in updateOne function. ${error}`);
+        throw new Error(`Error in updateMany function. ${error}`);
     }
   } 
 
 }
 
 console.log('------> starting tests');
-const query = new Query('users');
+// const query = new Query('users');
+
+
+
 // query.findOne({ username: 'test' });
-
 // delete this after testing
-// query.find({});
 // query.deleteOne({ username: 'library', password: 'book', returned: true });
-// query.find({});
-
 // query.updateOne({ username: 'Joe' }, { username: 'Joe', password: 'newerPassword', testField: true});
 // query.updateMany({ class: 'car' }, { isRobot: true }, { upsert: true });
+// query.deleteMany({ username: 'Joan' });
+
+// test for Query.dropCollection
+const testDrop = new Query('test-drop');
+testDrop.dropCollection();
 
 export { Query };
