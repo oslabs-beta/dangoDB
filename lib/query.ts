@@ -3,6 +3,9 @@
 import { Collection } from '../deps.ts';
 import { Connection } from './connections.ts';
 
+const testURIsteve = 'mongodb+srv://kaiz0923:qckgc2WHjd9Fq1ad@starwars.5sykv.mongodb.net/mongo-test?authMechanism=SCRAM-SHA-1';
+const testURIbill = 'mongodb+srv://wgreco13:g3HUuathwbVEisEj@cluster0.adcc3.mongodb.net/dangoDB?authMechanism=SCRAM-SHA-1';
+
 class Query {
   public collectionName: string;
   // Refactor how connection is brought in
@@ -11,7 +14,7 @@ class Query {
   constructor(collectionName: string) {
     this.collectionName = collectionName;
     this.connection = new Connection(
-      'mongodb+srv://wgreco13:g3HUuathwbVEisEj@cluster0.adcc3.mongodb.net/dangoDB?authMechanism=SCRAM-SHA-1'
+      testURIsteve
     );
   }
 
@@ -29,46 +32,92 @@ class Query {
     }
   }
 
-  
-  // public async deleteOne(queryObject: Record<string, string>) {
-  //   try {
-  //     const db = await this.connection.connect();
+  // delete, this is for my testing purposes only to see what's in the collection
+  public async find(queryObject: Record<string, unknown>) {
+    try {
+      const db = await this.connection.connect();
 
-  //     const collection = db.collection(this.collectionName);
-  //     const data = await collection.deleteOne(queryObject);
-  //     // console.log(data);
-  //   } catch (error) {
-  //   //  need to update error handling
-  //     throw new Error(`Error in deleteOne function. ${error}`);
-  //   }
-  // }
+      const collection = db.collection(this.collectionName);
+      const data = await collection.find(queryObject).toArray();
+      console.log(data);
+
+      await this.connection.disconnect();
+    } catch (error) {
+      throw new Error(`Error in findOne function. ${error}`);
+    }
+  }
+
+  
+  public async deleteOne(queryObject: Record<string, unknown>) {
+    try {
+      const db = await this.connection.connect();
+
+      const collection = db.collection(this.collectionName);
+      const data = await collection.deleteOne(queryObject); // returns number of deleted documents
+      console.log(data);
+      const returnObj = { deletedCount: data };
+      console.log(returnObj);
+  
+      await this.connection.disconnect();
+    } catch (error) {
+    //  need to update error handling
+      throw new Error(`Error in deleteOne function. ${error}`);
+    }
+  }
 
   // need to modify 2nd param to be Record or Array, check mongoose docs
-  // updates specified field/fields, uses $set operator
-  // updateObject might be an object with several properties, or even nested - update to account for that variability
+  // updates specified field(s), uses $set operator: changes values of properties at updateObject
+  // updateObject might be an object with several properties (COMPLETE), or even nested - update to account for that variability
   
-  // public async updateOne(queryObject: Record<string, string>, updateObject: Record<string, string>) {
-  //   try {
-  //     const db = await this.connection.connect();
+  public async updateOne(queryObject: Record<string, unknown>, updateObject: Record<string, unknown>, options?: Record<string, unknown>) {
+    // options param: only tested upsert set to true. 
+    // if upsert is true, and no matching documents are found, updateObject( regardless of how complete it is) will be inserted. 
+    // tested queryObject with 1 or more properties; tested updateObject with multiple properties.
+    try {
+      const db = await this.connection.connect();
 
-  //     const collection = db.collection(this.collectionName);
-  //     const setUpdateObject = { $set: updateObject };
-  //     const data = await collection.updateOne(queryObject, setUpdateObject);
-  //     // console.log(data);
-  //   } catch (error) {
-  //     //  need to update error handling
-  //       throw new Error(`Error in updateOne function. ${error}`);
-  //   }
-  // } 
+      const collection = db.collection(this.collectionName);
+      //  $set operator, check mongoDB atlas docs for updateOne for ref
+      const setUpdateObject = { $set: updateObject };
+      const data = await collection.updateOne(queryObject, setUpdateObject, options);
+      console.log(data);
+      await this.connection.disconnect();
+    } catch (error) {
+      //  need to update error handling
+        throw new Error(`Error in updateOne function. ${error}`);
+    }
+  } 
 
+  public async updateMany(queryObject: Record<string, unknown>, updateObject: Record<string, unknown>, options?: Record<string, unknown>) {
+    // options param: only tested upsert set to true. 
+    // if upsert is true, and no matching documents are found, updateObject( regardless of how complete it is) will be inserted. 
+    try {
+      const db = await this.connection.connect();
+
+      const collection = db.collection(this.collectionName);
+      //  $set operator, check mongoDB atlas docs for updateOne for ref
+      const setUpdateObject = { $set: updateObject };
+      const data = await collection.updateMany(queryObject, setUpdateObject, options);
+      console.log(data);
+      await this.connection.disconnect();
+    } catch (error) {
+      //  need to update error handling
+        throw new Error(`Error in updateOne function. ${error}`);
+    }
+  } 
 
 }
 
 console.log('------> starting tests');
-const query = new Query('new');
-query.findOne({ username: 'test' });
+const query = new Query('users');
+// query.findOne({ username: 'test' });
 
 // delete this after testing
 // query.find({});
+// query.deleteOne({ username: 'library', password: 'book', returned: true });
+// query.find({});
+
+// query.updateOne({ username: 'Joe' }, { username: 'Joe', password: 'newerPassword', testField: true});
+// query.updateMany({ class: 'car' }, { isRobot: true }, { upsert: true });
 
 export { Query };
