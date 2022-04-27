@@ -28,9 +28,47 @@ class Query {
       throw new Error(`Error in findOne function. ${error}`);
     }
   }
+
+  
+  // public async deleteOne(queryObject: Record<string, string>) {
+  //   try {
+  //     const db = await this.connection.connect();
+
+  //     const collection = db.collection(this.collectionName);
+  //     const data = await collection.deleteOne(queryObject);
+  //     // console.log(data);
+  //   } catch (error) {
+  //   //  need to update error handling
+  //     throw new Error(`Error in deleteOne function. ${error}`);
+  //   }
+  // }
+
+  // need to modify 2nd param to be Record or Array, check mongoose docs
+  // updates specified field/fields, uses $set operator
+  // updateObject might be an object with several properties, or even nested - update to account for that variability
+  
+  // public async updateOne(queryObject: Record<string, string>, updateObject: Record<string, string>) {
+  //   try {
+  //     const db = await this.connection.connect();
+
+  //     const collection = db.collection(this.collectionName);
+  //     const setUpdateObject = { $set: updateObject };
+  //     const data = await collection.updateOne(queryObject, setUpdateObject);
+  //     // console.log(data);
+  //   } catch (error) {
+  //     //  need to update error handling
+  //       throw new Error(`Error in updateOne function. ${error}`);
+  //   }
+  // } 
+
+
 }
 
+console.log('------> starting tests');
 const query = new Query('new');
 query.findOne({ username: 'test' });
+
+// delete this after testing
+// query.find({});
 
 export { Query };
