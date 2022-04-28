@@ -32,21 +32,6 @@ class Query {
     }
   }
 
-  // delete, this is for my testing purposes only to see what's in the collection
-  public async find(queryObject: Record<string, unknown>) {
-    try {
-      const db = await this.connection.connect();
-
-      const collection = db.collection(this.collectionName);
-      const data = await collection.find(queryObject).toArray();
-      console.log(data);
-
-      await this.connection.disconnect();
-    } catch (error) {
-      throw new Error(`Error in find function. ${error}`);
-    }
-  }
-
   public async dropCollection() {
     // when testing, create a new collection with garbage documents and pass that in Query object
     try {
@@ -141,18 +126,5 @@ class Query {
 
 console.log('------> starting tests');
 // const query = new Query('users');
-
-
-
-// query.findOne({ username: 'test' });
-// delete this after testing
-// query.deleteOne({ username: 'library', password: 'book', returned: true });
-// query.updateOne({ username: 'Joe' }, { username: 'Joe', password: 'newerPassword', testField: true});
-// query.updateMany({ class: 'car' }, { isRobot: true }, { upsert: true });
-// query.deleteMany({ username: 'Joan' });
-
-// test for Query.dropCollection
-const testDrop = new Query('test-drop');
-testDrop.dropCollection();
 
 export { Query };
