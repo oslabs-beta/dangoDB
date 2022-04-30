@@ -169,7 +169,9 @@ class Query {
     }
   }
 
-  public async findOneAndRemove(queryObject: Record<string, string>, callback: (input: unknown) => unknown) {
+  //does this need options???? or is remove the only option 
+
+  public async findOneAndRemove(queryObject: Record<string, string>, callback?: (input: unknown) => unknown) {
     try {
       const db = await this.connection.connect();
 
@@ -177,7 +179,7 @@ class Query {
      
       const data = await collection.findAndModify(queryObject, {remove: true});
    
-      await callback(data);
+      if(callback) await callback(data);
 
       console.log('Succesfully executed findOneAndRemove Query');
 
@@ -188,24 +190,57 @@ class Query {
     }
   }
 
-  // public async findByIdAndRemove(id?: string, callback?: (input: unknown) => unknown) {
+
+
+    // ------ Find By Id and Update -------
+  /* Finds a matching document by _id, updates it according to the update arg, passing any options, and returns the found document (if any) to the callbacks  */
+  // public async findByIdAndUpdate(id: string, update: Record<string, unknown>, options?: Record<string, unknown> | ((input: unknown) => unknown), callback?:(input: unknown) => unknown) {
   //   try {
     
-  //     const stringId = new Bson.ObjectId(id)
-     
-  //     const db = await this.connection.connect();
+  //     const filter = { _id: new Bson.ObjectId(id)}
+  //     console.log(filter)
 
+  //     const db = await this.connection.connect();
   //     const collection = db.collection(this.collectionName);
-  //     const data = await collection.findOneAndRemove({_id: stringId, callback});
-      
-  //     console.log('successfully removed: ', data);
+
+  //     // update the value of update with the $set operator
+  //     const newUpdate = { $set: update };
+  //     // check if options is a function and reassign callback to options if so - so that we can bypass the options param
+  //     if (typeof options === 'function') callback = options
+  //     options = {};
+  //     const data = await collection.updateOne(filter, newUpdate, options);
+  //     console.log(data);
+
+  //     if (callback) await callback(data);
 
   //     await this.connection.disconnect();
 
   //   } catch (error) {
-  //     throw new Error(`Error in findByIdAndRemove function. ${error}`);
+  //     throw new Error(`Error in findByIdAndUpdate function. ${error}`);
   //   }
   // }
+
+
+  public async findByIdAndRemove(id?: string, callback?: (input: unknown) => unknown) {
+    try {
+    
+      const stringId = new Bson.ObjectId(id)
+     
+      const db = await this.connection.connect();
+
+      const collection = db.collection(this.collectionName);
+
+      const data = await collection.findAndModify({_id: stringId}, { remove: true })
+
+      if(callback) await callback(data); 
+
+      await this.connection.disconnect();
+
+    } catch (error) {
+      throw new Error(`Error in findByIdAndRemove function. ${error}`);
+    }
+  }
+  
 }
 
 
@@ -230,7 +265,6 @@ query.find()
 // });
 // query.findByIdAndDelete("62642ee21bcc7078ae1dba3d")
 // query.findOneAndRemove({username: "Bob"}, (input) => {console.log('callback executed', input)})
-
-
+// query.findByIdAndRemove("626d8508c522d90bacb1c843", (input) => {console.log('callback executed', input)});
 
 export { Query };
