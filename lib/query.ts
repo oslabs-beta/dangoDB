@@ -127,7 +127,7 @@ class Query {
     }
   }
   // -------- Insert One --------
-  public async insertOne(Doc: Record<string, string>) {
+   public async insertOne(queryObject: Record<string, string>) {
     try {
       const db = await this.connection.connect();
 
