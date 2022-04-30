@@ -90,23 +90,23 @@ class Query {
       Analyze data changes over time. */
 
   //  public async aggregate(arg1: [{$match:{[unknownKeyName:string]: string}}]) {
-  public async aggregate(arg1: MatchInterface[], arg2: GroupInterface[]) {
-    const db = await this.connection.connect();
+  // public async aggregate(arg1: MatchInterface[], arg2: GroupInterface[]) {
+  //   const db = await this.connection.connect();
 
-    const collection = db.collection(this.collectionName);
-    const data = await collection.aggregate(arg1, arg2);
-    const dataRes = await data.toArray();
+  //   const collection = db.collection(this.collectionName);
+  //   const data = await collection.aggregate(arg1, arg2);
+  //   const dataRes = await data.toArray();
 
-    console.log(dataRes);
+  //   console.log(dataRes);
 
-    await this.connection.disconnect();
-  }
-  catch(error) {
-    throw new Error(`Error in aggregate function. ${error}`);
-  }
+  //   await this.connection.disconnect();
+  // }
+  // catch(error) {
+  //   throw new Error(`Error in aggregate function. ${error}`);
+  // }
   /* Celeste's queries */
   // ------- Replace One ---------
-  public async replaceOne(
+  public async replaceOne (
     filterId: Record<string, string>,
     queryObject: Record<string, string>
   ) {
@@ -127,7 +127,7 @@ class Query {
     }
   }
   // -------- Insert One --------
-  public async insertOne(queryObject: Record<string, string>) {
+  public async insertOne(Doc: Record<string, string>) {
     try {
       const db = await this.connection.connect();
 
@@ -261,6 +261,7 @@ const query = new Query('new');
 
 // query.findOne({ username: 'test' });
 // query.find()
+query.updateOne({ username: 'Bob' });
 // query.countDocuments({ username: 'test' });
 // query.estimatedDocumentCount();
 // query.aggregate([
