@@ -153,7 +153,7 @@ const query = new Query('new');
 //   new: true,
 // });
 
-
+//array: type is array of arrays
 
 
 
