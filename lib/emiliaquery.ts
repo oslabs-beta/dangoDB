@@ -40,7 +40,7 @@ class Query {
       }
     }
     /*Selects documents in a collection or view and returns a cursor to the selected documents. */
-    public async find(allQueryObjects?: object) {
+    public async find(allQueryObjects?: Record <string, unknown>) {
       try {
         const db = await this.connection.connect();
 
@@ -131,6 +131,22 @@ class Query {
     }
   }
 
+  public async deleteOne(queryObject: Record<string, unknown>) {
+    try {
+      const db = await this.connection.connect();
+
+      const collection = db.collection(this.collectionName);
+      const data = await collection.deleteOne(queryObject); // returns number of deleted documents
+      console.log(data);
+      const formattedReturnObj = { deletedCount: data };
+      console.log(formattedReturnObj);
+
+      await this.connection.disconnect();
+    } catch (error) {
+      //  need to update error handling
+      throw new Error(`Error in deleteOne function. ${error}`);
+    }
+  }
   // ------- Find By Id -------
   /* Finds a single document by its _id field */
   public async findByIdAndDelete(id: string) {
@@ -141,13 +157,53 @@ class Query {
       const db = await this.connection.connect();
 
       const collection = db.collection(this.collectionName);
-      const data = await collection.findOne({_id: stringId});
-      console.log(data);
+      const data = await collection.deleteOne({_id: stringId});
+      
+      console.log('successfully deleted: ', data);
 
       await this.connection.disconnect();
 
     } catch (error) {
-      throw new Error(`Error in findById function. ${error}`);
+      throw new Error(`Error in findByIdAndDelete function. ${error}`);
+    }
+  }
+
+  public async findOneAndRemove(id?: string, callback?: (input: unknown) => unknown) {
+    try {
+    
+      const stringId = new Bson.ObjectId(id)
+     
+      const db = await this.connection.connect();
+
+      const collection = db.collection(this.collectionName);
+      const data = await collection.findAndRemove({_id: stringId, callback});
+      
+      console.log('successfully removed: ', data);
+
+      await this.connection.disconnect();
+
+    } catch (error) {
+      throw new Error(`Error in findByAndRemove function. ${error}`);
+    }
+  }
+
+
+  public async findByIdAndRemove(id?: string, callback?: (input: unknown) => unknown) {
+    try {
+    
+      const stringId = new Bson.ObjectId(id)
+     
+      const db = await this.connection.connect();
+
+      const collection = db.collection(this.collectionName);
+      const data = await collection.findOneAndRemove({_id: stringId, callback});
+      
+      console.log('successfully removed: ', data);
+
+      await this.connection.disconnect();
+
+    } catch (error) {
+      throw new Error(`Error in findByIdAndRemove function. ${error}`);
     }
   }
 }
@@ -157,7 +213,7 @@ const query = new Query('new');
 
 
 // query.findOne({ username: 'test' });
-// query.find()
+query.find()
 // query.countDocuments({ username: 'test' });
 // query.estimatedDocumentCount();
 // query.aggregate([
@@ -172,9 +228,8 @@ const query = new Query('new');
 //   update: { $inc: { newField: +2 } },
 //   new: true,
 // });
-
-//array: type is array of arrays
-
+// query.findByIdAndDelete("62642ee21bcc7078ae1dba3d")
+query.findByIdAndRemove()
 
 
 
