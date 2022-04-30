@@ -6,5 +6,6 @@
  export {
     MongoClient,
     Database,
-    Collection
+    Collection,
+    Bson
 } from "https://deno.land/x/mongo@v0.29.4/mod.ts";
