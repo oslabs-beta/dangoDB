@@ -2,6 +2,7 @@
 
 import { Collection } from '../deps.ts';
 import { Connection } from './connections.ts';
+import { Bson } from "https://deno.land/x/mongo@v0.29.4/mod.ts";
 
 interface MatchInterface {
   $match: { [unknownKeyName: string]: string };
@@ -130,6 +131,25 @@ class Query {
     }
   }
 
+  // ------- Find By Id -------
+  /* Finds a single document by its _id field */
+  public async findByIdAndDelete(id: string) {
+    try {
+    
+      const stringId = new Bson.ObjectId(id)
+     
+      const db = await this.connection.connect();
+
+      const collection = db.collection(this.collectionName);
+      const data = await collection.findOne({_id: stringId});
+      console.log(data);
+
+      await this.connection.disconnect();
+
+    } catch (error) {
+      throw new Error(`Error in findById function. ${error}`);
+    }
+  }
 }
 
 
