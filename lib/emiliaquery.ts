@@ -3,6 +3,8 @@
 import { Collection } from '../deps.ts';
 import { Connection } from './connections.ts';
 import { Bson } from "https://deno.land/x/mongo@v0.29.4/mod.ts";
+import {FindAndModifyOptions } from 'https://deno.land/x/mongo@v0.29.4/src/types.ts'; 
+
 
 interface MatchInterface {
   $match: { [unknownKeyName: string]: string };
@@ -147,8 +149,7 @@ class Query {
       throw new Error(`Error in deleteOne function. ${error}`);
     }
   }
-  // ------- Find By Id -------
-  /* Finds a single document by its _id field */
+
   public async findByIdAndDelete(id: string) {
     try {
     
@@ -168,51 +169,50 @@ class Query {
     }
   }
 
-  public async findOneAndRemove(id?: string, callback?: (input: unknown) => unknown) {
+  public async findOneAndRemove(queryObject: Record<string, string>, callback: (input: unknown) => unknown) {
     try {
-    
-      const stringId = new Bson.ObjectId(id)
-     
       const db = await this.connection.connect();
 
       const collection = db.collection(this.collectionName);
-      const data = await collection.findAndRemove({_id: stringId, callback});
-      
-      console.log('successfully removed: ', data);
+     
+      const data = await collection.findAndModify(queryObject, {remove: true});
+   
+      await callback(data);
+
+      console.log('Succesfully executed findOneAndRemove Query');
 
       await this.connection.disconnect();
 
     } catch (error) {
-      throw new Error(`Error in findByAndRemove function. ${error}`);
+      throw new Error(`Error in findOneAndRemove function. ${error}`);
     }
   }
 
-
-  public async findByIdAndRemove(id?: string, callback?: (input: unknown) => unknown) {
-    try {
+  // public async findByIdAndRemove(id?: string, callback?: (input: unknown) => unknown) {
+  //   try {
     
-      const stringId = new Bson.ObjectId(id)
+  //     const stringId = new Bson.ObjectId(id)
      
-      const db = await this.connection.connect();
+  //     const db = await this.connection.connect();
 
-      const collection = db.collection(this.collectionName);
-      const data = await collection.findOneAndRemove({_id: stringId, callback});
+  //     const collection = db.collection(this.collectionName);
+  //     const data = await collection.findOneAndRemove({_id: stringId, callback});
       
-      console.log('successfully removed: ', data);
+  //     console.log('successfully removed: ', data);
 
-      await this.connection.disconnect();
+  //     await this.connection.disconnect();
 
-    } catch (error) {
-      throw new Error(`Error in findByIdAndRemove function. ${error}`);
-    }
-  }
+  //   } catch (error) {
+  //     throw new Error(`Error in findByIdAndRemove function. ${error}`);
+  //   }
+  // }
 }
 
 
 const query = new Query('new');
 
 
-// query.findOne({ username: 'test' });
+// query.findOne({ username: 'newtest2' });
 query.find()
 // query.countDocuments({ username: 'test' });
 // query.estimatedDocumentCount();
@@ -229,7 +229,7 @@ query.find()
 //   new: true,
 // });
 // query.findByIdAndDelete("62642ee21bcc7078ae1dba3d")
-query.findByIdAndRemove()
+// query.findOneAndRemove({username: "Bob"}, (input) => {console.log('callback executed', input)})
 
 
 
