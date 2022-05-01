@@ -237,3 +237,4 @@ query.find()
 // query.findByIdAndRemove("626d8508c522d90bacb1c843", (input) => {console.log('callback executed', input)});
 
 export { Query };
+//
