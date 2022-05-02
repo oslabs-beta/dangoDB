@@ -2,9 +2,8 @@
 
 import { Collection } from '../deps.ts';
 import { Connection } from './connections.ts';
-import { FindOptions } from 'https://deno.land/x/mongo@v0.29.4/mod.ts';
+import { FindOptions, DeleteOptions } from 'https://deno.land/x/mongo@v0.29.4/mod.ts';
 // import { Bson }
-
 
 class Query {
   public collectionName: string;
@@ -30,6 +29,7 @@ class Query {
       const collection = db.collection(this.collectionName);
       const data = await collection.drop();
       console.log(data);
+      await this.connection.disconnect();
     } catch (error) {
       //  need to update error handling
       throw new Error(`Error in dropCollection function. ${error}`);
@@ -52,16 +52,17 @@ class Query {
       throw new Error(`Error in deleteOne function. ${error}`);
     }
   }
-  public async deleteMany(queryObject: Record<string, unknown>) {
+  public async deleteMany(queryObject: Record<string, unknown>, options?: DeleteOptions) {
     // tested on non-existent documents, and multiple documents
     try {
       const db = await this.connection.connect();
 
       const collection = db.collection(this.collectionName);
-      const data = await collection.deleteMany(queryObject); // returns number of deleted documents
+      const data = await collection.deleteMany(queryObject, options); // returns number of deleted documents
       console.log(data);
       const formattedReturnObj = { deletedCount: data };
       console.log(formattedReturnObj);
+      await this.connection.disconnect();
     } catch (error) {
       //  need to update error handling
       throw new Error(`Error in deleteMany function. ${error}`);
@@ -81,6 +82,7 @@ class Query {
     // tested queryObject with 1 or more properties; tested updateObject with multiple properties.
     try {
       const db = await this.connection.connect();
+      console.log(`testing var db, this.connection.connected: ${this.connection.connected}`);
 
       const collection = db.collection(this.collectionName);
       //  $set operator, check mongoDB atlas docs for updateOne for ref
@@ -152,19 +154,27 @@ class Query {
 }
 
 // using Steve's MongoDB 
-const query = new Query('users');
+const query = new Query('stock-prices');
 
 // Tests for updated version of find Method using options parameter
 // query.find({ username: 'library' });
 //  Find test, options limit
-// query.find({ username: 'library' }, { limit: 3 });
+// query.find({ username: 'library' }, { });
 //  Find test, options skip
 
 //  Find test, options sort
 // query.find({}, { sort: { username: 1 } });
 // find test, options multiple sort fields
-query.find({}, { sort: { username: 1, password: 1 }, limit: 5 });
+// query.find({}, { sort: { username: 1, password: 1 }, limit: 5 });
+
+// query.updateOne({ username: 'rob ott'}, { username: 'ROBO OTT' });
+query.updateOne({ ticker: 'UPST'}, { price: 76.00 });
+
 
 //  Find test, options sort and limit
+
+// deleteMany with options
+// query.deleteMany({ car: 'red' }, { limit: 1 });
+// query.find({ price: { $gt: 100, $lt: 200 } });
 
 export { Query };
