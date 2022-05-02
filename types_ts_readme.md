@@ -9,6 +9,7 @@ Notes:
         - Boolean
         - ObjectID
         - UUID
+        - Date
     - The file currently has a line at the top to allow explicit any's. We are validating data types through the inputs so any should be acceptable.
 
 - Methods on Each:
@@ -34,6 +35,7 @@ Complete:
 TODO:
     - ObjectID
     - UUID
+    - Date
     - Full testing
     - Exports
     - Comments
