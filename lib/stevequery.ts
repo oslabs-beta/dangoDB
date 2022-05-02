@@ -22,78 +22,68 @@ class Query {
   // dropCollection, deleteOne, deleteMany, updateOne, updateMany
 
   public async dropCollection() {
-    // when testing, create a new collection with garbage documents and pass that in Query object
     try {
       const db = await this.connection.connect();
 
       const collection = db.collection(this.collectionName);
       const data = await collection.drop();
-      console.log(data);
+      // console.log(data);
       await this.connection.disconnect();
+      return data;
     } catch (error) {
-      //  need to update error handling
       throw new Error(`Error in dropCollection function. ${error}`);
     }
   }
 
-  public async deleteOne(queryObject: Record<string, unknown>) {
+  public async deleteOne(queryObject: Record<string, unknown>, options?: DeleteOptions) {
     try {
       const db = await this.connection.connect();
 
       const collection = db.collection(this.collectionName);
-      const data = await collection.deleteOne(queryObject); // returns number of deleted documents
-      console.log(data);
+      const data = await collection.deleteOne(queryObject, options); // returns number of deleted documents
       const formattedReturnObj = { deletedCount: data };
-      console.log(formattedReturnObj);
-
+      // console.log(formattedReturnObj);
       await this.connection.disconnect();
+      return formattedReturnObj;
     } catch (error) {
-      //  need to update error handling
       throw new Error(`Error in deleteOne function. ${error}`);
     }
   }
   public async deleteMany(queryObject: Record<string, unknown>, options?: DeleteOptions) {
-    // tested on non-existent documents, and multiple documents
     try {
       const db = await this.connection.connect();
 
       const collection = db.collection(this.collectionName);
-      const data = await collection.deleteMany(queryObject, options); // returns number of deleted documents
-      console.log(data);
+      // returns number of deleted documents
+      const data = await collection.deleteMany(queryObject, options); 
       const formattedReturnObj = { deletedCount: data };
-      console.log(formattedReturnObj);
+      // console.log(formattedReturnObj);
       await this.connection.disconnect();
+      return formattedReturnObj;
     } catch (error) {
-      //  need to update error handling
       throw new Error(`Error in deleteMany function. ${error}`);
     }
   }
-  // need to modify 2nd param to be Record or Array, check mongoose docs
-  // updates specified field(s), uses $set operator: changes values of properties at updateObject
-  // updateObject might be an object with several properties (COMPLETE), or even nested - update to account for that variability
-
   public async updateOne(
     queryObject: Record<string, unknown>,
     updateObject: Record<string, unknown>,
     options?: Record<string, unknown>
     ) {
-    // options param: only tested upsert set to true.
-    // if upsert is true, and no matching documents are found, updateObject( regardless of how complete it is) will be inserted.
-    // tested queryObject with 1 or more properties; tested updateObject with multiple properties.
     try {
       const db = await this.connection.connect();
       console.log(`testing var db, this.connection.connected: ${this.connection.connected}`);
 
       const collection = db.collection(this.collectionName);
-      //  $set operator, check mongoDB atlas docs for updateOne for ref
+      //  $set operator, sets field in updateObject to corresponding value, check mongoDB atlas docs for updateOne for ref
       const setUpdateObject = { $set: updateObject };
       const data = await collection.updateOne(
         queryObject,
         setUpdateObject,
         options
       );
-      console.log(data);
+      // console.log(data);
       await this.connection.disconnect();
+      return data;
     } catch (error) {
       //  need to update error handling
       throw new Error(`Error in updateOne function. ${error}`);
@@ -104,23 +94,22 @@ class Query {
     updateObject: Record<string, unknown>,
     options?: Record<string, unknown>
     ) {
-    // options param: only tested upsert set to true.
     // if upsert is true, and no matching documents are found, updateObject( regardless of how complete it is) will be inserted.
     try {
       const db = await this.connection.connect();
 
       const collection = db.collection(this.collectionName);
-      //  $set operator, check mongoDB atlas docs for updateOne for ref
+      //  $set operator, sets field in updateObject to corresponding value, check mongoDB atlas docs for updateOne for ref
       const setUpdateObject = { $set: updateObject };
       const data = await collection.updateMany(
         queryObject,
         setUpdateObject,
         options
       );
-      console.log(data);
+      // console.log(data);
       await this.connection.disconnect();
+      return data;
     } catch (error) {
-      //  need to update error handling
       throw new Error(`Error in updateMany function. ${error}`);
     }
   }
@@ -143,7 +132,7 @@ class Query {
       const data = await collection.find(allQueryObjects, options);
       const dataRes = await data.toArray();
 
-      console.log(dataRes);
+      // console.log(dataRes);
 
       await this.connection.disconnect();
     } catch (error) {
@@ -154,7 +143,7 @@ class Query {
 }
 
 // using Steve's MongoDB 
-const query = new Query('stock-prices');
+// const query = new Query('users');
 
 // Tests for updated version of find Method using options parameter
 // query.find({ username: 'library' });
@@ -168,7 +157,8 @@ const query = new Query('stock-prices');
 // query.find({}, { sort: { username: 1, password: 1 }, limit: 5 });
 
 // query.updateOne({ username: 'rob ott'}, { username: 'ROBO OTT' });
-query.updateOne({ ticker: 'UPST'}, { price: 76.00 });
+// query.updateOne({ ticker: 'UPST'}, { price: 77.00 });
+
 
 
 //  Find test, options sort and limit
@@ -176,5 +166,9 @@ query.updateOne({ ticker: 'UPST'}, { price: 76.00 });
 // deleteMany with options
 // query.deleteMany({ car: 'red' }, { limit: 1 });
 // query.find({ price: { $gt: 100, $lt: 200 } });
+
+// test dropCollection
+// const testQuery = new Query('fake-table');
+// testQuery.dropCollection();
 
 export { Query };
