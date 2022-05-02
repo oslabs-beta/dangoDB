@@ -1,9 +1,9 @@
 /*Create a query class*/
 
-import { Collection } from '../deps.ts';
+// import { Collection } from '../deps.ts';
 import { Connection } from './connections.ts';
 import { Bson } from "https://deno.land/x/mongo@v0.29.4/mod.ts";
-import {FindAndModifyOptions } from 'https://deno.land/x/mongo@v0.29.4/src/types.ts'; 
+// import {FindAndModifyOptions } from 'https://deno.land/x/mongo@v0.29.4/src/types.ts'; 
 
 
 interface MatchInterface {
@@ -27,6 +27,8 @@ class Query {
       'mongodb+srv://wgreco13:g3HUuathwbVEisEj@cluster0.adcc3.mongodb.net/dangoDB?authMechanism=SCRAM-SHA-1'
     );
   }
+
+
     /*Returns one document that satisfies the specified query criteria on the collection or view.  */
     public async findOne(queryObject: Record<string, string>) {
       try {
@@ -37,10 +39,13 @@ class Query {
         console.log(data);
 
         await this.connection.disconnect();
+
       } catch (error) {
         throw new Error(`Error in findOne function. ${error}`);
       }
     }
+
+
     /*Selects documents in a collection or view and returns a cursor to the selected documents. */
     public async find(allQueryObjects?: Record <string, unknown>) {
       try {
@@ -57,6 +62,8 @@ class Query {
         throw new Error(`Error in find function. ${error}`);
       }
     }
+
+    
     /* Returns the count of documents that match the query for a collection or view. */
     public async countDocuments(queryObject: Record<string, string>) {
       try {
