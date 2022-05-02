@@ -77,16 +77,22 @@ class Query {
 
   // ------ Find One and Update -------
   /* Finds a matching document, updates it according to the update arg, passing any options, and returns the found document (if any) to the callbacks  */
-  public async findOneAndUpdate(filter: Record<string, unknown>, update: Record<string, unknown>, options?: Record<string, number | unknown> ) {
+  public async findOneAndUpdate(filter: Record<string, unknown>, update: Record<string, unknown>, options?: Record<string,  unknown> | ((input: unknown) => unknown), callback?:(input: unknown) => unknown) {
     try {
       const db = await this.connection.connect();
       const collection = db.collection(this.collectionName);
-      const newUpdate = { $set: update };
-      const data = await collection.updateOne(filter, newUpdate, options)
-      console.log(data);
 
+      const newUpdate = { $set: update };
+      if (typeof options === 'function') callback = options
+      options = {};
+      const data = await collection.updateOne(filter, newUpdate, options);
+    
+      if (callback) return callback(data);
+    
       await this.connection.disconnect();
 
+      return data
+      
     } catch (error) {
       throw new Error(`Error in findOneAndUpdate function. ${error}`);
     }
@@ -103,9 +109,8 @@ class Query {
 
       const collection = db.collection(this.collectionName);
       const data = await collection.findOne({_id: stringId}, options);
-      console.log(data);
-
       await this.connection.disconnect();
+      return data;
 
     } catch (error) {
       throw new Error(`Error in findById function. ${error}`);
@@ -133,7 +138,7 @@ class Query {
       console.log(data);
 
       if (callback) await callback(data);
-
+      return ``
       await this.connection.disconnect();
 
     } catch (error) {
@@ -146,9 +151,9 @@ class Query {
 const query = new Query('new');
 // query.find();
 // query.findById('626aaab6ecf055a1a1c60c1e');
-query.findOne({ username: "omgThisWorksAgain" });
+query.findOne({ username: "OneandUpdating" });
 // query.findByIdAndUpdate('626aa9c8b1d75dd60462cf15', { username: "omgThisWorksAgain"}, (input) => {console.log('callback executed', input)});
 
-// query.findOneAndUpdate({ username: "newNewtest2" }, { password: "thisisnew"});
+// query.findOneAndUpdate({ username: "insertingOne" }, { username:"OneandUpdating"}, (input) => {console.log('callback executed', input)});
 
 export { Query };
