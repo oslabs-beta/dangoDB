@@ -61,11 +61,6 @@ export class SchemaNumber {
     this.valid = this.convertedValue === undefined ? false : true;
     return this.valid;
   }
-
-  validateConstraints(callback: ((arg: any) => boolean)): boolean {
-    if (typeof callback !== 'function') return false;
-    return callback(this.value)
-  }
 }
 
 export class SchemaDecimal128 {
@@ -119,11 +114,6 @@ export class SchemaDecimal128 {
     this.valid = this.convertedValue === undefined ? false : true;
     return this.valid;
   }
-
-  validateConstraints(callback: ((arg: any) => boolean)): boolean {
-    if (typeof callback !== 'function') return false;
-    return callback(this.value)
-  }
 }
 
 export class SchemaString {
@@ -174,11 +164,6 @@ export class SchemaString {
   validateType() {
     this.valid = this.convertedValue === undefined ? false : true;
     return this.valid;
-  }
-
-  validateConstraints(callback: ((arg: any) => boolean)): boolean {
-    if (typeof callback !== 'function') return false;
-    return callback(this.value)
   }
 }
 
@@ -268,7 +253,8 @@ export class SchemaObjectId {
     }
     
     else if (Bson.ObjectId.isValid(this.value)) {
-      this.convertedValue = this.value;
+      //TODO
+      this.convertedValue = new Bson.ObjectId(this.value);
     }
 
     return this.convertedValue;
@@ -312,7 +298,7 @@ export class SchemaUUID {
     }
     
     else if (Bson.UUID.isValid(this.value)) {
-      this.convertedValue = this.value;
+      this.convertedValue = new Bson.UUID(this.value);
     }
 
     return this.convertedValue;
