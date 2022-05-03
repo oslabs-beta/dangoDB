@@ -2,6 +2,9 @@
 
 import { Collection } from '../deps.ts';
 import { Connection } from './connections.ts';
+import { Bson } from "https://deno.land/x/mongo@v0.29.4/mod.ts";
+import {FindAndModifyOptions } from 'https://deno.land/x/mongo@v0.29.4/src/types.ts'; 
+
 
 interface MatchInterface {
   $match: { [unknownKeyName: string]: string };
@@ -39,7 +42,7 @@ class Query {
       }
     }
     /*Selects documents in a collection or view and returns a cursor to the selected documents. */
-    public async find(allQueryObjects?: object) {
+    public async find(allQueryObjects?: Record <string, unknown>) {
       try {
         const db = await this.connection.connect();
 
@@ -130,14 +133,91 @@ class Query {
     }
   }
 
+  public async deleteOne(queryObject: Record<string, unknown>) {
+    try {
+      const db = await this.connection.connect();
+
+      const collection = db.collection(this.collectionName);
+      const data = await collection.deleteOne(queryObject); // returns number of deleted documents
+      console.log(data);
+      const formattedReturnObj = { deletedCount: data };
+      console.log(formattedReturnObj);
+
+      await this.connection.disconnect();
+    } catch (error) {
+      //  need to update error handling
+      throw new Error(`Error in deleteOne function. ${error}`);
+    }
+  }
+
+  public async findByIdAndDelete(id: string) {
+    try {
+    
+      const stringId = new Bson.ObjectId(id)
+     
+      const db = await this.connection.connect();
+
+      const collection = db.collection(this.collectionName);
+      const data = await collection.deleteOne({_id: stringId});
+      
+      console.log('successfully deleted: ', data);
+
+      await this.connection.disconnect();
+
+    } catch (error) {
+      throw new Error(`Error in findByIdAndDelete function. ${error}`);
+    }
+  }
+
+  //does this need options???? or is remove the only option 
+
+  public async findOneAndRemove(queryObject: Record<string, string>, callback?: (input: unknown) => unknown) {
+    try {
+      const db = await this.connection.connect();
+
+      const collection = db.collection(this.collectionName);
+     
+      const data = await collection.findAndModify(queryObject, {remove: true});
+   
+      if(callback) await callback(data);
+
+      console.log('Succesfully executed findOneAndRemove Query');
+
+      await this.connection.disconnect();
+
+    } catch (error) {
+      throw new Error(`Error in findOneAndRemove function. ${error}`);
+    }
+  }
+
+  public async findByIdAndRemove(id?: string, callback?: (input: unknown) => unknown) {
+    try {
+    
+      const stringId = new Bson.ObjectId(id)
+     
+      const db = await this.connection.connect();
+
+      const collection = db.collection(this.collectionName);
+
+      const data = await collection.findAndModify({_id: stringId}, { remove: true })
+
+      if(callback) await callback(data); 
+
+      await this.connection.disconnect();
+
+    } catch (error) {
+      throw new Error(`Error in findByIdAndRemove function. ${error}`);
+    }
+  }
+  
 }
 
 
 const query = new Query('new');
 
 
-// query.findOne({ username: 'test' });
-// query.find()
+// query.findOne({ username: 'newtest2' });
+query.find()
 // query.countDocuments({ username: 'test' });
 // query.estimatedDocumentCount();
 // query.aggregate([
@@ -152,10 +232,8 @@ const query = new Query('new');
 //   update: { $inc: { newField: +2 } },
 //   new: true,
 // });
-
-
-
-
-
+// query.findByIdAndDelete("62642ee21bcc7078ae1dba3d")
+// query.findOneAndRemove({username: "Bob"}, (input) => {console.log('callback executed', input)})
+// query.findByIdAndRemove("626d8508c522d90bacb1c843", (input) => {console.log('callback executed', input)});
 
 export { Query };

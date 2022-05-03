@@ -18,6 +18,30 @@ class Query {
     );
   }
 
+  // ----- Format Bson Id ------
+  // private async formatBsonId(filter?: Record<string, unknown>) {
+  //   // if a filter param exists
+  //   if (filter) {
+  //     // if the filter param has an _id
+  //     if (filter?._id) {
+  //       // assign id to the filter._id
+  //       const id = filter._id;
+  //       // if id is a string
+  //       if (typeof id === 'string') {
+  //         // reassign filter._id to a new Bson formated id
+  //         filter._id = await new Bson.ObjectId(id);
+  //       } else if (Array.isArray(id.$in)) {
+  //         id.$in = await id.$in.map((_id: Record<string, unknown>) => {
+  //           if (typeof _id === "string") {
+  //            const data = await new Bson.ObjectId(_id);
+  //            console.log(data)
+  //           }
+  //         })
+  //       }
+  //     }
+  //   }
+  // }
+
   public async find(allQueryObjects?: object) {
     try {
       const db = await this.connection.connect();
@@ -51,9 +75,32 @@ class Query {
     }
   }
 
+  // ------ Find One and Update -------
+  /* Finds a matching document, updates it according to the update arg, passing any options, and returns the found document (if any) to the callbacks  */
+  public async findOneAndUpdate(filter: Record<string, unknown>, update: Record<string, unknown>, options?: Record<string,  unknown> | ((input: unknown) => unknown), callback?:(input: unknown) => unknown) {
+    try {
+      const db = await this.connection.connect();
+      const collection = db.collection(this.collectionName);
+
+      const newUpdate = { $set: update };
+      if (typeof options === 'function') callback = options
+      options = {};
+      const data = await collection.updateOne(filter, newUpdate, options);
+    
+      if (callback) return callback(data);
+    
+      await this.connection.disconnect();
+
+      return data
+      
+    } catch (error) {
+      throw new Error(`Error in findOneAndUpdate function. ${error}`);
+    }
+  }
+
   // ------- Find By Id -------
   /* Finds a single document by its _id field */
-  public async findById(id: string) {
+  public async findById(id: string, options?: Record<string, number | unknown>) {
     try {
     
       const stringId = new Bson.ObjectId(id)
@@ -61,10 +108,9 @@ class Query {
       const db = await this.connection.connect();
 
       const collection = db.collection(this.collectionName);
-      const data = await collection.findOne({_id: stringId});
-      console.log(data);
-
+      const data = await collection.findOne({_id: stringId}, options);
       await this.connection.disconnect();
+      return data;
 
     } catch (error) {
       throw new Error(`Error in findById function. ${error}`);
@@ -72,10 +118,42 @@ class Query {
   }
 
 
+  // ------ Find By Id and Update -------
+  /* Finds a matching document by _id, updates it according to the update arg, passing any options, and returns the found document (if any) to the callbacks  */
+  public async findByIdAndUpdate(id: string, update: Record<string, unknown>, options?: Record<string, unknown> | ((input: unknown) => unknown), callback?:(input: unknown) => unknown) {
+    try {
+    
+      const filter = { _id: new Bson.ObjectId(id)}
+      console.log(filter)
+
+      const db = await this.connection.connect();
+      const collection = db.collection(this.collectionName);
+
+      // update the value of update with the $set operator
+      const newUpdate = { $set: update };
+      // check if options is a function and reassign callback to options if so - so that we can bypass the options param
+      if (typeof options === 'function') callback = options
+      options = {};
+      const data = await collection.updateOne(filter, newUpdate, options);
+      console.log(data);
+
+      if (callback) await callback(data);
+      return ``
+      await this.connection.disconnect();
+
+    } catch (error) {
+      throw new Error(`Error in findByIdAndUpdate function. ${error}`);
+    }
+  }
+
 }
 
 const query = new Query('new');
 // query.find();
-query.findById('626aaab6ecf055a1a1c60c1e');
+// query.findById('626aaab6ecf055a1a1c60c1e');
+query.findOne({ username: "OneandUpdating" });
+// query.findByIdAndUpdate('626aa9c8b1d75dd60462cf15', { username: "omgThisWorksAgain"}, (input) => {console.log('callback executed', input)});
+
+// query.findOneAndUpdate({ username: "insertingOne" }, { username:"OneandUpdating"}, (input) => {console.log('callback executed', input)});
 
 export { Query };

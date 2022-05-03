@@ -90,66 +90,74 @@ class Query {
       Analyze data changes over time. */
 
   //  public async aggregate(arg1: [{$match:{[unknownKeyName:string]: string}}]) {
-  public async aggregate(arg1: MatchInterface[], arg2: GroupInterface[]) {
-    const db = await this.connection.connect();
+  // public async aggregate(arg1: MatchInterface[], arg2: GroupInterface[]) {
+  //   const db = await this.connection.connect();
 
-    const collection = db.collection(this.collectionName);
-    const data = await collection.aggregate(arg1, arg2);
-    const dataRes = await data.toArray();
+  //   const collection = db.collection(this.collectionName);
+  //   const data = await collection.aggregate(arg1, arg2);
+  //   const dataRes = await data.toArray();
 
-    console.log(dataRes);
+  //   console.log(dataRes);
 
-    await this.connection.disconnect();
-  }
-  catch(error) {
-    throw new Error(`Error in aggregate function. ${error}`);
-  }
+  //   await this.connection.disconnect();
+  // }
+  // catch(error) {
+  //   throw new Error(`Error in aggregate function. ${error}`);
+  // }
   /* Celeste's queries */
   // ------- Replace One ---------
-  public async replaceOne(
-    filterId: Record<string, string>,
-    queryObject: Record<string, string>
+  public async replaceOne (
+    filter: Record<string, unknown>,
+    document: Record<string, unknown>,
+    options?: Record<string, unknown>
   ) {
     try {
       //connect to the db
       const db = await this.connection.connect();
       // find the id given in the filter - the find method is available for use
       const collection = db.collection(this.collectionName);
-      const data = await collection.replaceOne(filterId, queryObject);
-      console.log(data); // returned as ex.{ upsertedId: undefined, upsertedCount: 0, matchedCount: 1, modifiedCount: 1 }
-
+      const data = await collection.replaceOne(filter, document, options);
+      // console.log(data); //returned as ex.{ upsertedId: undefined, upsertedCount: 0, matchedCount: 1, modifiedCount: 1 }
+  
       // do we want to include upsert: true option to check if no documents match the filter of which we can add one?
       /* should return a document containing a boolen acknowledged: true if succesful, a matchedCount showing how many matches there were and if we want to do the upsert method, the _id for that.
        */
       await this.connection.disconnect();
+      return data;
     } catch (error) {
       throw new Error(`Error in replaceOne function. ${error}`);
     }
   }
   // -------- Insert One --------
-  public async insertOne(queryObject: Record<string, string>) {
+   public async insertOne(document: Record<string, string>) {
     try {
       const db = await this.connection.connect();
 
       const collection = db.collection(this.collectionName);
-      const id = await collection.insertOne(queryObject);
-      console.log(id);
+      const id = await collection.insertOne(document);
 
       await this.connection.disconnect();
+      return id;
     } catch (error) {
       throw new Error(`Error in insertOne function. ${error}`);
     }
   }
-  // -------- Insert Many --------
-  public async insertMany(queryObject: Record<string, string>[]) {
-    try {
-      const db = await this.connection.connect();
 
+  // -------- Insert Many --------
+  public async insertMany(document: Record<string, unknown>[], options?: Record<string, unknown> | ((input: unknown) => unknown), callback?:(input: unknown) => unknown) {
+    try {
+
+      const db = await this.connection.connect();
       const collection = db.collection(this.collectionName);
-      const ids = await collection.insertMany(queryObject);
-      console.log(ids);
+      // check if options is a function and reassign callback to options if so - so that we can bypass the options param
+      if (typeof options === 'function') callback = options
+      options = {};
+
+      const ids = await collection.insertMany(document, options);
+      if (callback) return await callback(ids);
 
       await this.connection.disconnect();
+      return ids;
     } catch (error) {
       throw new Error(`Error in insertMany function. ${error}`);
     }
@@ -259,13 +267,16 @@ class Query {
 
 const query = new Query('new');
 
-// query.findOne({ username: 'test' });
-// query.find()
+// query.findOne({ username: 'BobsBackBaby' });
+query.find()
+// query.updateOne({ username: 'Bob' });
+// query.replaceOne({username: 'newtest'}, { username: 'BobsBackBaby'} );
 // query.countDocuments({ username: 'test' });
 // query.estimatedDocumentCount();
 // query.aggregate([
 //   { $match: { username: 'test' } },
 //   { $group: { _id: '$username', total: { $sum: 1 } } },
 // ]);
+// query.insertMany([ { username: 'insertingOne'}, { username: 'insertingMany' }], (input) => {console.log('callback executed', input)});
 
 export { Query };
