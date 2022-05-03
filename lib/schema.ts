@@ -1,5 +1,4 @@
 // deno-lint-ignore-file no-explicit-any
-// deno-lint-allow-any-bracket-notation
 
 /**
  * 
@@ -7,13 +6,31 @@
  * 
  */
 
-import { SchemaNumber, SchemaDecimal128, SchemaString, SchemaBoolean, SchemaObjectId, SchemaUUID, SchemaDate } from './datatypes.ts'
+import { 
+  SchemaNumber, 
+  SchemaDecimal128, 
+  SchemaString, SchemaBoolean, 
+  SchemaObjectId, 
+  SchemaUUID, 
+  SchemaDate 
+} from './datatypes.ts'
 
 export class Schema {
   
   schemaMap: Record<string, any>;
+  types: Record<string, any>
   
   constructor(schemaObj: Record<string, any>) {
+    this.types = {
+      number: SchemaNumber,
+      decimal128: SchemaDecimal128,
+      string: SchemaString,
+      boolean: SchemaBoolean,
+      objectid: SchemaObjectId,
+      UUID: SchemaUUID,
+      date: SchemaDate,
+    }
+    
     this.schemaMap = {};    
     for (const property in schemaObj) {
       if (typeof schemaObj[property] === 'object') {
@@ -24,22 +41,6 @@ export class Schema {
         throw new Error('Argument for schema definition incorrectly formatted.')
       }
     }
-  }
-
-  isUnique() {
-
-  }
-
-  isRequired() {
-
-  }
-
-  setDefault() {
-
-  }
-
-  isValid() {
-    
   }
 }
 
@@ -73,18 +74,4 @@ class SchemaOptions {
       }
     }
   }
-}
-
-const type = {
-  number: SchemaNumber,
-  decimal128: SchemaDecimal128,
-  string: SchemaString,
-  boolean: SchemaBoolean,
-  objectid: SchemaObjectId,
-  UUID: SchemaUUID,
-  date: SchemaDate,
-}
-
-name {
-  type: dango.type.number
 }

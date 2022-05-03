@@ -17,7 +17,7 @@ class Query {
   public collectionName: string;
   // Refactor how connection is brought in
   public connection: Connection;
-
+  // We need to add schema to the collection
   constructor(collectionName: string) {
     this.collectionName = collectionName;
     this.connection = new Connection(
