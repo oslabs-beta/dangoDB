@@ -16,7 +16,7 @@ File Description:
     estimatedDocumentCount, 
     aggregate, 
     findAndModify, 
-    deleteOne, 
+    deleteOne (removed bc I think Steve has it), 
     findByIdAndDelete,
     findOneAndRemove, 
     findByIdAndRemove; 
@@ -47,8 +47,11 @@ File Description:
     findByIdAndRemove() - Issue a mongodb findAndModify remove command by a document's _id field. findByIdAndRemove(id, ...) is equivalent to findOneAndRemove({ _id: id }, ...). Finds a matching document, removes it, passing the found document (if any) to the callback. Executes the query if callback is passed. This function triggers the following middleware: findOneAndRemove(). 
 
 
-    ToDo: 
+    ToDo/Concerns: 
         -update error handling? 
         -refactor how the connection is brought in? 
         -does everything that needs options have options passed in? 
         -add console log messages
+        -what do the removes and deletes return? 
+        -how to pass options into findoneandremove and findbyidandremove?
+        -should we specify additional options for each method, since many of the options are method-specific? 
