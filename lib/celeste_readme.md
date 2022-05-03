@@ -6,6 +6,7 @@ Notes:
     Find One and Update
     Find By ID
     Find By ID and Update
+    Fine One and Replace
 
 replaceOne() - Replace One takes in up to four parameters, filter, document, the optional 'options' and optional callback. Filter is the client input criteria which can be any type. Doc is the client input for what will replace the filter input, also any type. Options include multipleCastError, strict, upsert, writeConcern and timestamps.  ReplaceOne replaces the filters existing document with the input doc - same as update() in the mongoDB Driver. Returns a query.
 
@@ -18,3 +19,5 @@ findOne() - Find One and Update takes in four parameters, filter, document, the 
 findById() - Find By Id takes in up to four parameters, id, optional: projection, options, and callback, and returns a query. It find a singl document by its _id field - is ALMOST equivalent to findOne(). The difference being findById(unefined) translates to findOne({_id: null}) where findOne(undefined) or findOne({_id: undefined}) equate to findOne({}).
 
 findByIdAndUpdate() - Find By Id and Update takes up to four parameters, id, update, optional: options, callback and returns a query. Finds a matching document by _id, updates it according to the update arg, passing any options, and returns the found document (if any) to the callbacks. Uses findOneAndUpdate. Potential options: new, upsert, runValidators, sort, rawResult, strict and select.
+
+findOneAndReplace() - Find One and Replace takes up to four parameters, filter, replacement optional: options and callback, and returns a query. Find a matching document, removes it, and passed the found document (if any) to the callback. Executes if callback is passed. Available options: sort, rawResult.
