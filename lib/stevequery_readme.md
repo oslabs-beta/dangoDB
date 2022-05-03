@@ -10,6 +10,7 @@ Query.deleteOne()
     conditions object can can contain 1 or more fields.
 
   - options [optional] ( Type: DeleteOptions  )
+  - callback [optional]
 
     interface DeleteOptions {
       collation?: Document;
@@ -36,6 +37,7 @@ Query.deleteMany()
 
   - options [optional] ( Type: DeleteOptions  )
     see Query.deleteOne for more details.
+  - callback [optional]
 
   Returns: object with property deletedCount, value number
   // returns { deletedCount: x }
@@ -59,6 +61,7 @@ Query.updateOne()
     updateObject can can contain 1 or more fields.
 
   - options [optional] ( Type: UpdateOptions )
+  - callback [optional]
 
     interface UpdateOptions {
       arrayFilters?: Document[];
@@ -100,6 +103,7 @@ Query.updateMany()
 
   - options [optional] ( Type: UpdateOptions )
     see Query.updateOne for more details.
+  - callback [optional]
 
   Returns: object with properties upsertedId, upsertedCount, matchedCount, modifiedCount
 
