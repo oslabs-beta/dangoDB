@@ -24,10 +24,9 @@ class Query {
   public async dropCollection() {
     try {
       const db = await this.connection.connect();
-
       const collection = db.collection(this.collectionName);
       const data = await collection.drop();
-      // console.log(data);
+      console.log(data);
       await this.connection.disconnect();
       return data;
     } catch (error) {
@@ -35,29 +34,45 @@ class Query {
     }
   }
 
-  public async deleteOne(queryObject: Record<string, unknown>, options?: DeleteOptions) {
+  public async deleteOne(queryObject: Record<string, unknown>, 
+    options?: DeleteOptions | ((input: unknown) => unknown),
+    callback?: ((input: unknown) => unknown)
+    ) {
     try {
       const db = await this.connection.connect();
-
       const collection = db.collection(this.collectionName);
-      const data = await collection.deleteOne(queryObject, options); // returns number of deleted documents
+      // check if options is a function and reassign callback to options if so - so that we can bypass the options param
+      if (typeof options === 'function') {
+        callback = options
+        options = {};
+      }
+      // returns number of deleted documents
+      const data = await collection.deleteOne(queryObject, options); 
+      if (callback) return await callback(data);
       const formattedReturnObj = { deletedCount: data };
-      // console.log(formattedReturnObj);
+      console.log(formattedReturnObj);
       await this.connection.disconnect();
       return formattedReturnObj;
     } catch (error) {
       throw new Error(`Error in deleteOne function. ${error}`);
     }
   }
-  public async deleteMany(queryObject: Record<string, unknown>, options?: DeleteOptions) {
+  public async deleteMany(queryObject: Record<string, unknown>, 
+    options?: DeleteOptions | ((input: unknown) => unknown), 
+    callback?: ((input: unknown) => unknown)
+    ) {
     try {
       const db = await this.connection.connect();
-
       const collection = db.collection(this.collectionName);
+      if (typeof options === 'function') {
+        callback = options;
+        options = {};
+      }
       // returns number of deleted documents
-      const data = await collection.deleteMany(queryObject, options); 
+      const data = await collection.deleteMany(queryObject, options);
       const formattedReturnObj = { deletedCount: data };
-      // console.log(formattedReturnObj);
+      console.log(formattedReturnObj);
+      if (callback) return await callback(data);
       await this.connection.disconnect();
       return formattedReturnObj;
     } catch (error) {
@@ -67,46 +82,46 @@ class Query {
   public async updateOne(
     queryObject: Record<string, unknown>,
     updateObject: Record<string, unknown>,
-    options?: Record<string, unknown>
+    options?: Record<string, unknown> | ((input: unknown) => unknown),
+    callback?: ((input: unknown) => unknown)
     ) {
     try {
       const db = await this.connection.connect();
-      console.log(`testing var db, this.connection.connected: ${this.connection.connected}`);
-
       const collection = db.collection(this.collectionName);
+      if(typeof options === 'function') {
+        callback = options;
+        options = {};
+      }
       //  $set operator, sets field in updateObject to corresponding value, check mongoDB atlas docs for updateOne for ref
       const setUpdateObject = { $set: updateObject };
-      const data = await collection.updateOne(
-        queryObject,
-        setUpdateObject,
-        options
-      );
-      // console.log(data);
+      const data = await collection.updateOne(queryObject, setUpdateObject, options);
+      console.log(data);
+      if(callback) callback(data);
       await this.connection.disconnect();
       return data;
     } catch (error) {
-      //  need to update error handling
       throw new Error(`Error in updateOne function. ${error}`);
     }
   }
   public async updateMany(
     queryObject: Record<string, unknown>,
     updateObject: Record<string, unknown>,
-    options?: Record<string, unknown>
+    options?: Record<string, unknown> | ((input: unknown) => unknown),
+    callback?: ((input: unknown) => unknown)
     ) {
     // if upsert is true, and no matching documents are found, updateObject( regardless of how complete it is) will be inserted.
     try {
       const db = await this.connection.connect();
-
       const collection = db.collection(this.collectionName);
+      if(typeof options === 'function') {
+        callback = options;
+        options = {};
+      }
       //  $set operator, sets field in updateObject to corresponding value, check mongoDB atlas docs for updateOne for ref
       const setUpdateObject = { $set: updateObject };
-      const data = await collection.updateMany(
-        queryObject,
-        setUpdateObject,
-        options
-      );
-      // console.log(data);
+      const data = await collection.updateMany(queryObject, setUpdateObject, options);
+      console.log(data);
+      if(callback) callback(data);
       await this.connection.disconnect();
       return data;
     } catch (error) {
@@ -132,7 +147,7 @@ class Query {
       const data = await collection.find(allQueryObjects, options);
       const dataRes = await data.toArray();
 
-      // console.log(dataRes);
+      console.log(dataRes);
 
       await this.connection.disconnect();
     } catch (error) {
@@ -164,7 +179,7 @@ class Query {
 //  Find test, options sort and limit
 
 // deleteMany with options
-// query.deleteMany({ car: 'red' }, { limit: 1 });
+// query.deleteMany({ car: 'red' }, { limit: 1 } ,(data) => { console.log(data); });
 // query.find({ price: { $gt: 100, $lt: 200 } });
 
 // test dropCollection
