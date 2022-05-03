@@ -3,7 +3,7 @@
 import { Query } from './query.ts';
 import { Schema } from './schema.ts';
 
-export function model (dbName: string, schema: Record<string, any>) {
+export function model (dbName: string, schema: Schema) {
   return new Model(dbName, schema);
 }
 

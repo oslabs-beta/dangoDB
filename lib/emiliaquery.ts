@@ -255,7 +255,7 @@ class Query {
 const query = new Query('new');
 
 // query.findOne({ username: 'newtest2' });
-// query.find()
+console.log(await query.find())
 // query.countDocuments({ username: 'test' });
 // query.estimatedDocumentCount();
 // query.aggregate([
@@ -265,7 +265,7 @@ const query = new Query('new');
 // query.findAndModify({ username: 'emilia' }, 
 // {
 //   sort: { _id: 1 },
-//   update: { $inc: { newField: +2 } },
+//   update: { $inc: { newField: +4 } },
 //   new: true,
 // });
 // query.findByIdAndDelete("62642ee21bcc7078ae1dba3d")
