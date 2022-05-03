@@ -98,6 +98,28 @@ class Query {
     }
   }
 
+
+  // ------ Find One and Replace -------
+  public async findOneAndReplace(filter: Record<string, unknown>, replacement: Record<string, unknown>,  options?: Record<string, unknown> | ((input: unknown) => unknown), callback?:(input: unknown) => unknown) {
+    try {
+      const db = await this.connection.connect();
+      const collection = db.collection(this.collectionName);
+
+      if (typeof options === 'function') callback = options
+      options = {};
+      const data = await collection.replaceOne(filter, replacement, options);
+    
+      if (callback) return callback(data);
+    
+      await this.connection.disconnect();
+
+      return data
+      
+    } catch (error) {
+      throw new Error(`Error in findOneAndReplace function. ${error}`);
+    }
+  }
+
   // ------- Find By Id -------
   /* Finds a single document by its _id field */
   public async findById(id: string, options?: Record<string, number | unknown>) {
@@ -135,12 +157,11 @@ class Query {
       if (typeof options === 'function') callback = options
       options = {};
       const data = await collection.updateOne(filter, newUpdate, options);
-      console.log(data);
 
       if (callback) await callback(data);
-      return ``
+     
       await this.connection.disconnect();
-
+      return data
     } catch (error) {
       throw new Error(`Error in findByIdAndUpdate function. ${error}`);
     }
@@ -151,9 +172,10 @@ class Query {
 const query = new Query('new');
 // query.find();
 // query.findById('626aaab6ecf055a1a1c60c1e');
-query.findOne({ username: "OneandUpdating" });
+// query.findOne({ username: "Iron_Man" });
 // query.findByIdAndUpdate('626aa9c8b1d75dd60462cf15', { username: "omgThisWorksAgain"}, (input) => {console.log('callback executed', input)});
 
 // query.findOneAndUpdate({ username: "insertingOne" }, { username:"OneandUpdating"}, (input) => {console.log('callback executed', input)});
+//query.findOneAndReplace({ username: "OneandUpdating" }, { username: "Iron_Man"}, (input) => {console.log('callback executed', input)});
 
 export { Query };
