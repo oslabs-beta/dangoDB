@@ -12,7 +12,7 @@ replaceOne() - Replace One takes in up to four parameters, filter, document, the
 
 insertOne() - Insert One takes one parameter, a document, which inserts a document into the database. InsertOne() has taken over the deprecated Insert() and is pulled from the MongoDB driver. Returns a query. * Stretch - If the document does not specify an _id field, then MongoDB driver will add the _id field and assign a unique ObjectId() for the document before inserting. Most drivers create an ObjectId and insert the _id field, but the MongoDB will create and populate the _id if the driver or application does not.
 
-insertMany() - Insert Many takes in three parameters, documents include an array or objects and an optional options, and an optional callback. Inserts an array or object into the database Currently if one document has a validation error, no documents will be saved. Returns a promise.
+insertMany() - Insert Many takes in three parameters, documents include an array or objects and an optional options, and an optional callback. Inserts an array or object into the database. Currently if one document has a validation error, no documents will be saved. Returns a promise.
 
 findOne() - Find One and Update takes in four parameters, filter, document, the optional 'options' and optional callback. Finds a matching document, updates it according to the update arg, passing any options, and returns the found document (if any) to the callbacks. The query executes if callback is passed, otherwise it returns a query. *Potential options we might want: new, upsert, runValidators, rawResult.
 
@@ -20,4 +20,9 @@ findById() - Find By Id takes in up to four parameters, id, optional: projection
 
 findByIdAndUpdate() - Find By Id and Update takes up to four parameters, id, update, optional: options, callback and returns a query. Finds a matching document by _id, updates it according to the update arg, passing any options, and returns the found document (if any) to the callbacks. Uses findOneAndUpdate. Potential options: new, upsert, runValidators, sort, rawResult, strict and select.
 
-findOneAndReplace() - Find One and Replace takes up to four parameters, filter, replacement optional: options and callback, and returns a query. Find a matching document, removes it, and passed the found document (if any) to the callback. Executes if callback is passed. Available options: sort, rawResult.
+findOneAndReplace() - Find One and Replace takes up to four parameters, filter, replacement optional: options and callback, and returns a query. Finds a matching document, removes it, and passes the found document (if any) to the callback. Executes if callback is passed. Available options: sort, rawResult.
+
+Concerns:  // do we want to include upsert: true option to check if no documents match the filter of which we can add one?
+      /* should return a document containing a boolen acknowledged: true if successful, a matchedCount showing how many matches there were and if we want to do the upsert method, the _id for that.
+       */
+       // console.log(data); //returned as ex.{ upsertedId: undefined, upsertedCount: 0, matchedCount: 1, modifiedCount: 1 }
