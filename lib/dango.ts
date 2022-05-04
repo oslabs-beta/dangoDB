@@ -9,30 +9,48 @@
 import { Connection } from './connections.ts';
 import { model } from './model.ts';
 import { Schema } from './schema.ts';
+import { 
+  SchemaNumber, 
+  SchemaDecimal128, 
+  SchemaString, SchemaBoolean, 
+  SchemaObjectId, 
+  SchemaUUID, 
+  SchemaDate 
+} from './datatypes.ts'
 
 class Dango {
 
   currentConnection: boolean | Connection
   model: typeof model;
+  types: Record<string, any>;
 
   constructor() {
     this.currentConnection = false;
     this.model = model;
+    this.types = {
+      number: SchemaNumber,
+      decimal128: SchemaDecimal128,
+      string: SchemaString,
+      boolean: SchemaBoolean,
+      objectid: SchemaObjectId,
+      UUID: SchemaUUID,
+      date: SchemaDate,
+    }
   }
 
-  connect(connectionString: string) {
+  async connect(connectionString: string) {
     this.currentConnection = new Connection(connectionString)
-    this.currentConnection.connect()
+    await this.currentConnection.connect()
     return this.currentConnection;
   }
 
-  disconnect() {
+  async disconnect() {
     if (typeof this.currentConnection === 'boolean') {
       if (this.currentConnection === false) {
         throw new Error('No database connection exists to disconnect.');
       }
     } else {
-      this.currentConnection.disconnect();
+      await this.currentConnection.disconnect();
       this.currentConnection = false;
       return;
     }

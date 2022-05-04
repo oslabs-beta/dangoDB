@@ -541,6 +541,17 @@ class Query {
 
 }
 
+<<<<<<< HEAD
+// const query = new Query('new');
+
+// query.findOne({ username: 'BobsBackBaby' });
+// query.find()
+// query.updateOne({ username: 'Bob' });
+// query.replaceOne({username: 'newtest'}, { username: 'BobsBackBaby'} );
+// query.countDocuments({ username: 'test' });
+// query.estimatedDocumentCount();
+// query.aggregate([
+=======
 //   // ----- Format Bson Id ------
 //   // private async formatBsonId(filter?: Record<string, unknown>) {
 //   //   // if a filter param exists
@@ -571,6 +582,7 @@ const query = new Query('new');
 // console.log(await query.countDocuments({ username: 'Iron_Man' }));
 // console.log(await query.estimatedDocumentCount());
 // console.log(await query.aggregate([
+>>>>>>> dev
 //   { $match: { username: 'test' } },
 //   { $group: { _id: '$username', total: { $sum: 1 } } },
 // ]));
