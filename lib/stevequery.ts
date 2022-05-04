@@ -48,7 +48,7 @@ class Query {
       }
       // returns number of deleted documents
       const data = await collection.deleteOne(queryObject, options); 
-      if (callback) return await callback(data);
+      if (callback) return callback(data);
       const formattedReturnObj = { deletedCount: data };
       console.log(formattedReturnObj);
       await this.connection.disconnect();
@@ -72,7 +72,7 @@ class Query {
       const data = await collection.deleteMany(queryObject, options);
       const formattedReturnObj = { deletedCount: data };
       console.log(formattedReturnObj);
-      if (callback) return await callback(data);
+      if (callback) return callback(data);
       await this.connection.disconnect();
       return formattedReturnObj;
     } catch (error) {
@@ -96,7 +96,7 @@ class Query {
       const setUpdateObject = { $set: updateObject };
       const data = await collection.updateOne(queryObject, setUpdateObject, options);
       console.log(data);
-      if(callback) callback(data);
+      if(callback) return callback(data);
       await this.connection.disconnect();
       return data;
     } catch (error) {

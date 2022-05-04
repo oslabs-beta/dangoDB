@@ -40,7 +40,11 @@ export class Schema {
       console.log(dango.types)
       if (typeof schemaObj[property] === 'object') {
         this.schemaMap[property] = new SchemaOptions(schemaObj[property])
+<<<<<<< HEAD
       } else if (typeof schemaObj[property] !== 'object' && Object.prototype.hasOwnProperty.call(dango.types, schemaObj[property])) {
+=======
+      } else if (typeof schemaObj[property] !== 'object' && Object.prototype.hasOwnProperty.call(this.types, schemaObj[property])) {
+>>>>>>> dev
         this.schemaMap[property] = new SchemaOptions({ type: schemaObj[property]})
       } else {
         throw new Error('Argument for schema definition incorrectly formatted.')
