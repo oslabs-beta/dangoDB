@@ -1,14 +1,16 @@
-import { MongoClient } from '../deps.ts';
+import { MongoClient, Database } from '../deps.ts';
 
 /* Create a MongoDB connection. */
 class Connection {
   private client!: MongoClient;
   public connected: boolean;
+  public db: Database | boolean;
 
   constructor(private connectionString: string) {
     if (!connectionString) throw new Error('Connect method requires at least one argument');
     this.connected = false;
     this.connectionString = connectionString;
+    this.db = false
   }
 
   /*Connect to the database */
@@ -18,7 +20,7 @@ class Connection {
       const db = await this.client.connect(this.connectionString);
       this.connected = true;
       console.log('connect');
-
+      this.db = db;
       return db;
 
     } catch (error) {
@@ -38,6 +40,7 @@ class Connection {
     if (this.connected) {
       this.client.close();
       this.connected = false;   
+      this.db = false;
       console.log('closed connection');
     } else {
       console.log('did not work');

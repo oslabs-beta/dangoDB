@@ -3,18 +3,18 @@
 import { Query } from './query.ts';
 import { Schema } from './schema.ts';
 
-export function model (dbName: string, schema: Schema) {
-  return new Model(dbName, schema);
+export function model (collectionName: string, schema: Schema) {
+  return new Model(collectionName, schema);
 }
 
 class Model extends Query {
-  dbName: string;
+  collectionName: string;
   schema: Schema;
   
-  constructor(dbName: string, schema: Schema) {
+  constructor(collectionName: string, schema: Schema) {
     // super(dbName, schema)
-    super(dbName);
-    this.dbName = dbName;
+    super(collectionName, schema);
+    this.collectionName = collectionName;
     this.schema = schema;
   }
 }
