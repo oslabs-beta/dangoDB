@@ -13,8 +13,40 @@ function checkDataFields(queryObject: Record<string, any>) {
 }
 
 // Runs after checkDataFields. Loops through properties in Schema. Calls each check function on each property
-validateAgainstSchema() {
+async function validateInsertAgainstSchema(queryObject: Record<string, any>) {
+  this.checkDataFields(queryObject);
+  for (const property of this.schema.schemaMap) {
+    this.checkRequired(queryObject, property, this.schema.schemaMap[property]);
+    this.setDefault(queryObject, property, this.schema.schemaMap[property]);
+    this.populateQuery(queryObject, property, this.schema.schemaMap[property]);
+    //Do we need async here
+    await this.checkUnique(property, this.schema.schemaMap[property])
+    this.checkConstraints(property, this.schema.schemaMap[property])
+  }
+  return true;
+}
 
+async function validateReplaceAgainstSchema(findObject: Record<string, any>, queryObject: Record<string, any>) {
+  this.checkDataFields(queryObject);
+  for (const property of this.schema.schemaMap) {
+    this.checkRequired(queryObject, property, this.schema.schemaMap[property]);
+    this.setDefault(queryObject, property, this.schema.schemaMap[property]);
+    this.populateQuery(queryObject, property, this.schema.schemaMap[property]);
+    //Do we need async here
+    await this.checkUniqueForReplace(property, this.schema.schemaMap[property], findObject)
+    this.checkConstraints(property, this.schema.schemaMap[property])
+  }
+  return true;
+}
+
+async function validateUpdateAgainstSchema(queryObject: Record<string, any>) {
+  this.checkDataFields(queryObject);
+  for (const property of queryObject) {
+    this.populateQuery(queryObject, property, this.schema.schemaMap[property]);
+    //Do we need async here
+    await this.checkUnique(property, this.schema.schemaMap[property])
+    this.checkConstraints(property, this.schema.schemaMap[property])
+  }
 }
 
 // For a given property checks if 'required' property is true. If required and property does not exist on query object throws an error.
@@ -41,22 +73,59 @@ function setDefault(queryObject: Record<string, any>, propertyName: string, prop
 // Run data type method of  validateType. Will set property of this.valid to true if it's valid. If not, it will set this.valid to false
 // Throw error if this.valid is false.
 // Set a property on query object to populate. Call it this.queryObject = {}. 
+
+// this.updatedQueryObject = {}
 function populateQuery(queryObject: Record<string, any>, propertyName: string, propertyOptions: optionsObject) {
-  
+  const valueAsDatatype = new propertyOptions.type(queryObject[propertyName]);
+  valueAsDatatype.convertType();
+  valueAsDatatype.validateType();
+  if (valueAsDatatype.isValid === false) {
+    throw new Error('Data was not able to be translated to given specified schema data type.');
+  }
+  this.updatedQueryObject[propertyName] = valueAsDatatype.convertedValue;
 }
 
 
 // Runs a find one query if Unique property is set to true on schema. Will check each property set to true on the populated result document. Throw error if duplicate exists.
 // Should ignore 'null' if that is the value.
-checkUnique() {
-
+async function checkUnique(propertyName: string, propertyOptions: optionsObject) {
+  const queryObjectForUnique: Record<string, any> = {}
+  queryObjectForUnique[propertyName] = this.updatedQueryObject[propertyName];
+  if (propertyOptions.unique === true) {
+    const propertyExists = await this.findOne(queryObjectForUnique);
+    if (propertyExists !== undefined) {
+      throw new Error('Property designated as unique in Schema already exists.');
+    }
+  }
+  return true;
 }
+
+async function checkUniqueForReplace(propertyName: string, propertyOptions: optionsObject, findObject: Record<string, any>) {
+  const queryObjectForUnique: Record<string, any> = {}
+  queryObjectForUnique[propertyName] = this.updatedQueryObject[propertyName];
+  if (propertyOptions.unique === true) {
+    const originalPropertyValue = await this.findOne(findObject);
+    const propertyExists = await this.findOne(queryObjectForUnique);
+    if (propertyExists !== undefined && originalPropertyValue[propertyName] !== this.updatedQueryObject[propertyName]) {
+      throw new Error('Property designated as unique in Schema already exists.');
+    }
+  }
+  return true;
+}
+
 
 // Runs the convertedValue through a user specified callback function. If true, proceed with database modifications. If false, throw error.
 // Need to check if this is set up correctly, has been moved.
-checkConstraints(callback: ((arg: any) => boolean)): boolean {
-  if (typeof callback !== 'function') return false;
-  return callback(this.value)
+function checkConstraints(propertyName: string, propertyOptions: optionsObject) {
+  if (propertyOptions.validator === null) return true;
+  if (typeof propertyOptions.validator !== 'function') {
+    throw new Error('Callback given as validator in Schema is not a function.');
+  }
+  const isConstraintMet = propertyOptions.validator(this.updatedQueryObject[propertyName])
+  if (isConstraintMet !== true) {
+    throw new Error('Callback given as validator in Schema is violated.');
+  }
+  return true;
 }
 
 // Update functions will need some combination of these functions as well. Insert is more straight forward.

@@ -33,18 +33,10 @@ export class Schema {
     // }
     
     this.schemaMap = {};    
-    console.log(schemaObj);
     for (const property in schemaObj) {
-      // console.log(schemaObj[property]
-      console.log(property, schemaObj[property])
-      console.log(dango.types)
       if (typeof schemaObj[property] === 'object') {
         this.schemaMap[property] = new SchemaOptions(schemaObj[property])
-<<<<<<< HEAD
       } else if (typeof schemaObj[property] !== 'object' && Object.prototype.hasOwnProperty.call(dango.types, schemaObj[property])) {
-=======
-      } else if (typeof schemaObj[property] !== 'object' && Object.prototype.hasOwnProperty.call(this.types, schemaObj[property])) {
->>>>>>> dev
         this.schemaMap[property] = new SchemaOptions({ type: schemaObj[property]})
       } else {
         throw new Error('Argument for schema definition incorrectly formatted.')
@@ -64,25 +56,38 @@ export interface optionsObject {
 
 class SchemaOptions {
   
-  schemaOptions: optionsObject;
+  // schemaOptions: optionsObject;
+  type: any;
+  required?: boolean;
+  unique?: boolean;
+  default?: any;
+  validator?: Function | null;
 
   constructor(options: optionsObject) {
     if (!Object.prototype.hasOwnProperty.call(options, 'type')) {
       throw new Error('Type must be specified');
     }
-    this.schemaOptions = {
-      type: undefined,
-      required: false,
-      unique: false,
-      default: null,
-      validator: null
-    } 
+    // this.schemaOptions = {
+    //   type: undefined,
+    //   required: false,
+    //   unique: false,
+    //   default: null,
+    //   validator: null
+    // } 
+    this.type = undefined,
+    this.required = false,
+    this.unique = false,
+    this.default = null,
+    this.validator = null
     for (const key in options) {
       if (key === 'type') {
-        this.schemaOptions.type = dango.types[options[key]];
+        // this.schemaOptions.type = dango.types[options[key]];
+        this.type = dango.types[options[key]];
       }
-      else if (Object.prototype.hasOwnProperty.call(this.schemaOptions, key)) {
-        this.schemaOptions[key as keyof optionsObject] = options[key as keyof optionsObject];
+      // else if (Object.prototype.hasOwnProperty.call(this.schemaOptions, key)) {
+      //   this.schemaOptions[key as keyof optionsObject] = options[key as keyof optionsObject];
+      else if (Object.prototype.hasOwnProperty.call(this, key)) {
+        this[key as keyof optionsObject] = options[key as keyof optionsObject];
       }
     }
   }
