@@ -45,12 +45,12 @@ class Connection {
   }
 }
 /* TEST */
-const test = new Connection(
-  'mongodb+srv://wgreco13:g3HUuathwbVEisEj@cluster0.adcc3.mongodb.net/dangoDB?authMechanism=SCRAM-SHA-1'
-);
+// const test = new Connection(
+//   'mongodb+srv://wgreco13:g3HUuathwbVEisEj@cluster0.adcc3.mongodb.net/dangoDB?authMechanism=SCRAM-SHA-1'
+// );
 
-await test.connect();
-test.disconnect(); 
+// await test.connect();
+// test.disconnect(); 
 // export new Connection('mongodb+srv://wgreco13:g3HUuathwbVEisEj@cluster0.adcc3.mongodb.net/dangoDB?authMechanism=SCRAM-SHA-1');
 
 
