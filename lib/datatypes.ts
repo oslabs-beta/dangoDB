@@ -219,11 +219,6 @@ export class SchemaBoolean {
     this.valid = this.convertedValue === undefined ? false : true;
     return this.valid;
   }
-
-  validateConstraints(callback: ((arg: any) => boolean)): boolean {
-    if (typeof callback !== 'function') return false;
-    return callback(this.value)
-  }
 }
 
 export class SchemaObjectId {
@@ -264,11 +259,6 @@ export class SchemaObjectId {
     this.valid = this.convertedValue === undefined ? false : true;
     return this.valid;
   }
-
-  validateConstraints(callback: ((arg: any) => boolean)): boolean {
-    if (typeof callback !== 'function') return false;
-    return callback(this.value)
-  }
 }
 
 export class SchemaUUID {
@@ -307,11 +297,6 @@ export class SchemaUUID {
   validateType() {
     this.valid = this.convertedValue === undefined ? false : true;
     return this.valid;
-  }
-
-  validateConstraints(callback: ((arg: any) => boolean)): boolean {
-    if (typeof callback !== 'function') return false;
-    return callback(this.value)
   }
 }
 
@@ -371,11 +356,6 @@ export class SchemaDate {
   validateType() {
     this.valid = this.convertedValue === undefined ? false : true;
     return this.valid;
-  }
-
-  validateConstraints(callback: ((arg: any) => boolean)): boolean {
-    if (typeof callback !== 'function') return false;
-    return callback(this.value)
   }
 }
 

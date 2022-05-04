@@ -265,10 +265,10 @@ class Query {
   }
 }
 
-const query = new Query('new');
+// const query = new Query('new');
 
 // query.findOne({ username: 'BobsBackBaby' });
-query.find()
+// query.find()
 // query.updateOne({ username: 'Bob' });
 // query.replaceOne({username: 'newtest'}, { username: 'BobsBackBaby'} );
 // query.countDocuments({ username: 'test' });
