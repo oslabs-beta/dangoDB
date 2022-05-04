@@ -21,3 +21,8 @@ findById() - Find By Id takes in up to four parameters, id, optional: projection
 findByIdAndUpdate() - Find By Id and Update takes up to four parameters, id, update, optional: options, callback and returns a query. Finds a matching document by _id, updates it according to the update arg, passing any options, and returns the found document (if any) to the callbacks. Uses findOneAndUpdate. Potential options: new, upsert, runValidators, sort, rawResult, strict and select.
 
 findOneAndReplace() - Find One and Replace takes up to four parameters, filter, replacement optional: options and callback, and returns a query. Find a matching document, removes it, and passed the found document (if any) to the callback. Executes if callback is passed. Available options: sort, rawResult.
+
+Concerns:  // do we want to include upsert: true option to check if no documents match the filter of which we can add one?
+      /* should return a document containing a boolen acknowledged: true if successful, a matchedCount showing how many matches there were and if we want to do the upsert method, the _id for that.
+       */
+       // console.log(data); //returned as ex.{ upsertedId: undefined, upsertedCount: 0, matchedCount: 1, modifiedCount: 1 }
