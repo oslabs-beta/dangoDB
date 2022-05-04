@@ -366,14 +366,19 @@ class Query {
 
 
 
-//STOPPED HERE//
 
-
-
-  // -------- Insert Many --------
+  /**
+   * Insert Many inserts an array or object into the database.
+   *
+   * @param Document which is the client input for what will replace the filter.
+   * @param options Optional for different inderting options
+   * @param callback function
+   * @returns a promise resolving to the raw result from the MongoDB driver if `options.rawResult` was `true`, or the documents that passed validation, otherwise
+   * example: await query.insertMany([ { username: 'anotherOne'}, { username: 'Tulips' }], (input) => {console.log('callback executed', input)});
+   */
   public async insertMany(
     document: Record<string, unknown>[],
-    options?: Record<string, unknown> | ((input: unknown) => unknown),
+    options?: InsertOptions | ((input: unknown) => unknown),
     callback?: (input: unknown) => unknown
   ) {
     try {
@@ -384,21 +389,34 @@ class Query {
       options = {};
 
       const ids = await collection.insertMany(document, options);
-      if (callback) return await callback(ids);
-
-      await this.connection.disconnect();
-      return ids;
+      if (callback) {
+        await this.connection.disconnect();
+        return callback(ids);
+      } else {
+        await this.connection.disconnect();
+        return ids;
+      };
+     
     } catch (error) {
       throw new Error(`Error in insertMany function. ${error}`);
     }
   }
 
-  // ------ Find One and Update -------
-  /* Finds a matching document, updates it according to the update arg, passing any options, and returns the found document (if any) to the callbacks  */
+
+  /**
+   * Find One And Update finds a matching document, updates it according to the update arg, passing any options, and returns the found document (if any) to the callbacks.
+   *
+   * @param Filter which is the client input for the document to find
+   * @param Update which is the clients input for what portion will be updated within the document
+   * @param Additonal options UpdateOptions
+   * @param callback function
+   * @returns the found document
+   * example: await query.findByIdAndUpdate('626aa9c8b1d75dd60462cf15', { username: "omgThisWorksAgain"}, (input) => {console.log('callback executed', input)})
+   */
   public async findOneAndUpdate(
     filter: Record<string, unknown>,
     update: Record<string, unknown>,
-    options?: Record<string, unknown> | ((input: unknown) => unknown),
+    options?: UpdateOptions | ((input: unknown) => unknown),
     callback?: (input: unknown) => unknown
   ) {
     try {
@@ -410,21 +428,32 @@ class Query {
       options = {};
       const data = await collection.updateOne(filter, newUpdate, options);
 
-      if (callback) return callback(data);
+      if (callback) {
+        await this.connection.disconnect();
+        return callback(data);
+      } else {
+        await this.connection.disconnect();
+        return data;
+      }
 
-      await this.connection.disconnect();
-
-      return data;
     } catch (error) {
       throw new Error(`Error in findOneAndUpdate function. ${error}`);
     }
   }
 
-  // ------ Find One and Replace -------
+  /**
+   * Find One And Replace finds a matching document, removes the contents of the document, and passes the input document (if any) into the document as a replacement.
+   * @param Filter which is the client input for which document will be found
+   * @param Replacement is the client input for which document will be replacing the filter
+   * @param Additional options
+   * @param Callback function
+   * @returns 
+   * example: await query.findOneAndReplace({ username: "OneandUpdating" }, { username: "Iron_Man"}, (input) => {console.log('callback executed', input)})
+   */
   public async findOneAndReplace(
     filter: Record<string, unknown>,
     replacement: Record<string, unknown>,
-    options?: Record<string, unknown> | ((input: unknown) => unknown),
+    options?: FindAndModifyOptions | ((input: unknown) => unknown),
     callback?: (input: unknown) => unknown
   ) {
     try {
@@ -435,42 +464,68 @@ class Query {
       options = {};
       const data = await collection.replaceOne(filter, replacement, options);
 
-      if (callback) return callback(data);
+      if (callback) {
+        await this.connection.disconnect();
+        return callback(data);
+      } else {
+        await this.connection.disconnect();
+        return data;
+      }
 
-      await this.connection.disconnect();
-
-      return data;
     } catch (error) {
       throw new Error(`Error in findOneAndReplace function. ${error}`);
     }
   }
 
-  // ------- Find By Id -------
-  /* Finds a single document by its _id field */
+  /**
+   * Find By Id finds a single document by its _id field
+   * @param id which is the client input for which document will be found
+   * @param Additional options such as projection, sort etc
+   * @param callback function
+   * @returns the document
+   * example: await query.findById('626aaa96500d65b1228e6940');
+   */
   public async findById(
     id: string,
-    options?: Record<string, number | unknown>
-  ) {
+    options?: FindOptions | ((input: unknown) => unknown),
+    callback?: (input: unknown) => unknown
+    )
+   {
     try {
       const stringId = new Bson.ObjectId(id);
 
       const db = await this.connection.connect();
-
       const collection = db.collection(this.collectionName);
+
+      if (typeof options === 'function') callback = options;
+      options = {};
+      
       const data = await collection.findOne({ _id: stringId }, options);
-      await this.connection.disconnect();
-      return data;
+      if (callback) {
+        await this.connection.disconnect();
+        return callback(data);
+      } else {
+        await this.connection.disconnect();
+        return data;
+      }
     } catch (error) {
       throw new Error(`Error in findById function. ${error}`);
     }
   }
 
-  // ------ Find By Id and Update -------
-  /* Finds a matching document by _id, updates it according to the update arg, passing any options, and returns the found document (if any) to the callbacks  */
+  /**
+   * Find By Id and Update finds a matching document by _id, updates it according to the update arg, passing any options, and returns the found document (if any) to the callbacks.
+   * @param id which is the client input for which document will be found
+   * @param update which is the clients input for what portion will be updated within the document
+   * @param additional options updateoptions
+   * @param callback function
+   * @returns the document
+   * example: await query.findByIdAndUpdate(626aa9c8b1d75dd60462cf15', { username: "omgThisWorksAgain"}, (input) => {console.log('callback executed', input)});
+   */
   public async findByIdAndUpdate(
     id: string,
     update: Record<string, unknown>,
-    options?: Record<string, unknown> | ((input: unknown) => unknown),
+    options?: UpdateOptions  | ((input: unknown) => unknown),
     callback?: (input: unknown) => unknown
   ) {
     try {
@@ -487,16 +542,26 @@ class Query {
       options = {};
       const data = await collection.updateOne(filter, newUpdate, options);
 
-      if (callback) await callback(data);
+      if (callback) {
+        await this.connection.disconnect();
+        return callback(data);
+      } else {
+        await this.connection.disconnect();
+        return data;
+      }
 
-      await this.connection.disconnect();
-      return data;
     } catch (error) {
       throw new Error(`Error in findByIdAndUpdate function. ${error}`);
     }
   }
 
   // UPDATED STEVE
+
+  /**
+   * DropCollection drops current model/collection that user is connected to.
+   * @returns undefined
+   * example: Model.dropCollection()
+   */
   public async dropCollection() {
     try {
       const db = await this.connection.connect();
@@ -512,9 +577,17 @@ class Query {
     }
   }
 
+  /**
+   * Delete One deletes the first document that matches conditions from the collection.
+   * @param document which is the client input for which document will be found
+   * @param additional options deleteOptions
+   * @param callback function
+   * @returns an object with the property deletedCount indicating how many documents were deleted. 
+   * example: await query.deleteOne({ username: "test"}, (input) => {console.log('callback executed', input)})
+   */
   public async deleteOne(
-    queryObject: Record<string, unknown>,
-    options?: Record<string, unknown> | ((input: unknown) => unknown),
+    document: Record<string, unknown>,
+    options?: DeleteOptions | ((input: unknown) => unknown),
     callback?: (input: unknown) => unknown
   ) {
     try {
@@ -526,30 +599,43 @@ class Query {
         options = {};
       }
       // returns number of deleted documents
-      const data = await collection.deleteOne(queryObject, options);
-      if (callback) return callback(data);
-      const formattedReturnObj = { deletedCount: data };
-      console.log(formattedReturnObj);
-      await this.connection.disconnect();
-      return formattedReturnObj;
+      const data = await collection.deleteOne(document, options);
+      if (callback) {
+        await this.connection.disconnect();
+        return callback(data);
+      } else {
+        const formattedReturnObj = { deletedCount: data };
+        await this.connection.disconnect();
+        return formattedReturnObj;
+      }
+      
     } catch (error) {
       throw new Error(`Error in deleteOne function. ${error}`);
     }
   }
+
+    /**
+   * Delete Many deletes all of the documents that match conditions from the collection
+   * @param document which is the client input for which document will be found
+   * @param additional options deleteOptions
+   * @param callback function
+   * @returns an object with the property deletedCount containing the number of documents deleted
+   * example: await query.deleteMany({ username: 'newtest1' }, { limit: 1 } ,(data) => { console.log(data); });
+   */
   public async deleteMany(
-    queryObject: Record<string, unknown>,
+    document: Record<string, unknown>,
     options?: DeleteOptions | ((input: unknown) => unknown),
     callback?: (input: unknown) => unknown
   ) {
     try {
       const db = await this.connection.connect();
-      const collection = db.collection(this.collectionName);
+      const collection = db.collection(this.collectionName); 
       if (typeof options === 'function') {
         callback = options;
         options = {};
       }
       // returns number of deleted documents
-      const data = await collection.deleteMany(queryObject, options);
+      const data = await collection.deleteMany(document, options);
       const formattedReturnObj = { deletedCount: data };
       console.log(formattedReturnObj);
       if (callback) return callback(data);
@@ -559,10 +645,20 @@ class Query {
       throw new Error(`Error in deleteMany function. ${error}`);
     }
   }
+   /**
+   * Update One finds a matching document, updates it according to the update arg, passing any options. Will update only the first document that matches filter regardless of the value of the multi option.
+   *
+   * @param document which is the client input for the document to find
+   * @param Update which is the clients input for what portion will be updated within the document
+   * @param Additonal options UpdateOptions
+   * @param callback function params are (error, writeOpResult)
+   * @returns the found document
+   * example: await query.updateOne({ username: 'rob ott'}, { username: 'ROBO OTT' });
+   */
   public async updateOne(
-    queryObject: Record<string, unknown>,
-    updateObject: Record<string, unknown>,
-    options?: Record<string, unknown> | ((input: unknown) => unknown),
+    document: Record<string, unknown>,
+    update: Record<string, unknown>,
+    options?: UpdateOptions | ((input: unknown) => unknown),
     callback?: (input: unknown) => unknown
   ) {
     try {
@@ -573,9 +669,9 @@ class Query {
         options = {};
       }
       //  $set operator, sets field in updateObject to corresponding value, check mongoDB atlas docs for updateOne for ref
-      const setUpdateObject = { $set: updateObject };
+      const setUpdateObject = { $set: update };
       const data = await collection.updateOne(
-        queryObject,
+        document,
         setUpdateObject,
         options
       );
@@ -587,12 +683,23 @@ class Query {
       throw new Error(`Error in updateOne function. ${error}`);
     }
   }
+
+  /**
+   * Update Many updates many documents matching search criteria in the database.
+   *
+   * @param document which is the client input for the document to find
+   * @param update which is the clients input for what portion will be updated within the document
+   * @param options options UpdateOptions
+   * @param callback function
+   * @returns the found document
+   * example: await query.updateMany({ name: 'Mireille' }, { favoriteFood: 'pizza' }, (input) => {console.log('callback executed', input)})
+   */
   public async updateMany(
-    queryObject: Record<string, unknown>,
-    updateObject: Record<string, unknown>,
-    options?: Record<string, unknown> | ((input: unknown) => unknown),
+    document: Record<string, unknown>,
+    update: Record<string, unknown>,
+    options?: UpdateOptions  | ((input: unknown) => unknown),
     callback?: (input: unknown) => unknown
-  ) {
+  ) { 
     // if upsert is true, and no matching documents are found, updateObject( regardless of how complete it is) will be inserted.
     try {
       const db = await this.connection.connect();
@@ -602,9 +709,9 @@ class Query {
         options = {};
       }
       //  $set operator, sets field in updateObject to corresponding value, check mongoDB atlas docs for updateOne for ref
-      const setUpdateObject = { $set: updateObject };
+      const setUpdateObject = { $set: update };
       const data = await collection.updateMany(
-        queryObject,
+        document,
         setUpdateObject,
         options
       );
@@ -652,8 +759,8 @@ class Query {
 //   // }
 
 const query = new Query('new');
-console.log(await query.find());
-// console.log(await query.findOne({ username: "ThisWorked" }));
+// console.log(await query.find());
+//console.log(await query.findOne({ username: "jack" }));
 // console.log(await query.countDocuments({ username: 'Iron_Man' }));
 // console.log(await query.estimatedDocumentCount());
 // console.log(await query.aggregate([
@@ -672,18 +779,21 @@ console.log(await query.find());
 // console.log(
   // await query.replaceOne({ username: 'ImTired' }, { username: 'SOTIRED' }, (input) => { console.log('callback executed', input) } ));
 // console.log(await query.insertOne({username: 'hullaballoo belay'}))
+// console.log(query.insertMany([ { username: 'anotherOne'}, { username: 'Tulips' }], (input) => {console.log('callback executed', input)}));
+// console.log(await query.findOneAndUpdate({ username: "SOTIRED" }, { username:"NOREALLYSOTIRED"}, (input) => {console.log('callback executed', input)}));
+// console.log(query.findOneAndReplace({ username: "Moon_Knight" }, { username: "DANG_Oh"}, (input) => {console.log('callback executed', input)}));
+// console.log(await query.findById('626aaa96500d65b1228e6940'));
+// console.log(await query.findByIdAndUpdate('626aa9c8b1d75dd60462cf14', { username: "AnotherTest"}, (input) => {console.log('callback executed', input)}));
+//console.log(await query.deleteOne({ username: "newtest1"}, (input) => {console.log('callback executed', input)}))
+// console.log(await query.deleteMany({ username: 'newtest1' }, { limit: 1 } ,(data) => { console.log(data); }));
+
+// console.log(await query.updateOne({ username: 'test' }, {username: 'SpongeBob'}, (input) => {console.log('callback executed', input)}));
+//console.log(await query.updateMany({ username: 'jack' }, { age: "31"}, (input) => {console.log('callback executed', input)}))
+// console.log(await query.insertOne({ username: 'theNewest', password: 'newtest1'}));
 
 
 
-// query.updateOne({ username: 'Bob' });
 
-// query.findById('626aaa96500d65b1228e6940');
-// console.log(await query.insertOne({ username: 'theNewest', password: 'theBestPass'}));
 
-// query.findByIdAndUpdate('626aa9c8b1d75dd60462cf15', { username: "omgThisWorksAgain"}, (input) => {console.log('callback executed', input)});
-
-// query.findOneAndUpdate({ username: "insertingOne" }, { username:"OneandUpdating"}, (input) => {console.log('callback executed', input)});
-//query.findOneAndReplace({ username: "OneandUpdating" }, { username: "Iron_Man"}, (input) => {console.log('callback executed', input)});
-// query.insertMany([ { username: 'insertingOne'}, { username: 'insertingMany' }], (input) => {console.log('callback executed', input)});
 
 export { Query };
