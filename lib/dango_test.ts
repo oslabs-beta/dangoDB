@@ -2,9 +2,9 @@
 
 import { dango } from './dango.ts';
 
-console.log(dango);
+// console.log(dango);
 await dango.connect('mongodb+srv://wgreco13:g3HUuathwbVEisEj@cluster0.adcc3.mongodb.net/dangoDB?authMechanism=SCRAM-SHA-1');
-console.log(dango.currentConnection);
+// console.log(dango.currentConnection);
 
 const dangoSchema = dango.schema({
   name: 'string',
@@ -26,9 +26,17 @@ const dangoSchema = dango.schema({
 // Test model creation
 
 const dangoModel = dango.model('new', dangoSchema);
-console.log(dangoModel);
+// console.log(dangoModel);
 console.log(await dangoModel.find());
+// console.log(await dangoModel.findById('626aaa96500d65b1228e6940'));
+// console.log(await dangoModel.insertOne({username: 'dango rules'}))
+// console.log(await dangoModel.findOne({ username: "dango rules" }));
+// console.log(await dangoModel.deleteOne({ username: "dango rules"}, (input) => {console.log('callback executed', input)}));
+// console.log(await dangoModel.updateOne({ username: 'jack'}, { age: 69  }));
+// console.log(await dangoModel.findOneAndUpdate({ username: "anotherOne" }, { username:"MyBrainHurts"}, (input) => {console.log('callback executed', input)}));
+// console.log(await dangoModel.find({ username: "jack" }));
 
+// console.log(await dangoModel.find({ username: 'test'}, { limit: 2 }));
 // Test if we can bring connection into query specifically
 // Test queries from model
 
