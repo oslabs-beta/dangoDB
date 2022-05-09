@@ -18,6 +18,10 @@ import {
   SchemaDate 
 } from './datatypes.ts'
 
+/**
+  * Class definition of Dango..
+  * @returns An object of class SchemaOptions.
+  */
 class Dango {
 
   currentConnection: boolean | Connection
@@ -38,12 +42,23 @@ class Dango {
     }
   }
 
+  /**
+  * Establishes a new connection to a database. Invokes the connect method of a Connection object.
+  * @param connectionString A database URI
+  * 
+  * @returns The connection object.
+  */
   async connect(connectionString: string) {
-    this.currentConnection = new Connection(connectionString)
-    await this.currentConnection.connect()
+    this.currentConnection = new Connection(connectionString);
+    await this.currentConnection.connect();
     return this.currentConnection;
   }
 
+  /**
+  * Disconnects an existing connection to a database. Invokes the disconnect method of a Connection object.
+  * 
+  * @returns undefined
+  */
   async disconnect() {
     if (typeof this.currentConnection === 'boolean') {
       if (this.currentConnection === false) {
@@ -56,6 +71,12 @@ class Dango {
     }
   }
 
+  /**
+  * Creates a new instance of a Schema object.
+  * @param schemaObj A user-defined schema.
+  * 
+  * @returns A schema object
+  */
   schema(schemaObj: Record<string, any>) {
     return new Schema(schemaObj);
   }

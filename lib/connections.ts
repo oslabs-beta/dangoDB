@@ -1,6 +1,12 @@
 import { MongoClient, Database } from '../deps.ts';
 
-/* Create a MongoDB connection. */
+
+/**
+  * Counts number of documents matching filter in a database collection.
+  * @param connectionString A URI string from the user.
+  * @returns A connection object.
+  * example: new Connection(''mongodb+srv://example-uri');
+  */
 class Connection {
   private client!: MongoClient;
   public connected: boolean;
@@ -13,48 +19,38 @@ class Connection {
     this.db = false
   }
 
-  /*Connect to the database */
+  /**
+    * Establishes connection to the database.
+    * Reassigns Connection class properties of connected to true and db to the connected database.
+  */
   public async connect() {
     try {
       this.client = new MongoClient();
       const db = await this.client.connect(this.connectionString);
       this.connected = true;
-      console.log('connect');
+      console.log('Connected to Database.');
       this.db = db;
-      return db;
+      return this.db;
 
     } catch (error) {
-      console.log('error');
-      throw new Error(`Could not connect. ${error}`);
+      throw new Error(`Could not connect to database. ${error}`);
     }
   }
 
-  // /* Test connection */
-  // public async ping () {
-  //     await this.connect;
-  // }
-
-  /* Close the connection from the database  */
-  //should this be async? 
+  /**
+    * Closes connection to the database.
+    * Reassigns Connection class properties of connected to false and db to false.
+  */
   public disconnect() {
     if (this.connected) {
       this.client.close();
       this.connected = false;   
       this.db = false;
-      console.log('closed connection');
+      console.log('Disconnected from Database.');
     } else {
-      console.log('did not work');
+      throw new Error(`No connection established to disconnect.`);
     } 
   }
 }
-/* TEST */
-// const test = new Connection(
-//   'mongodb+srv://wgreco13:g3HUuathwbVEisEj@cluster0.adcc3.mongodb.net/dangoDB?authMechanism=SCRAM-SHA-1'
-// );
-
-// await test.connect();
-// test.disconnect(); 
-// export new Connection('mongodb+srv://wgreco13:g3HUuathwbVEisEj@cluster0.adcc3.mongodb.net/dangoDB?authMechanism=SCRAM-SHA-1');
-
 
 export { Connection };

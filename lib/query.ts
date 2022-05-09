@@ -3,9 +3,8 @@
  * @description This file defines the query class and its methods.
  *
  */
-// import { dango } from './dango.ts';
 import { Connection } from './connections.ts';
-import { Bson } from 'https://deno.land/x/mongo@v0.29.4/mod.ts';
+import { Bson } from '../deps.ts';
 import {
   CountOptions,
   InsertOptions,
@@ -15,7 +14,7 @@ import {
   AggregateOptions,
   FindOptions,
   DeleteOptions,
-} from 'https://deno.land/x/mongo@v0.29.4/src/types.ts';
+} from '../deps.ts';
 import { dango } from './dango.ts'
 import { Schema, optionsObject } from './schema.ts'
 
@@ -856,44 +855,66 @@ class Query {
     }
   }
 
-  // Schema Validation Functions
-
+  /**
+   * Method validates schema for insert queries by calling each schema option. Validation steps will throw an error if validation fails.
+   *
+   * @param queryObject which is the client document to insert into the database
+   * @returns true or undefined.
+   */
   async validateInsertAgainstSchema(queryObject: Record<string, unknown>) {
     this.checkDataFields(queryObject);
     for (const property in this.schema.schemaMap) {
       this.checkRequired(queryObject, property, this.schema.schemaMap[property]);
       this.setDefault(queryObject, property, this.schema.schemaMap[property]);
       this.populateQuery(queryObject, property, this.schema.schemaMap[property]);
-      //Do we need async here
       await this.checkUnique(property, this.schema.schemaMap[property])
       this.checkConstraints(property, this.schema.schemaMap[property])
     }
     return true;
   }
 
+  /**
+   * Method validates schema for replace queries by calling each schema option. Validation steps will throw an error if validation fails.
+   * checkUnique step is different from validateInsertAgainstSchema for edge case where document property flagged as unique replaces itself.
+   *
+   * @param findObject The query used to match documents
+   * @param queryObject which is the client document to insert into the database
+   * @returns true or undefined.
+   */
   async validateReplaceAgainstSchema(findObject: Record<string, unknown>, queryObject: Record<string, unknown>) {
     this.checkDataFields(queryObject);
     for (const property in this.schema.schemaMap) {
       this.checkRequired(queryObject, property, this.schema.schemaMap[property]);
       this.setDefault(queryObject, property, this.schema.schemaMap[property]);
       this.populateQuery(queryObject, property, this.schema.schemaMap[property]);
-      //Do we need async here
       await this.checkUniqueForReplace(property, this.schema.schemaMap[property], findObject)
       this.checkConstraints(property, this.schema.schemaMap[property])
     }
     return true;
   }
 
+  /**
+   * Method validates schema for update queries by calling each schema option. Validation steps will throw an error if validation fails.
+   * checkRequired and setDefault steps are not needed in validateInsertAgainstSchema method.
+   *
+   * @param queryObject which is the client document field to update in the database
+   * @returns true or undefined.
+   */
   async validateUpdateAgainstSchema(queryObject: Record<string, unknown>) {
     this.checkDataFields(queryObject);
     for (const property in queryObject) {
       this.populateQuery(queryObject, property, this.schema.schemaMap[property]);
-      //Do we need async here
       await this.checkUnique(property, this.schema.schemaMap[property])
       this.checkConstraints(property, this.schema.schemaMap[property])
     }
   }
 
+  /**
+   * Method loops through all fields in query objects and throws an error if any properties exist which are not present in the schema.
+   *
+   * @param queryObject which is the client document field to update or insert into the database
+   * @returns true or undefined.
+   */
   checkDataFields(queryObject: Record<string, unknown>) {
     for (const property in queryObject) {
       if (!Object.prototype.hasOwnProperty.call(this.schema.schemaMap, property)) {
@@ -903,7 +924,14 @@ class Query {
     return true;
   }
 
-  // For a given property checks if 'required' property is true. If required and property does not exist on query object throws an error.
+  /**
+   * Method validates a property with the option of 'required' has a given value and throws an error if any property does not meet schema criteria.
+   *
+   * @param queryObject which is the client document field to update or insert into the database
+   * @param propertyName which is the property key to check
+   * @param propertyOptions which is the propertyOptions object for the given property from the schema
+   * @returns true or undefined.
+   */
   checkRequired(queryObject: Record<string, unknown>, propertyName: string, propertyOptions: optionsObject) {
     if (propertyOptions.required === true) {
       if (!Object.prototype.hasOwnProperty.call(queryObject, propertyName)) {
@@ -913,7 +941,14 @@ class Query {
     return true;
   }
 
-  // For a given property, if it does not exist on the query object, it will populate the original query object with that property and the default value specified.
+  /**
+   * Method populates original queryObject with properties not present in the query but present in the schema with their specified default values.
+   *
+   * @param queryObject which is the client document field to update or insert into the database
+   * @param propertyName which is the property key to check
+   * @param propertyOptions which is the propertyOptions object for the given property from the schema
+   * @returns true or undefined.
+   */
   setDefault(queryObject: Record<string, unknown>, propertyName: string, propertyOptions: optionsObject) {
     if (!Object.prototype.hasOwnProperty.call(queryObject, propertyName)) {
       queryObject[propertyName] = propertyOptions.default;
@@ -921,14 +956,16 @@ class Query {
     return true;
   }
 
-  // Populates a result object.
-  // Creates a new datatype using value of query object as input. Data type class is value of type on options object
-  // Run data type method of convertValue. Will set property of this.convertedValue if conversion possible. If not, it will set it to undefined
-  // Run data type method of  validateType. Will set property of this.valid to true if it's valid. If not, it will set this.valid to false
-  // Throw error if this.valid is false.
-  // Set a property on query object to populate. Call it this.queryObject = {}. 
-
-  // this.updatedQueryObject = {}
+  /**
+   * Method populates the property updatedQueryObject object to be used in the actual query.
+   * Creates an instance of the given schema datatype with the user value from their query.
+   * Casts the value to the datatype and returns an error if impossible.
+   *
+   * @param queryObject which is the client document field to update or insert into the database
+   * @param propertyName which is the property key to check
+   * @param propertyOptions which is the propertyOptions object for the given property from the schema
+   * @returns true or undefined.
+   */
   populateQuery(queryObject: Record<string, unknown>, propertyName: string, propertyOptions: optionsObject) {
     const valueAsDatatype = new propertyOptions.type(queryObject[propertyName]);
     valueAsDatatype.convertType();
@@ -940,8 +977,13 @@ class Query {
     this.updatedQueryObject[propertyName] = valueAsDatatype.convertedValue;
   }
 
-  // Runs a find one query if Unique property is set to true on schema. Will check each property set to true on the populated result document. Throw error if duplicate exists.
-  // Should ignore 'null' if that is the value.
+  /**
+   * Method queries the database to see if a document already exists with a duplicate value for the given property.
+   *
+   * @param queryObject which is the client document field to update or insert into the database
+   * @param propertyName which is the property key to check
+   * @returns true or undefined.
+   */
   async checkUnique(propertyName: string, propertyOptions: optionsObject) {
     const queryObjectForUnique: Record <string, unknown> = {};
     queryObjectForUnique[propertyName] = this.updatedQueryObject[propertyName];
@@ -954,6 +996,15 @@ class Query {
     return true;
   }
 
+  /**
+   * Method queries the database to see if a document already exists with a duplicate value for the given property.
+   * This method is different from checkUnique due to edge case where document property flagged as unique replaces itself.
+   *
+   * @param queryObject which is the client document field to update or insert into the database
+   * @param propertyName which is the property key to check
+   * @param findObject The query used to match documents
+   * @returns true or undefined.
+   */
   async checkUniqueForReplace(propertyName: string, propertyOptions: optionsObject, findObject: Record<string, unknown>) {
     const queryObjectForUnique: Record<string, unknown> = {}
     queryObjectForUnique[propertyName] = this.updatedQueryObject[propertyName];
@@ -974,8 +1025,13 @@ class Query {
     return true;
   }
 
-  // Runs the convertedValue through a user specified callback function. If true, proceed with database modifications. If false, throw error.
-  // Need to check if this is set up correctly, has been moved.
+  /**
+   * Method validates that the casted datatype satisfies the user defined callback function.
+   *
+   * @param queryObject which is the client document field to update or insert into the database
+   * @param propertyName which is the property key to check
+   * @returns true or undefined.
+   */
   checkConstraints(propertyName: string, propertyOptions: optionsObject) {
     if (propertyOptions.validator === null) return true;
     if (typeof propertyOptions.validator !== 'function') {
@@ -988,82 +1044,15 @@ class Query {
     return true;
   }
 
+  /**
+   * Method resets the updatedQueryObject to an empty object after an insert, replace, or update query.
+   *
+   * @returns undefined.
+   */
   resetQueryObject() {
     this.updatedQueryObject = {};
     return;
   }
-
 }
-
-// const query = new Query('new');
-
-// query.findOne({ username: 'BobsBackBaby' });
-// query.find()
-// query.updateOne({ username: 'Bob' });
-// query.replaceOne({username: 'newtest'}, { username: 'BobsBackBaby'} );
-// query.countDocuments({ username: 'test' });
-// query.estimatedDocumentCount();
-// query.aggregate([
-//   // ----- Format Bson Id ------
-//   // private async formatBsonId(filter?: Record<string, unknown>) {
-//   //   // if a filter param exists
-//   //   if (filter) {
-//   //     // if the filter param has an _id
-//   //     if (filter?._id) {
-//   //       // assign id to the filter._id
-//   //       const id = filter._id;
-//   //       // if id is a string
-//   //       if (typeof id === 'string') {
-//   //         // reassign filter._id to a new Bson formated id
-//   //         filter._id = await new Bson.ObjectId(id);
-//   //       } else if (Array.isArray(id.$in)) {
-//   //         id.$in = await id.$in.map((_id: Record<string, unknown>) => {
-//   //           if (typeof _id === "string") {
-//   //            const data = await new Bson.ObjectId(_id);
-//   //            console.log(data)
-//   //           }
-//   //         })
-//   //       }
-//   //     }
-//   //   }
-//   // }
-
-// const query = new Query('new');
-// console.log(await query.find());
-//console.log(await query.findOne({ username: "jack" }));
-// console.log(await query.countDocuments({ username: 'Iron_Man' }));
-// console.log(await query.estimatedDocumentCount());
-// console.log(await query.aggregate([
-//   { $match: { username: 'test' } },
-//   { $group: { _id: '$username', total: { $sum: 1 } } },
-// ]));
-// query.findAndModify({ username: 'emilia' },
-// {
-//   sort: { _id: 1 },
-//   update: { $inc: { newField: +10 } },
-//   new: true,
-// });
-// query.findByIdAndDelete("6270468e9b3ad7d380187fda", (input) => {console.log('callback executed', input)});
-// console.log(await query.findOneAndRemove( { username: 'Iron_Man'}, (input) => { console.log('callback executed', input) } )) ;
-// console.log(await query.findByIdAndRemove("626d84b29e4f6c740be268e5", (input) => { console.log('callback executed', input) } ));
-// console.log(
-  // await query.replaceOne({ username: 'ImTired' }, { username: 'SOTIRED' }, (input) => { console.log('callback executed', input) } ));
-// console.log(await query.insertOne({username: 'hullaballoo belay'}))
-// console.log(query.insertMany([ { username: 'anotherOne'}, { username: 'Tulips' }], (input) => {console.log('callback executed', input)}));
-// console.log(await query.findOneAndUpdate({ username: "SOTIRED" }, { username:"NOREALLYSOTIRED"}, (input) => {console.log('callback executed', input)}));
-// console.log(query.findOneAndReplace({ username: "Moon_Knight" }, { username: "DANG_Oh"}, (input) => {console.log('callback executed', input)}));
-// console.log(await query.findById('626aaa96500d65b1228e6940'));
-// console.log(await query.findByIdAndUpdate('626aa9c8b1d75dd60462cf14', { username: "AnotherTest"}, (input) => {console.log('callback executed', input)}));
-//console.log(await query.deleteOne({ username: "newtest1"}, (input) => {console.log('callback executed', input)}))
-// console.log(await query.deleteMany({ username: 'newtest1' }, { limit: 1 } ,(data) => { console.log(data); }));
-
-// console.log(await query.updateOne({ username: 'test' }, {username: 'SpongeBob'}, (input) => {console.log('callback executed', input)}));
-//console.log(await query.updateMany({ username: 'jack' }, { age: "31"}, (input) => {console.log('callback executed', input)}))
-// console.log(await query.insertOne({ username: 'theNewest', password: 'newtest1'}));
-
-
-
-
-
 
 export { Query };

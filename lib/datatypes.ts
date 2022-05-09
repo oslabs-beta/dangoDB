@@ -9,7 +9,11 @@
 
 import { Bson } from '../deps.ts';
 
-
+/**
+  * Class definition of Number Schema datatype
+  * @param value Raw value input from the user.
+  * @returns An object of class SchemaNumber.
+  */
 export class SchemaNumber {
 
   public value: any; 
@@ -25,6 +29,10 @@ export class SchemaNumber {
     this.valid
   }  
 
+  /**
+  * Attempts to convert raw value to the given data type.
+  * Sets convertedValue property to the casted input if possible, or undefined if not.
+  */
   convertType() {
     if (this.value === null) {
       this.convertedValue = this.value;
@@ -57,17 +65,26 @@ export class SchemaNumber {
     return this.convertedValue;
   }
 
+  /**
+  * Checks whether the value was casted to the correct data type.
+  * Sets valid property to true or false.
+  */
   validateType() {
     this.valid = this.convertedValue === undefined ? false : true;
     return this.valid;
   }
 }
 
+/**
+  * Class definition of Decimal128 Schema datatype
+  * @param value Raw value input from the user.
+  * @returns An object of class SchemaDecimal128.
+  */
 export class SchemaDecimal128 {
 
   public value: any; 
   public valid: boolean | undefined;
-  public convertedValue: number | Bson.Decimal128 | null | undefined;  
+  public convertedValue: Bson.Decimal128 | null | undefined;  
 
   constructor(value: any) {
     if (value === undefined) {
@@ -78,6 +95,10 @@ export class SchemaDecimal128 {
     this.valid
   }  
 
+  /**
+  * Attempts to convert raw value to the given data type.
+  * Sets convertedValue property to the casted input if possible, or undefined if not.
+  */
   convertType() {
     if (this.value === null) {
       this.convertedValue = this.value;
@@ -110,12 +131,21 @@ export class SchemaDecimal128 {
     return this.convertedValue;
   }
 
+  /**
+  * Checks whether the value was casted to the correct data type.
+  * Sets valid property to true or false.
+  */
   validateType() {
     this.valid = this.convertedValue === undefined ? false : true;
     return this.valid;
   }
 }
 
+/**
+  * Class definition of String Schema datatype
+  * @param value Raw value input from the user.
+  * @returns An object of class SchemaString.
+  */
 export class SchemaString {
 
   public value: any; 
@@ -128,9 +158,13 @@ export class SchemaString {
     }
     this.value = value;
     this.convertedValue;
-    this.valid
+    this.valid;
   }  
 
+  /**
+  * Attempts to convert raw value to the given data type.
+  * Sets convertedValue property to the casted input if possible, or undefined if not.
+  */
   convertType() {
     if (this.value === null) {
       this.convertedValue = this.value;
@@ -161,19 +195,28 @@ export class SchemaString {
     return this.convertedValue;
   }
 
+  /**
+  * Checks whether the value was casted to the correct data type.
+  * Sets valid property to true or false.
+  */
   validateType() {
     this.valid = this.convertedValue === undefined ? false : true;
     return this.valid;
   }
 }
 
+/**
+  * Class definition of Boolean Schema datatype
+  * @param value Raw value input from the user.
+  * @returns An object of class SchemaBoolean.
+  */
 export class SchemaBoolean {
 
   public value: any; 
   public valid: boolean | undefined;
   public convertedValue: boolean | Boolean | null | undefined;  
 
-  constructor(value: number | string | boolean) {
+  constructor(value: any) {
     if (value === undefined) {
       throw new Error('A value is required.')
     }
@@ -182,6 +225,10 @@ export class SchemaBoolean {
     this.valid
   }  
 
+  /**
+  * Attempts to convert raw value to the given data type.
+  * Sets convertedValue property to the casted input if possible, or undefined if not.
+  */
   convertType() {
     if (this.value === null) {
       this.convertedValue = this.value;
@@ -198,8 +245,8 @@ export class SchemaBoolean {
     }
     
     else if (typeof this.value === 'string') {
-      if (this.value === 'true') this.convertedValue = true;
-      else if (this.value === 'false') this.convertedValue = false;
+      if (this.value.toLowerCase() === 'true') this.convertedValue = true;
+      else if (this.value.toLowerCase() === 'false') this.convertedValue = false;
     }  
 
     else if (typeof this.value === 'number') {
@@ -208,19 +255,27 @@ export class SchemaBoolean {
     }
 
     else if (typeof this.value === 'boolean') {
-      if (this.value) this.convertedValue = true;
-      else if (!this.value) this.convertedValue = false;
+      this.convertedValue = this.value;
     }
 
     return this.convertedValue;
   }
 
+  /**
+  * Checks whether the value was casted to the correct data type..
+  * Sets valid property to true or false.
+  */
   validateType() {
     this.valid = this.convertedValue === undefined ? false : true;
     return this.valid;
   }
 }
 
+/**
+  * Class definition of ObjectId Schema datatype
+  * @param value Raw value input from the user.
+  * @returns An object of class SchemaObjectId.
+  */
 export class SchemaObjectId {
 
   public value: any; 
@@ -236,6 +291,10 @@ export class SchemaObjectId {
     this.valid
   }  
 
+  /**
+  * Attempts to convert raw value to the given data type.
+  * Sets convertedValue property to the casted input if possible, or undefined if not.
+  */
   convertType() {
     if (this.value === null) {
       this.convertedValue = this.value;
@@ -248,19 +307,27 @@ export class SchemaObjectId {
     }
     
     else if (Bson.ObjectId.isValid(this.value)) {
-      //TODO
       this.convertedValue = new Bson.ObjectId(this.value);
     }
 
     return this.convertedValue;
   }
 
+  /**
+  * Checks whether the value was casted to the correct data type..
+  * Sets valid property to true or false.
+  */
   validateType() {
     this.valid = this.convertedValue === undefined ? false : true;
     return this.valid;
   }
 }
 
+/**
+  * Class definition of UUID Schema datatype
+  * @param value Raw value input from the user.
+  * @returns An object of class SchemaUUID.
+  */
 export class SchemaUUID {
 
   public value: any; 
@@ -276,6 +343,10 @@ export class SchemaUUID {
     this.valid
   }  
 
+  /**
+  * Attempts to convert raw value to the given data type.
+  * Sets convertedValue property to the casted input if possible, or undefined if not.
+  */
   convertType() {
     if (this.value === null) {
       this.convertedValue = this.value;
@@ -294,12 +365,21 @@ export class SchemaUUID {
     return this.convertedValue;
   }
 
+  /**
+  * Checks whether the value was casted to the correct data type..
+  * Sets valid property to true or false.
+  */
   validateType() {
     this.valid = this.convertedValue === undefined ? false : true;
     return this.valid;
   }
 }
 
+/**
+  * Class definition of Date Schema datatype
+  * @param value Raw value input from the user.
+  * @returns An object of class SchemaDate.
+  */
 export class SchemaDate {
 
   public value: any; 
@@ -315,6 +395,10 @@ export class SchemaDate {
     this.valid
   }  
 
+  /**
+  * Attempts to convert raw value to the given data type.
+  * Sets convertedValue property to the casted input if possible, or undefined if not.
+  */
   convertType() {
     if (this.value === null) {
       this.convertedValue = this.value;
@@ -353,28 +437,12 @@ export class SchemaDate {
     return this.convertedValue;
   }
 
+  /**
+  * Checks whether the value was casted to the correct data type..
+  * Sets valid property to true or false.
+  */
   validateType() {
     this.valid = this.convertedValue === undefined ? false : true;
     return this.valid;
   }
 }
-
-// let newdec = new Bson.Decimal128('15.5135');
-// console.log(newdec);
-
-// let newdouble = new Bson.Double(parseFloat('test'));
-// console.log(newdouble.valueOf());
-
-// function func(num: number | string): boolean {
-//     if (typeof num === 'number')
-//         return num % 2 === 0
-//     else return false;
-// }
-
-// const num = new SchemaNumber('test');
-// console.log(num.validateType());
-// console.log(num.validateConstraints(func))
-// console.log(num.validateType() instanceof Bson.Double)
-
-// const id = Bson.ObjectId.isValid('test');
-// console.log(id);
