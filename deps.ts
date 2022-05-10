@@ -10,7 +10,7 @@
     Bson
 } from "https://deno.land/x/mongo@v0.29.4/mod.ts";
 
-export {
+export type {
     CountOptions,
     InsertOptions,
     UpdateOptions,
@@ -19,4 +19,4 @@ export {
     AggregateOptions,
     FindOptions,
     DeleteOptions,
-} from 'https://deno.land/x/mongo@v0.29.4/src/types.ts';}
+} from 'https://deno.land/x/mongo@v0.29.4/src/types.ts';

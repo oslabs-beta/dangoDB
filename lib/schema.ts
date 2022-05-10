@@ -54,7 +54,7 @@ export interface optionsObject {
   * @returns An object of class SchemaOptions.
   */
 
-class SchemaOptions {
+export class SchemaOptions {
   
   type: any;
   required?: boolean;
