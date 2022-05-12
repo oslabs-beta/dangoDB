@@ -915,23 +915,10 @@ class Query {
    * @param queryObject which is the client document field to update or insert into the database
    * @returns true or undefined.
    */
-  checkDataFields(queryObject: Record<string, unknown>, subSchema?: Schema) {
-    // check for subSchema
-    if(subSchema) {
-      this.schema.schemaMap = subSchema.schemaMap;
-    }
-
+  checkDataFields(queryObject: Record<string, unknown>) {
     for (const property in queryObject) {
-      console.log(`-----> printing queryObject[property]: ${queryObject[property]}`);
-
       if (!Object.prototype.hasOwnProperty.call(this.schema.schemaMap, property)) {
         throw new Error ('Requested query object contains properties not present in the Schema.')
-      }
-      // checking for Schema assigned as value
-      if(queryObject[property] instanceof Schema) {
-        // 1st arg, stored nested object from queryObject, 2nd arg: stored subSchema from current Schema's schemaMap
-        const querySubObj = queryObject[property];
-        this.checkDataFields(querySubObj, this.schema.schemaMap[property]);
       }
     }
     return true;

@@ -4,29 +4,28 @@ import { dango } from './dango.ts';
 import { Bson } from '../deps.ts';
 import { SchemaOptions } from './schema.ts';
 
-// const { Object } = Bson;
-
 // console.log(dango);
 await dango.connect('mongodb+srv://kaiz0923:qckgc2WHjd9Fq1ad@starwars.5sykv.mongodb.net/mongo-test?authMechanism=SCRAM-SHA-1');
 // console.log(dango.currentConnection);
 
+// nested schema
+const addressSchema = dango.schema({
+  number: { type: 'string', required: true },
+  unit: { type: 'string', required: false },
+  town: { type: 'string', required: true },
+  state: { type: 'string', required: true },
+  zipcode: { type: 'string', required: true },
+});
+
+// outer schema
 const infoSchema = dango.schema({
   name: { type: 'string'},
-  address: { type: 'object' },
-  // age: {type: 'number', required: false, default: 60, validator: ((num: number) => num > 50)},
-  // age: {type: 'number', required: true, default: 60},
-  // food: {type: 'string', required: false, default: true},
+  address: addressSchema,
 });
-console.log('----> name property on infoSchema  :', infoSchema.schemaMap.name);
-console.log('----> address property on infoSchema  :', infoSchema.schemaMap.address);
-console.log('----> schemaMap.address is class SchemaOptions  :', infoSchema.schemaMap.address instanceof SchemaOptions);
 
-// const testObj = {
-//   name: 'string',
-//   age: {type: 'number', required: true, default: 60},
-// }
-// console.log(testObj.age.type)
-
+// console.log('----> name property on infoSchema  :', infoSchema.schemaMap.name);
+// console.log('----> address property on infoSchema  :', infoSchema.schemaMap.address);
+// console.log('----> schemaMap.address is class SchemaOptions  :', infoSchema.schemaMap.address instanceof SchemaOptions);
 
 // console.log(dangoSchema);
 // console.log('test', dangoSchema.schemaMap.name.type);
@@ -39,18 +38,18 @@ const infoModel = dango.model('info', infoSchema);
 // // console.log(dangoModel);
 console.log(await infoModel.find({}));
 // console.log(`Printing Bson.object type: ${Object}`);
-// console.log(await infoModel.insertOne({
-//   name: 'Jim',
-//   address: {
-//     number_street: '123',
-//     unit: '3B',
-//     town: 'Brooklyn',
-//     state: 'NY',
-//     zipcode: '10002'
-//   },
-// }));
+console.log(await infoModel.insertOne({
+  name: 'Jack',
+  address: {
+    number_street: '100',
+    unit: '2A',
+    town: 'Brooklyn',
+    state: 'NY',
+    zipcode: '10005'
+  },
+}));
 
-// console.log(await infoModel.find({}));
+console.log(await infoModel.find({}));
 
 
 // Test if we can bring connection into query specifically
