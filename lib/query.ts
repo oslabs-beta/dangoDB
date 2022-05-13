@@ -863,7 +863,6 @@ class Query {
    */
   async validateInsertAgainstSchema(queryObject: Record<string, unknown>, schema: Schema, updatedQueryObject: Record<string, unknown>) {
     
-    // const updatedQueryObject = !subUpdatedQueryObject ? this.updatedQueryObject : subUpdatedQueryObject;
     const currentSchemaMap = schema.schemaMap;
     // console.log('Entering validateInsertAgainstSchema, schemaMap: ', currentSchemaMap);
 
