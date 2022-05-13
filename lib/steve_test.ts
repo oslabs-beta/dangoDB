@@ -34,9 +34,11 @@ const addressSchema = dango.schema({
 
 // outer schema
 const infoSchema = dango.schema({
-  name: { type: 'string', required: true},
+  name: { type: 'string', required: true,},
   address: addressSchema,
-  test: { type: 'string', required: true},
+  test: { type: 'string', required: true,},
+  address2: addressSchema,
+  age: {type: 'number', required: true, validator: ((num: number) => num > 17)}
 });
 
 console.log('infoSchema: ', infoSchema);
@@ -80,6 +82,17 @@ console.log(await infoModel.insertOne({
     },
   },
   test: 'test!!!',
+  address2: {
+    number: '1',
+    // unit: '8D',
+    town: 'Queens',
+    state: 'NY',
+    zipcode: '10004',
+    phone: {
+      home: '718-123-4567',
+    },
+  },
+  age: 18,
 }));
 
 console.log(await infoModel.find({}));

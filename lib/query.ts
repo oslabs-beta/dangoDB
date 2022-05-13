@@ -862,20 +862,15 @@ class Query {
    * @returns true or undefined.
    */
   async validateInsertAgainstSchema(queryObject: Record<string, unknown>, subSchema?: Schema, subUpdatedQueryObject?: Record<string, unknown>) {
-    console.log('Entering validateInsertAgainstSchema');
-    let updatedQueryObject = subUpdatedQueryObject ? subUpdatedQueryObject : this.updatedQueryObject;
+    // console.log('Entering validateInsertAgainstSchema');
+    const updatedQueryObject = !subUpdatedQueryObject ? this.updatedQueryObject : subUpdatedQueryObject;
 
-    let currentSchemaMap = undefined;
-    if(!subSchema) {
-      currentSchemaMap = this.schema.schemaMap;
-    }
-    else {
-      currentSchemaMap = subSchema.schemaMap;
-    }
+    const currentSchemaMap = !subSchema ? this.schema.schemaMap : subSchema.schemaMap;
+
     this.checkDataFields(queryObject, currentSchemaMap);
     for (const property in currentSchemaMap) {
-      // set up if, if else conditions for Schema vs SchemaOptions
       console.log('Entered for loop in validateInsertAgainstSchema, after passing checkDataFields, current property:', property);
+      // set up if, if else conditions for Schema vs SchemaOptions
       if(currentSchemaMap[property] instanceof Schema) {
         updatedQueryObject[property] = {};
         await this.validateInsertAgainstSchema(queryObject[property] as Record<string, unknown>, currentSchemaMap[property], updatedQueryObject[property] as Record<string, unknown>);
@@ -885,14 +880,15 @@ class Query {
         this.checkRequired(queryObject, property, currentSchemaMap[property]);
         this.setDefault(queryObject, property, currentSchemaMap[property]);
         console.log('updatedQueryObject:', updatedQueryObject);
-        if(subUpdatedQueryObject) {
-          console.log('subUpdatedQueryObject is defined, populateQuery for property: ', property);
-          this.populateQuery(queryObject, property, currentSchemaMap[property], updatedQueryObject);
-        }
-        else {
-          console.log('!subUpdatedQueryObject, populateQuery for property: ', property);
-          this.populateQuery(queryObject, property, currentSchemaMap[property]);
-        }
+        // if(subUpdatedQueryObject) {
+        //   console.log('subUpdatedQueryObject is defined, populateQuery for property: ', property);
+        //   this.populateQuery(queryObject, property, currentSchemaMap[property], updatedQueryObject);
+        // }
+        // else {
+        //   console.log('!subUpdatedQueryObject, populateQuery for property: ', property);
+        //   this.populateQuery(queryObject, property, currentSchemaMap[property]);
+        // }
+        !subUpdatedQueryObject ? this.populateQuery(queryObject, property, currentSchemaMap[property]) : this.populateQuery(queryObject, property, currentSchemaMap[property], updatedQueryObject);
         await this.checkUnique(property, currentSchemaMap[property])
         this.checkConstraints(property, currentSchemaMap[property])
       }
@@ -945,11 +941,6 @@ class Query {
    * @returns true or undefined.
    */
   checkDataFields(queryObject: Record<string, unknown>, currentSchemaMap: Record<string, unknown>) {
-    // check for subSchema
-    // if(subSchema) {
-    //   this.schema.schemaMap = subSchema.schemaMap;
-    // }
-    // console.log('printing current schema:', Object.entries(this.schema.schemaMap));
 
     for (const property in queryObject) {
       // console.log('-----> printing queryObject[property]:', queryObject[property]);
@@ -957,15 +948,8 @@ class Query {
       if (!Object.prototype.hasOwnProperty.call(currentSchemaMap, property)) {
         throw new Error ('Requested query object contains properties not present in the Schema.')
       }
-      // checking for Schema assigned as value in schemaMap
-      // if(this.schema.schemaMap[property] instanceof Schema) {
-      //   // 1st arg, stored nested object from queryObject, 2nd arg: stored subSchema from current Schema's schemaMap
-      //   if(typeof queryObject[property] === 'object') {
-      //     this.checkDataFields(queryObject[property] as Record<string, unknown>, this.schema.schemaMap[property]);
-      //   }
-      // }
     }
-    console.log('COMPLETED CHECKDATA FIELDS CHECK');
+    // console.log('COMPLETED CHECKDATA FIELDS CHECK');
     return true;
   }
 
@@ -1012,7 +996,8 @@ class Query {
    * @returns true or undefined.
    */
   populateQuery(queryObject: Record<string, unknown>, propertyName: string, propertyOptions: optionsObject, subUpdatedQueryObject?: Record<string, unknown>) {
-
+    // assign updatedQueryObject to class level or sublevel updatedQueryObject
+    const updatedQueryObject = !subUpdatedQueryObject ? this.updatedQueryObject : subUpdatedQueryObject;
     const valueAsDatatype = new propertyOptions.type(queryObject[propertyName]);
     valueAsDatatype.convertType();
     valueAsDatatype.validateType();
@@ -1020,17 +1005,17 @@ class Query {
     if (valueAsDatatype.valid === false) {
       throw new Error('Data was not able to be translated to given specified schema data type.');
     }
-    if(subUpdatedQueryObject) {
-      console.log('subUpdatedQueryObject exists, about to update property:', propertyName);
-      subUpdatedQueryObject[propertyName] = valueAsDatatype.convertedValue;
-      return;
-    }
-    else {
-      console.log('populateQuery without subUpdatedQueryObject, current property:', propertyName);
-      this.updatedQueryObject[propertyName] = valueAsDatatype.convertedValue;
-      console.log('POST populateQuery without subUpdatedQueryObject, current property:', propertyName, ' global updatedQueryObject: ', this.updatedQueryObject);
-
-    }
+    // if(subUpdatedQueryObject) {
+    //   console.log('subUpdatedQueryObject exists, about to update property:', propertyName);
+    //   subUpdatedQueryObject[propertyName] = valueAsDatatype.convertedValue;
+    //   return;
+    // }
+    // else {
+    //   console.log('populateQuery without subUpdatedQueryObject, current property:', propertyName);
+    //   this.updatedQueryObject[propertyName] = valueAsDatatype.convertedValue;
+    //   console.log('POST populateQuery without subUpdatedQueryObject, current property:', propertyName, ' global updatedQueryObject: ', this.updatedQueryObject);
+    // }
+    updatedQueryObject[propertyName] = valueAsDatatype.convertedValue;
   }
 
   /**
