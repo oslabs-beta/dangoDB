@@ -474,7 +474,6 @@ export class SchemaObject {
     }
 
     else if (typeof this.value === 'object') {
-      // if (this.value instanceof Date) {
         this.convertedValue = this.value;
       // }
     }
@@ -483,26 +482,6 @@ export class SchemaObject {
       return;
     }
     
-    // else if (typeof this.value === 'string') {
-    //   const convertedDate: number | Date = Date.parse(this.value)
-    //   if (typeof convertedDate === 'number') {
-    //     if (isNaN(convertedDate)) {
-    //       return;
-    //     }
-    //   }
-    //   else this.convertedValue = convertedDate;
-    // }
-    
-    // else if (typeof this.value === 'number') {
-    //   const convertedDate: number | Date = Date.parse(this.value.toString())
-    //   if (typeof convertedDate === 'number') {
-    //     if (isNaN(convertedDate)) {
-    //       return;
-    //     }
-    //   }
-    //   else this.convertedValue = convertedDate;
-    // }
-
     return this.convertedValue;
   }
 

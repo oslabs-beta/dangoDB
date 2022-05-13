@@ -879,18 +879,18 @@ class Query {
         console.log('entering checks, schemaOption, queryObject: ', queryObject, ', property: ', property, ', currentSchemaMap[property]: ', currentSchemaMap[property]);
         this.checkRequired(queryObject, property, currentSchemaMap[property]);
         this.setDefault(queryObject, property, currentSchemaMap[property]);
-        console.log('updatedQueryObject:', updatedQueryObject);
         // if(subUpdatedQueryObject) {
-        //   console.log('subUpdatedQueryObject is defined, populateQuery for property: ', property);
-        //   this.populateQuery(queryObject, property, currentSchemaMap[property], updatedQueryObject);
-        // }
-        // else {
-        //   console.log('!subUpdatedQueryObject, populateQuery for property: ', property);
-        //   this.populateQuery(queryObject, property, currentSchemaMap[property]);
-        // }
+          //   console.log('subUpdatedQueryObject is defined, populateQuery for property: ', property);
+          //   this.populateQuery(queryObject, property, currentSchemaMap[property], updatedQueryObject);
+          // }
+          // else {
+            //   console.log('!subUpdatedQueryObject, populateQuery for property: ', property);
+            //   this.populateQuery(queryObject, property, currentSchemaMap[property]);
+            // }
         !subUpdatedQueryObject ? this.populateQuery(queryObject, property, currentSchemaMap[property]) : this.populateQuery(queryObject, property, currentSchemaMap[property], updatedQueryObject);
         await this.checkUnique(property, currentSchemaMap[property])
         this.checkConstraints(property, currentSchemaMap[property])
+        console.log('updatedQueryObject:', updatedQueryObject);
       }
     }
     return true;
