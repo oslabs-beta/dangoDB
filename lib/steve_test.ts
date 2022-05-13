@@ -8,20 +8,11 @@ import { SchemaOptions } from './schema.ts';
 await dango.connect('mongodb+srv://kaiz0923:qckgc2WHjd9Fq1ad@starwars.5sykv.mongodb.net/mongo-test?authMechanism=SCRAM-SHA-1');
 // console.log(dango.currentConnection);
 
-// nested schema
-// const addressSchema = dango.schema({
-//   number: { type: 'string', required: true },
-//   unit: { type: 'string', required: false },
-//   town: { type: 'string', required: true },
-//   state: { type: 'string', required: true },
-//   zipcode: { type: 'string', required: true },
-// });
-
 // test schemas
 const phoneSchema = dango.schema({
   cell: 'string',
   home: 'string',
-})
+});
 
 const addressSchema = dango.schema({
   number: { type: 'string', required: true },
@@ -34,68 +25,63 @@ const addressSchema = dango.schema({
 
 // outer schema
 const infoSchema = dango.schema({
-  name: { type: 'string', required: true,},
+  name: { type: 'string', required: true },
   address: addressSchema,
-  test: { type: 'string', required: true,},
+  test: { type: 'string', required: true },
   address2: addressSchema,
-  age: {type: 'number', required: true, validator: ((num: number) => num > 17)}
+  age: { type: 'number', required: true, validator: ((num: number) => num > 17) }
 });
 
-console.log('infoSchema: ', infoSchema);
+// const simpleSchema = dango.schema({
+//   id: { type: 'number', required: true, unique: true, validator: ((num: number) => num > 99) },
+//   name: { type: 'string', required: true },
+//   DOB: { type: 'date'},
+// });
 
-// console.log('----> name property on infoSchema  :', infoSchema.schemaMap.name);
-// console.log('----> address property on infoSchema  :', infoSchema.schemaMap.address);
-// console.log('----> schemaMap.address is class SchemaOptions  :', infoSchema.schemaMap.address instanceof SchemaOptions);
-
-// console.log(dangoSchema);
-// console.log('test', dangoSchema.schemaMap.name.type);
-// console.log(dangoSchema.schemaMap.name)
-// console.log(dangoSchema.schemaMap.age)
+// console.log('infoSchema: ', infoSchema);
+// console.log('simpleSchema: ', simpleSchema);
 
 // Test model creation
 
 const infoModel = dango.model('info', infoSchema);
-// console.log(await infoModel.find({}));
-// console.log(`Printing Bson.object type: ${Object}`);
-// console.log(await infoModel.insertOne({
-//   name: 'Grouch',
-//   address: {
-//     number: '1',
-//     // unit: '8D',
-//     town: 'Queens',
-//     state: 'NY',
-//     zipcode: '10004'
-//   },
-// }));
 
 // TEST
 console.log(await infoModel.insertOne({
   name: 'Grouch',
   address: {
-    number: '1',
+    number: '105',
     // unit: '8D',
     town: 'Queens',
     state: 'NY',
-    zipcode: '10004',
+    zipcode: '11345',
     phone: {
       cell: '718-123-4567',
     },
   },
   test: 'test!!!',
   address2: {
-    number: '1',
+    number: '1200',
     // unit: '8D',
     town: 'Queens',
     state: 'NY',
-    zipcode: '10004',
+    zipcode: '12345',
     phone: {
-      home: '718-123-4567',
+      home: '718-888-8888',
     },
   },
-  age: 18,
+  age: 35,
 }));
 
-console.log(await infoModel.find({}));
+// console.log(await infoModel.find({}));
+// let birthday = new Date(1995, 11, 17);
+
+// const infoModel = dango.model('info', simpleSchema);
+// console.log(await infoModel.insertOne({
+//   id: 100,
+//   name: "Joe",
+//   DOB: birthday,
+// }));
+
 
 
 // Test if we can bring connection into query specifically
