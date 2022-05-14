@@ -419,19 +419,14 @@ export class SchemaDate {
       if (typeof convertedDate === 'number') {
         if (isNaN(convertedDate)) {
           return;
+        } else {
+          this.convertedValue = new Date(convertedDate);
         }
       }
-      else this.convertedValue = convertedDate;
     }
     
     else if (typeof this.value === 'number') {
-      const convertedDate: number | Date = Date.parse(this.value.toString())
-      if (typeof convertedDate === 'number') {
-        if (isNaN(convertedDate)) {
-          return;
-        }
-      }
-      else this.convertedValue = convertedDate;
+      this.convertedValue = new Date(this.value);
     }
 
     return this.convertedValue;

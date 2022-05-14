@@ -26,6 +26,9 @@ export class Schema {
   
   constructor(schemaObj: Record<string, any>) {
     
+    if (schemaObj === undefined) {   
+      throw new Error('Schema requires a valid argument.');
+    }
     this.schemaMap = {};    
     for (const property in schemaObj) {
       // SJ: check if Schema assigned as value
@@ -78,7 +81,12 @@ export class SchemaOptions {
     this.validator = null;
     for (const key in options) {
       if (key === 'type') {
-        this.type = dango.types[options[key]];
+        if (Object.prototype.hasOwnProperty.call(dango.types, options[key])){
+          this.type = dango.types[options[key]];
+        }
+        else {
+          throw new Error('Specified type is invalid');
+        }
       }
       else if (Object.prototype.hasOwnProperty.call(this, key)) {
         this[key as keyof optionsObject] = options[key as keyof optionsObject];
