@@ -46,11 +46,41 @@ const infoSchema = dango.schema({
 const infoModel = dango.model('info', infoSchema);
 
 // TEST
-console.log(await infoModel.insertOne({
-  name: 'Grouch',
+// console.log(await infoModel.insertOne({
+//   name: 'Grouch',
+//   address: {
+//     number: '105',
+//     // unit: '8D',
+//     town: 'Queens',
+//     state: 'NY',
+//     zipcode: '11345',
+//     phone: {
+//       cell: '718-123-4567',
+//     },
+//   },
+//   test: 'test!!!',
+//   address2: {
+//     number: '1200',
+//     // unit: '8D',
+//     town: 'Queens',
+//     state: 'NY',
+//     zipcode: '12345',
+//     phone: {
+//       home: '718-888-8888',
+//     },
+//   },
+//   age: 35,
+// }));
+
+// TEST FOR validateReplaceAgainstSchema
+console.log(await infoModel.findOneAndReplace({
+  'address.number': '105'
+},
+{
+  name: 'Big Bird',
   address: {
-    number: '105',
-    // unit: '8D',
+    number: '900',
+    unit: '3D',
     town: 'Queens',
     state: 'NY',
     zipcode: '11345',
@@ -58,7 +88,7 @@ console.log(await infoModel.insertOne({
       cell: '718-123-4567',
     },
   },
-  test: 'test!!!',
+  test: 'Not a test',
   address2: {
     number: '1200',
     // unit: '8D',
@@ -66,13 +96,20 @@ console.log(await infoModel.insertOne({
     state: 'NY',
     zipcode: '12345',
     phone: {
-      home: '718-888-8888',
+      cell: '718-888-8888',
     },
   },
-  age: 35,
+  age: 20,
 }));
 
-// console.log(await infoModel.find({}));
+
+// 1 level schema test
+// console.log(await infoModel.find({ cell: '718-123-4567' }));
+// console.log(await infoModel.find({ id: 100 }));
+// Searching within embedded documents
+// console.log(await infoModel.find({ 'address2.number': '1200' }));
+
+
 // let birthday = new Date(1995, 11, 17);
 
 // const infoModel = dango.model('info', simpleSchema);

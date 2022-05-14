@@ -546,7 +546,7 @@ class Query {
         const collection = this.connection.db.collection(this.collectionName);
         if (typeof options === 'function') callback = options;
         options = {};
-        await this.validateReplaceAgainstSchema(filter, replacement);
+        await this.validateReplaceAgainstSchema(filter, replacement, this.schema, this.updatedQueryObject);
         const data = await collection.replaceOne(filter, this.updatedQueryObject, options);
         this.resetQueryObject();
         if (callback) return callback(data);
@@ -895,16 +895,23 @@ class Query {
    * @param queryObject which is the client document to insert into the database
    * @returns true or undefined.
    */
-  async validateReplaceAgainstSchema(findObject: Record<string, unknown>, queryObject: Record<string, unknown>) {
-    let currentSchemaMap = this.schema.schemaMap;
-    let updatedQueryObject = this.updatedQueryObject;
+  async validateReplaceAgainstSchema(findObject: Record<string, unknown>, queryObject: Record<string, unknown>, schema: Schema, updatedQueryObject: Record<string, unknown>) {
+    const currentSchemaMap = schema.schemaMap;
+    // let updatedQueryObject = this.updatedQueryObject;
     this.checkDataFields(queryObject, currentSchemaMap);
-    for (const property in this.schema.schemaMap) {
-      this.checkRequired(queryObject, property, this.schema.schemaMap[property]);
-      this.setDefault(queryObject, property, this.schema.schemaMap[property]);
-      this.populateQuery(queryObject, property, this.schema.schemaMap[property], updatedQueryObject);
-      await this.checkUniqueForReplace(property, this.schema.schemaMap[property], findObject)
-      this.checkConstraints(property, this.schema.schemaMap[property])
+    for (const property in currentSchemaMap) {
+      if(currentSchemaMap[property] instanceof Schema) {
+        updatedQueryObject[property] = {};
+        await this.validateReplaceAgainstSchema(findObject, queryObject[property] as Record<string, unknown>, currentSchemaMap[property] as Schema, updatedQueryObject[property] as Record<string, unknown>);
+
+      }
+      else {
+        this.checkRequired(queryObject, property, currentSchemaMap[property]);
+        this.setDefault(queryObject, property, currentSchemaMap[property]);
+        this.populateQuery(queryObject, property, currentSchemaMap[property], updatedQueryObject);
+        await this.checkUniqueForReplace(property, currentSchemaMap[property], findObject)
+        this.checkConstraints(property, currentSchemaMap[property])
+      }
     }
     return true;
   }
