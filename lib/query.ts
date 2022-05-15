@@ -861,7 +861,7 @@ class Query {
    * @param queryObject which is the client document to insert into the database
    * @returns true or undefined.
    */
-  async validateInsertAgainstSchema(queryObject: Record<string, unknown>, schema: Schema, updatedQueryObject: Record<string, unknown>) {
+  async validateInsertAgainstSchema(queryObject: Record<string, unknown>, schema: Schema, updatedQueryObject: Record<string, unknown>, embeddedUniqueProperty: string[] = []) {
     
     const currentSchemaMap = schema.schemaMap;
     // console.log('Entering validateInsertAgainstSchema, schemaMap: ', currentSchemaMap);
@@ -872,14 +872,19 @@ class Query {
       // set up if, if else conditions for Schema vs SchemaOptions
       if(currentSchemaMap[property] instanceof Schema) {
         updatedQueryObject[property] = {};
-        await this.validateInsertAgainstSchema(queryObject[property] as Record<string, unknown>, currentSchemaMap[property] as Schema, updatedQueryObject[property] as Record<string, unknown>);
+        embeddedUniqueProperty.push(property);
+        await this.validateInsertAgainstSchema(queryObject[property] as Record<string, unknown>, 
+          currentSchemaMap[property] as Schema, 
+          updatedQueryObject[property] as Record<string, unknown>,
+          embeddedUniqueProperty);
+        embeddedUniqueProperty.pop();
       }
       else {
         // console.log('entering checks, schemaOption, queryObject: ', queryObject, ', property: ', property, ', currentSchemaMap[property]: ', currentSchemaMap[property]);
         this.checkRequired(queryObject, property, currentSchemaMap[property] as optionsObject);
         this.setDefault(queryObject, property, currentSchemaMap[property] as optionsObject);
         this.populateQuery(queryObject, property, currentSchemaMap[property] as optionsObject, updatedQueryObject);
-        await this.checkUnique(property, currentSchemaMap[property] as optionsObject);
+        await this.checkUnique(property, currentSchemaMap[property] as optionsObject, updatedQueryObject, embeddedUniqueProperty);
         this.checkConstraints(property, currentSchemaMap[property] as optionsObject);
         // console.log('updatedQueryObject:', updatedQueryObject);
       }
@@ -929,7 +934,7 @@ class Query {
     this.checkDataFields(queryObject, currentSchemaMap);
     for (const property in queryObject) {
       this.populateQuery(queryObject, property, this.schema.schemaMap[property], updatedQueryObject);
-      await this.checkUnique(property, this.schema.schemaMap[property])
+      await this.checkUnique(property, this.schema.schemaMap[property], this.updatedQueryObject, [])
       this.checkConstraints(property, this.schema.schemaMap[property])
     }
   }
@@ -1012,9 +1017,20 @@ class Query {
    * @param propertyName which is the property key to check
    * @returns true or undefined.
    */
-  async checkUnique(propertyName: string, propertyOptions: optionsObject) {
+  async checkUnique(propertyName: string, propertyOptions: optionsObject, updatedQueryObject: Record<string, unknown>, embeddedUniqueProperty: string[]) {
+    if(propertyOptions.unique === false) {
+      return true;
+    }
     const queryObjectForUnique: Record <string, unknown> = {};
-    queryObjectForUnique[propertyName] = this.updatedQueryObject[propertyName];
+    let formattedPropertyName = '';
+    while(embeddedUniqueProperty.length > 0) {
+      if(formattedPropertyName === '') formattedPropertyName += embeddedUniqueProperty.shift();
+      else formattedPropertyName += `.${embeddedUniqueProperty.shift()}`;
+    }
+
+    formattedPropertyName === '' ? formattedPropertyName = propertyName : formattedPropertyName += `.${propertyName}`;
+    console.log('Inside checkUnique, current property: ', propertyName, 'formattedPropertyName: ', formattedPropertyName)
+    queryObjectForUnique[formattedPropertyName] = updatedQueryObject[propertyName];
     if (propertyOptions.unique === true) {
       const propertyExists = await this.findOne(queryObjectForUnique);
       if (propertyExists !== undefined) {

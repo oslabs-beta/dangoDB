@@ -10,7 +10,7 @@ await dango.connect('mongodb+srv://kaiz0923:qckgc2WHjd9Fq1ad@starwars.5sykv.mong
 
 // test schemas
 const phoneSchema = dango.schema({
-  cell: 'string',
+  cell: { type: 'string', required: false },
   home: 'string',
 });
 
@@ -21,14 +21,14 @@ const addressSchema = dango.schema({
   state: { type: 'string', required: true },
   zipcode: { type: 'string', required: true },
   phone: phoneSchema,
+  house_id: {type: 'number', required: true, unique: true},
 });
 
 // outer schema
 const infoSchema = dango.schema({
-  name: { type: 'string', required: true },
+  name: { type: 'string', required: true, unique: true },
   address: addressSchema,
-  test: { type: 'string', required: true },
-  address2: addressSchema,
+  test: { type: 'string', required: false, default: null },
   age: { type: 'number', required: true, validator: ((num: number) => num > 17) }
 });
 
@@ -44,13 +44,34 @@ const infoSchema = dango.schema({
 // Test model creation
 
 const infoModel = dango.model('info', infoSchema);
-
+// console.log(await infoModel.findOne({ name: 'Bill'}));
 // TEST
-// console.log(await infoModel.insertOne({
-//   name: 'Grouch',
+console.log(await infoModel.insertOne({
+  name: 'Mr. D',
+  address: {
+    number: '105',
+    // unit: '8D',
+    town: 'BK',
+    state: 'NY',
+    zipcode: '11345',
+    phone: {
+      cell: '718-100-1234',
+    },
+    house_id: 23456,
+  },
+  test: 'test!!!',
+  age: 50,
+}));
+
+// TEST FOR validateReplaceAgainstSchema
+// console.log(await infoModel.findOneAndReplace({
+//   'address.number': '8888'
+// },
+// {
+//   name: 'Mr. Neighbor',
 //   address: {
-//     number: '105',
-//     // unit: '8D',
+//     number: '8888',
+//     unit: '3D',
 //     town: 'Queens',
 //     state: 'NY',
 //     zipcode: '11345',
@@ -58,49 +79,9 @@ const infoModel = dango.model('info', infoSchema);
 //       cell: '718-123-4567',
 //     },
 //   },
-//   test: 'test!!!',
-//   address2: {
-//     number: '1200',
-//     // unit: '8D',
-//     town: 'Queens',
-//     state: 'NY',
-//     zipcode: '12345',
-//     phone: {
-//       home: '718-888-8888',
-//     },
-//   },
-//   age: 35,
+//   // test: 'Not a test',
+//   age: 20,
 // }));
-
-// TEST FOR validateReplaceAgainstSchema
-console.log(await infoModel.findOneAndReplace({
-  'address.number': '105'
-},
-{
-  name: 'Big Bird',
-  address: {
-    number: '900',
-    unit: '3D',
-    town: 'Queens',
-    state: 'NY',
-    zipcode: '11345',
-    phone: {
-      cell: '718-123-4567',
-    },
-  },
-  test: 'Not a test',
-  address2: {
-    number: '1200',
-    // unit: '8D',
-    town: 'Queens',
-    state: 'NY',
-    zipcode: '12345',
-    phone: {
-      cell: '718-888-8888',
-    },
-  },
-  age: 20,
-}));
 
 
 // 1 level schema test
