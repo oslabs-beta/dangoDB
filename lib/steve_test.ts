@@ -46,42 +46,43 @@ const infoSchema = dango.schema({
 const infoModel = dango.model('info', infoSchema);
 // console.log(await infoModel.findOne({ name: 'Bill'}));
 // TEST
-console.log(await infoModel.insertOne({
-  name: 'Mr. D',
-  address: {
-    number: '105',
-    // unit: '8D',
-    town: 'BK',
-    state: 'NY',
-    zipcode: '11345',
-    phone: {
-      cell: '718-100-1234',
-    },
-    house_id: 23456,
-  },
-  test: 'test!!!',
-  age: 50,
-}));
+// console.log(await infoModel.insertOne({
+//   name: 'Mr. F',
+//   address: {
+//     number: '110',
+//     // unit: '8D',
+//     town: 'BK',
+//     state: 'NY',
+//     zipcode: '11222',
+//     phone: {
+//       cell: '718-222-1235',
+//     },
+//     house_id: 555555,
+//   },
+//   // test: 'test!!!',
+//   age: 60,
+// }));
 
 // TEST FOR validateReplaceAgainstSchema
-// console.log(await infoModel.findOneAndReplace({
-//   'address.number': '8888'
-// },
-// {
-//   name: 'Mr. Neighbor',
-//   address: {
-//     number: '8888',
-//     unit: '3D',
-//     town: 'Queens',
-//     state: 'NY',
-//     zipcode: '11345',
-//     phone: {
-//       cell: '718-123-4567',
-//     },
-//   },
-//   // test: 'Not a test',
-//   age: 20,
-// }));
+console.log(await infoModel.findOneAndReplace({
+  name: 'Mr. A'
+},
+{
+  name: 'Mr. D',
+  address: {
+    number: '110',
+    unit: '3D',
+    town: 'BK',
+    state: 'NY',
+    zipcode: '11222',
+    phone: {
+      cell: '718-222-1235',
+    },
+    house_id: 5556,
+  },
+  // test: 'Not a test',
+  age: 60,
+}));
 
 
 // 1 level schema test

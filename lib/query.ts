@@ -862,7 +862,7 @@ class Query {
    * @returns true or undefined.
    */
   async validateInsertAgainstSchema(queryObject: Record<string, unknown>, schema: Schema, updatedQueryObject: Record<string, unknown>, embeddedUniqueProperty: string[] = []) {
-    
+    // console.log('entering validateInsertAgainstSchema, this refers to: ', this);
     const currentSchemaMap = schema.schemaMap;
     // console.log('Entering validateInsertAgainstSchema, schemaMap: ', currentSchemaMap);
 
@@ -900,21 +900,24 @@ class Query {
    * @param queryObject which is the client document to insert into the database
    * @returns true or undefined.
    */
-  async validateReplaceAgainstSchema(findObject: Record<string, unknown>, queryObject: Record<string, unknown>, schema: Schema, updatedQueryObject: Record<string, unknown>) {
+  async validateReplaceAgainstSchema(findObject: Record<string, unknown>, queryObject: Record<string, unknown>, schema: Schema, updatedQueryObject: Record<string, unknown>, embeddedUniqueProperty: string[] = []) {
     const currentSchemaMap = schema.schemaMap;
-    // let updatedQueryObject = this.updatedQueryObject;
     this.checkDataFields(queryObject, currentSchemaMap);
     for (const property in currentSchemaMap) {
       if(currentSchemaMap[property] instanceof Schema) {
         updatedQueryObject[property] = {};
-        await this.validateReplaceAgainstSchema(findObject, queryObject[property] as Record<string, unknown>, currentSchemaMap[property] as Schema, updatedQueryObject[property] as Record<string, unknown>);
+        embeddedUniqueProperty.push(property);
+        await this.validateReplaceAgainstSchema(findObject, queryObject[property] as Record<string, unknown>, 
+          currentSchemaMap[property] as Schema, 
+          updatedQueryObject[property] as Record<string, unknown>);
+        embeddedUniqueProperty.pop();
 
       }
       else {
         this.checkRequired(queryObject, property, currentSchemaMap[property]);
         this.setDefault(queryObject, property, currentSchemaMap[property]);
         this.populateQuery(queryObject, property, currentSchemaMap[property], updatedQueryObject);
-        await this.checkUniqueForReplace(property, currentSchemaMap[property], findObject)
+        await this.checkUniqueForReplace(property, currentSchemaMap[property], findObject, updatedQueryObject, embeddedUniqueProperty)
         this.checkConstraints(property, currentSchemaMap[property])
       }
     }
@@ -1049,22 +1052,41 @@ class Query {
    * @param findObject The query used to match documents
    * @returns true or undefined.
    */
-  async checkUniqueForReplace(propertyName: string, propertyOptions: optionsObject, findObject: Record<string, unknown>) {
-    const queryObjectForUnique: Record<string, unknown> = {}
-    queryObjectForUnique[propertyName] = this.updatedQueryObject[propertyName];
-    if (propertyOptions.unique === true) {
-      const originalPropertyValue = await this.findOne(findObject);
-      if (originalPropertyValue === undefined) {
-        throw new Error('No database entry found on query.');
-      }
-      else if (originalPropertyValue === null) throw new Error('No database entry found on query.')
-      else if (typeof originalPropertyValue === 'object') {
-        const propertyExists = await this.findOne(queryObjectForUnique);
-        //@ts-ignore Fix later.
-        if (propertyExists !== undefined && originalPropertyValue[propertyName] !== this.updatedQueryObject[propertyName]) {
-          throw new Error('Property designated as unique in Schema already exists.');
+  async checkUniqueForReplace(propertyName: string, 
+    propertyOptions: optionsObject, 
+    findObject: Record<string, unknown>, 
+    updatedQueryObject: Record<string, unknown>, 
+    embeddedUniqueProperty: string[]) {
+      if (propertyOptions.unique === true) {
+        let originalPropertyValue = await this.findOne(findObject);
+        if (originalPropertyValue === undefined) {
+          throw new Error('No database entry found on query.');
         }
-      }
+        else if (originalPropertyValue === null) throw new Error('No database entry found on query.')
+        else if (typeof originalPropertyValue === 'object') {
+          // iterate through embeddedUniqueProperty array to access embedded objects originalPropertyValue
+          if(embeddedUniqueProperty.length) {
+            embeddedUniqueProperty.forEach((prop) => {
+              //@ts-ignore Fix later.
+              originalPropertyValue = originalPropertyValue[prop];
+            })
+          }
+
+          const queryObjectForUnique: Record<string, unknown> = {}
+          let formattedPropertyName = '';
+          while(embeddedUniqueProperty.length > 0) {
+            if(formattedPropertyName === '') formattedPropertyName += embeddedUniqueProperty.shift();
+            else formattedPropertyName += `.${embeddedUniqueProperty.shift()}`;
+          }
+
+          formattedPropertyName === '' ? formattedPropertyName = propertyName : formattedPropertyName += `.${propertyName}`;
+          queryObjectForUnique[propertyName] = updatedQueryObject[propertyName];
+          const propertyExists = await this.findOne(queryObjectForUnique);
+          //@ts-ignore Fix later.
+          if (propertyExists !== undefined && originalPropertyValue[propertyName] !== updatedQueryObject[propertyName]) {
+            throw new Error('Property designated as unique in Schema already exists.');
+          }
+        }
     }
     return true;
   }
