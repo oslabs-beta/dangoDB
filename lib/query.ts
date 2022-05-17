@@ -922,7 +922,8 @@ class Query {
       if(currentSchemaMap[property] instanceof Schema) {
         updatedQueryObject[property] = {};
         embeddedUniqueProperty.push(property);
-        await this.validateReplaceAgainstSchema(findObject, queryObject[property] as Record<string, unknown>, 
+        await this.validateReplaceAgainstSchema(findObject, 
+          queryObject[property] as Record<string, unknown>, 
           currentSchemaMap[property] as Schema, 
           updatedQueryObject[property] as Record<string, unknown>,
           embeddedUniqueProperty);
@@ -975,6 +976,7 @@ class Query {
         this.checkConstraints(property, currentSchemaMap[property]);
       }
     }
+    return true; 
   }
 
   /**

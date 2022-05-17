@@ -48,20 +48,20 @@ const infoSchema = dango.schema({
 const infoModel = dango.model('info', infoSchema);
 // TEST
 // console.log(await infoModel.insertOne({
-//   name: 'Mr. C',
+//   name: 'Mr. B',
 //   address: {
-//     number: '5 Archer Ave',
-//     // unit: '8D',
+//     number: '10 Archer Ave',
+//     unit: '8D',
 //     town: 'Bronx',
 //     state: 'NY',
-//     zipcode: '12223',
+//     zipcode: '12222',
 //     phone: {
-//       cell: '718-100-2000',
+//       cell: '718-100-5000',
 //     },
-//     house_id: 54321,
+//     house_id: 99999,
 //   },
 //   // test: 'test!!!',
-//   age: 30,
+//   age: 35,
 // }));
 
 // TEST FOR validateReplaceAgainstSchema
@@ -71,13 +71,13 @@ console.log(await infoModel.findOneAndReplace({
 {
   name: 'Mr. F',
   address: {
-    number: '6000',
+    number: '9000',
     unit: '3D',
     town: 'BK',
     state: 'NY',
     zipcode: '11222',
     phone: {
-      cell: '718-222-1235',
+      cell: '718-300-1235',
     },
     house_id: 55555,
   },
