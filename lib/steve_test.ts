@@ -7,6 +7,8 @@ import { SchemaOptions } from './schema.ts';
 // console.log(dango);
 await dango.connect('mongodb+srv://kaiz0923:qckgc2WHjd9Fq1ad@starwars.5sykv.mongodb.net/mongo-test?authMechanism=SCRAM-SHA-1');
 // console.log(dango.currentConnection);
+// backupConnect: 'mongodb+srv://wgreco13:g3HUuathwbVEisEj@cluster0.adcc3.mongodb.net/dangoDB?authMechanism=SCRAM-SHA-1'
+// collectionName: 'new'
 
 // test schemas
 const phoneSchema = dango.schema({
@@ -44,33 +46,32 @@ const infoSchema = dango.schema({
 // Test model creation
 
 const infoModel = dango.model('info', infoSchema);
-// console.log(await infoModel.findOne({ name: 'Bill'}));
 // TEST
 // console.log(await infoModel.insertOne({
-//   name: 'Mr. F',
+//   name: 'Mr. C',
 //   address: {
-//     number: '110',
+//     number: '5 Archer Ave',
 //     // unit: '8D',
-//     town: 'BK',
+//     town: 'Bronx',
 //     state: 'NY',
-//     zipcode: '11222',
+//     zipcode: '12223',
 //     phone: {
-//       cell: '718-222-1235',
+//       cell: '718-100-2000',
 //     },
-//     house_id: 555555,
+//     house_id: 54321,
 //   },
 //   // test: 'test!!!',
-//   age: 60,
+//   age: 30,
 // }));
 
 // TEST FOR validateReplaceAgainstSchema
 console.log(await infoModel.findOneAndReplace({
-  name: 'Mr. A'
+  name: 'Mr. F'
 },
 {
-  name: 'Mr. D',
+  name: 'Mr. F',
   address: {
-    number: '110',
+    number: '6000',
     unit: '3D',
     town: 'BK',
     state: 'NY',
@@ -78,11 +79,17 @@ console.log(await infoModel.findOneAndReplace({
     phone: {
       cell: '718-222-1235',
     },
-    house_id: 5556,
+    house_id: 55555,
   },
   // test: 'Not a test',
   age: 60,
 }));
+
+// console.log(await infoModel.findOneAndUpdate({
+//   name: 'Mr. D', 
+// }, {
+//   name: 'Mr. D'
+// }));
 
 
 // 1 level schema test
