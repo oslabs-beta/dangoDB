@@ -71,7 +71,7 @@ console.log(await infoModel.findOneAndReplace({
 {
   name: 'Mr. F',
   address: {
-    number: '9000',
+    number: '5000',
     unit: '3D',
     town: 'BK',
     state: 'NY',
@@ -79,7 +79,7 @@ console.log(await infoModel.findOneAndReplace({
     phone: {
       cell: '718-300-1235',
     },
-    house_id: 55555,
+    house_id: 54321,
   },
   // test: 'Not a test',
   age: 60,
