@@ -37,8 +37,8 @@ const dangoModel = dango.model('new', dangoSchema);
 // console.log(await dangoModel.insertOne({username: 'dango rules'}))
 // console.log(await dangoModel.findOne({ username: "dango rules" }));
 // console.log(await dangoModel.deleteOne({ username: "dango rules"}, (input) => {console.log('callback executed', input)}));
-// console.log(await dangoModel.updateMany({ name: 'Joker'}, { food: 'steak'  }));
-console.log(await dangoModel.find({name: 'Joker' }));
+// console.log(await dangoModel.updateMany({ name: 'Joker'}, { food: 'dango' }));
+// console.log(await dangoModel.find({name: 'Joker' }));
 // console.log(await dangoModel.findByIdAndUpdate('62733a0b76beb44c3c17e674', { age: 'Merlin'}))
 // console.log(await dangoModel.findOneAndReplace({ name: 'Merlin' }, { name: 'Merlin', age: 100, food: 'starbursts'}));
 // console.log(await dangoModel.find({name: 'Merlin' }));
@@ -46,9 +46,11 @@ console.log(await dangoModel.find({name: 'Joker' }));
 // console.log(await dangoModel.find({ username: "jack" }));
 // console.log(await dangoModel.find()); 
 // console.log(await dangoModel.find({ username: 'test'}, { limit: 2 }));
-// console.log(await dangoModel.insertMany([ { name: 'Goose', age: 25 }, { name: 'Maverick', age: 26 } ]));
-// console.log(await dangoModel.findOne({ name: "Goose" }));
-// console.log(await dangoModel.findOne({ name: "Maverick" }));
+// console.log(await dangoModel.insertMany([ { name: 'Viper' }, { name: 'Slider', age: 26 } ]));
+// console.log(await dangoModel.findOne({ name: "Viper" }));
+// console.log(await dangoModel.findOne({ name: "Slider" }));
+// console.log(await dangoModel.countDocuments({ name: 'Carp'}));
+console.log(await dangoModel.estimatedDocumentCount());
 
 // Test if we can bring connection into query specifically
 // Test queries from model

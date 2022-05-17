@@ -31,7 +31,12 @@ export class Schema {
     }
     this.schemaMap = {};    
     for (const property in schemaObj) {
-      if (typeof schemaObj[property] === 'object') {
+      // SJ: check if Schema assigned as value
+      if(schemaObj[property] instanceof Schema) {
+        // SJ: assign Schema 
+        this.schemaMap[property] = schemaObj[property];
+      }
+      else if (typeof schemaObj[property] === 'object') {
         this.schemaMap[property] = new SchemaOptions(schemaObj[property]) 
       } else if (typeof schemaObj[property] !== 'object' && Object.prototype.hasOwnProperty.call(dango.types, schemaObj[property])) {
         this.schemaMap[property] = new SchemaOptions({ type: schemaObj[property]})

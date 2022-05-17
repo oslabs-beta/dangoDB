@@ -441,3 +441,51 @@ export class SchemaDate {
     return this.valid;
   }
 }
+
+// SCHEMA OBJ
+
+export class SchemaObject {
+
+  public value: any; 
+  public valid: boolean | undefined;
+  public convertedValue: Record<string, unknown> | null | undefined;  
+
+  constructor(value: any) {
+    if (value === undefined) {
+      throw new Error('A value is required.')
+    }
+    this.value = value;
+    this.convertedValue;
+    this.valid
+  }  
+
+  /**
+  * Attempts to convert raw value to the given data type.
+  * Sets convertedValue property to the casted input if possible, or undefined if not.
+  */
+  convertType() {
+    if (this.value === null) {
+      this.convertedValue = this.value;
+    }
+
+    else if (typeof this.value === 'object') {
+        this.convertedValue = this.value;
+      // }
+    }
+    
+    else if (typeof this.value !== 'object') {
+      return;
+    }
+    
+    return this.convertedValue;
+  }
+
+  /**
+  * Checks whether the value was casted to the correct data type..
+  * Sets valid property to true or false.
+  */
+  validateType() {
+    this.valid = this.convertedValue === undefined ? false : true;
+    return this.valid;
+  }
+}

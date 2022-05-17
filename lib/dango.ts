@@ -15,7 +15,8 @@ import {
   SchemaString, SchemaBoolean, 
   SchemaObjectId, 
   SchemaUUID, 
-  SchemaDate 
+  SchemaDate,
+  SchemaObject, 
 } from './datatypes.ts'
 
 /**
@@ -39,6 +40,7 @@ class Dango {
       objectid: SchemaObjectId,
       UUID: SchemaUUID,
       date: SchemaDate,
+      object: SchemaObject,
     }
   }
 

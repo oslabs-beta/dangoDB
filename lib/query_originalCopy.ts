@@ -420,7 +420,7 @@ class Query {
         }
       } else {
         const collection = this.connection.db.collection(this.collectionName);
-        await this.validateInsertAgainstSchema(document, this.schema, this.updatedQueryObject);
+        await this.validateInsertAgainstSchema(document);
         const id = await collection.insertOne(this.updatedQueryObject, writeConcern);
         this.resetQueryObject();
         console.log('Successfully insertedOne')
@@ -461,7 +461,7 @@ class Query {
 
         const validatedDocuments = [];
         for(const doc of document) {
-          await this.validateInsertAgainstSchema(doc, this.schema, this.updatedQueryObject);
+          await this.validateInsertAgainstSchema(doc);
           validatedDocuments.push(this.updatedQueryObject);
           this.resetQueryObject();
         }
@@ -502,7 +502,7 @@ class Query {
         }
       } else {
         const collection = this.connection.db.collection(this.collectionName);
-        await this.validateUpdateAgainstSchema(update, this.schema, this.updatedQueryObject);
+        await this.validateUpdateAgainstSchema(update);
         const newUpdate = { $set: this.updatedQueryObject };
         if (typeof options === 'function') callback = options;
         options = {};
@@ -546,7 +546,7 @@ class Query {
         const collection = this.connection.db.collection(this.collectionName);
         if (typeof options === 'function') callback = options;
         options = {};
-        await this.validateReplaceAgainstSchema(filter, replacement, this.schema, this.updatedQueryObject);
+        await this.validateReplaceAgainstSchema(filter, replacement);
         const data = await collection.replaceOne(filter, this.updatedQueryObject, options);
         this.resetQueryObject();
         if (callback) return callback(data);
@@ -630,7 +630,7 @@ class Query {
         const collection = this.connection.db.collection(this.collectionName);
 
       // update the value of update with the $set operator
-      await this.validateUpdateAgainstSchema(update, this.schema, this.updatedQueryObject);
+      await this.validateUpdateAgainstSchema(update)
       const newUpdate = { $set: this.updatedQueryObject };
       // check if options is a function and reassign callback to options if so - so that we can bypass the options param
       if (typeof options === 'function') callback = options;
@@ -789,7 +789,7 @@ class Query {
         options = {};
       }
       //  $set operator, sets field in updateObject to corresponding value, check mongoDB atlas docs for updateOne for ref
-      await this.validateUpdateAgainstSchema(update, this.schema, this.updatedQueryObject);
+      await this.validateUpdateAgainstSchema(update);
       const setUpdateObject = { $set: this.updatedQueryObject };
 
       const data = await collection.updateOne(
@@ -837,7 +837,7 @@ class Query {
         options = {};
       }
       //  $set operator, sets field in updateObject to corresponding value, check mongoDB atlas docs for updateOne for ref
-      await this.validateUpdateAgainstSchema(update, this.schema, this.updatedQueryObject);
+      await this.validateUpdateAgainstSchema(update);
       const setUpdateObject = { $set: this.updatedQueryObject };
       const data = await collection.updateMany(
         document,
@@ -859,39 +859,16 @@ class Query {
    * Method validates schema for insert queries by calling each schema option. Validation steps will throw an error if validation fails.
    *
    * @param queryObject which is the client document to insert into the database
-   * @param schema which is the current schema, either at the outer level of a document or is an embedded schema
-   * @param updatedQueryObject which is the converted version of the user's queryObject with properly coverted types for each value
-   * @param embeddedUniqueProperty When checking a property in an embedded document with the schema option 'unique', set to true, this array will
-   * contain property keys from outer levels
    * @returns true or undefined.
    */
-  async validateInsertAgainstSchema(queryObject: Record<string, unknown>, 
-    schema: Schema, 
-    updatedQueryObject: Record<string, unknown>, 
-    embeddedUniqueProperty: string[] = []) {
-    
-    const currentSchemaMap = schema.schemaMap;
-
-    this.checkDataFields(queryObject, currentSchemaMap);
-    for (const property in currentSchemaMap) {
-      // current SchemaMap's current property value is either an instance of a Schema or a SchemaOption
-      // If Schema is stored, validate embedded object.
-      if(currentSchemaMap[property] instanceof Schema) {
-        updatedQueryObject[property] = {};
-        embeddedUniqueProperty.push(property);
-        await this.validateInsertAgainstSchema(queryObject[property] as Record<string, unknown>, 
-          currentSchemaMap[property] as Schema, 
-          updatedQueryObject[property] as Record<string, unknown>,
-          embeddedUniqueProperty);
-        embeddedUniqueProperty.pop();
-      }
-      else {
-        this.checkRequired(queryObject, property, currentSchemaMap[property] as optionsObject);
-        this.setDefault(queryObject, property, currentSchemaMap[property] as optionsObject);
-        this.populateQuery(queryObject, property, currentSchemaMap[property] as optionsObject, updatedQueryObject);
-        await this.checkUnique(property, currentSchemaMap[property] as optionsObject, updatedQueryObject, embeddedUniqueProperty);
-        this.checkConstraints(property, currentSchemaMap[property] as optionsObject);
-      }
+  async validateInsertAgainstSchema(queryObject: Record<string, unknown>) {
+    this.checkDataFields(queryObject);
+    for (const property in this.schema.schemaMap) {
+      this.checkRequired(queryObject, property, this.schema.schemaMap[property]);
+      this.setDefault(queryObject, property, this.schema.schemaMap[property]);
+      this.populateQuery(queryObject, property, this.schema.schemaMap[property]);
+      await this.checkUnique(property, this.schema.schemaMap[property])
+      this.checkConstraints(property, this.schema.schemaMap[property])
     }
     return true;
   }
@@ -902,40 +879,16 @@ class Query {
    *
    * @param findObject The query used to match documents
    * @param queryObject which is the client document to insert into the database
-   * @param schema which is the current schema, either at the outer level of a document or is an embedded schema
-   * @param updatedQueryObject which is the converted version of the user's queryObject with properly coverted types for each value
-   * @param embeddedUniqueProperty When checking a property in an embedded document with the schema option 'unique', set to true, this array will
-   * contain property keys from outer levels
    * @returns true or undefined.
    */
-  async validateReplaceAgainstSchema(findObject: Record<string, unknown>, 
-    queryObject: Record<string, unknown>, 
-    schema: Schema, 
-    updatedQueryObject: Record<string, unknown>, 
-    embeddedUniqueProperty: string[] = []) {
-    
-    const currentSchemaMap = schema.schemaMap;
-    this.checkDataFields(queryObject, currentSchemaMap);
-    for (const property in currentSchemaMap) {
-      // current SchemaMap's current property value is either an instance of a Schema or a SchemaOption
-      // If Schema is stored, validate embedded object.
-      if(currentSchemaMap[property] instanceof Schema) {
-        updatedQueryObject[property] = {};
-        embeddedUniqueProperty.push(property);
-        await this.validateReplaceAgainstSchema(findObject, 
-          queryObject[property] as Record<string, unknown>, 
-          currentSchemaMap[property] as Schema, 
-          updatedQueryObject[property] as Record<string, unknown>,
-          embeddedUniqueProperty);
-        embeddedUniqueProperty.pop();
-      }
-      else {
-        this.checkRequired(queryObject, property, currentSchemaMap[property]);
-        this.setDefault(queryObject, property, currentSchemaMap[property]);
-        this.populateQuery(queryObject, property, currentSchemaMap[property], updatedQueryObject);
-        await this.checkUniqueForReplace(property, currentSchemaMap[property], findObject, updatedQueryObject, embeddedUniqueProperty);
-        this.checkConstraints(property, currentSchemaMap[property]);
-      }
+  async validateReplaceAgainstSchema(findObject: Record<string, unknown>, queryObject: Record<string, unknown>) {
+    this.checkDataFields(queryObject);
+    for (const property in this.schema.schemaMap) {
+      this.checkRequired(queryObject, property, this.schema.schemaMap[property]);
+      this.setDefault(queryObject, property, this.schema.schemaMap[property]);
+      this.populateQuery(queryObject, property, this.schema.schemaMap[property]);
+      await this.checkUniqueForReplace(property, this.schema.schemaMap[property], findObject)
+      this.checkConstraints(property, this.schema.schemaMap[property])
     }
     return true;
   }
@@ -945,51 +898,26 @@ class Query {
    * checkRequired and setDefault steps are not needed in validateInsertAgainstSchema method.
    *
    * @param queryObject which is the client document field to update in the database
-   * @param schema which is the current schema, either at the outer level of a document or is an embedded schema
-   * @param updatedQueryObject which is the converted version of the user's queryObject with properly coverted types for each value
-   * @param embeddedUniqueProperty When checking a property in an embedded document with the schema option 'unique', set to true, this array will
-   * contain property keys from outer levels
    * @returns true or undefined.
    */
-  async validateUpdateAgainstSchema(queryObject: Record<string, unknown>, 
-    schema: Schema, 
-    updatedQueryObject: Record<string, unknown>, 
-    embeddedUniqueProperty: string[] = []) {
-
-    const currentSchemaMap = schema.schemaMap;
-    this.checkDataFields(queryObject, currentSchemaMap);
+  async validateUpdateAgainstSchema(queryObject: Record<string, unknown>) {
+    this.checkDataFields(queryObject);
     for (const property in queryObject) {
-      // current SchemaMap's current property value is either an instance of a Schema or a SchemaOption
-      // If Schema is stored, validate embedded object.
-      if(currentSchemaMap[property] instanceof Schema) {
-        updatedQueryObject[property] = {};
-        embeddedUniqueProperty.push(property);
-        await this.validateUpdateAgainstSchema(queryObject[property] as Record<string, unknown>, 
-          currentSchemaMap[property], 
-          updatedQueryObject[property] as Record<string, unknown>,
-          embeddedUniqueProperty);
-        embeddedUniqueProperty.pop();
-      }
-      else {
-        this.populateQuery(queryObject, property, currentSchemaMap[property], updatedQueryObject);
-        await this.checkUnique(property, currentSchemaMap[property], updatedQueryObject, embeddedUniqueProperty);
-        this.checkConstraints(property, currentSchemaMap[property]);
-      }
+      this.populateQuery(queryObject, property, this.schema.schemaMap[property]);
+      await this.checkUnique(property, this.schema.schemaMap[property])
+      this.checkConstraints(property, this.schema.schemaMap[property])
     }
-    return true; 
   }
 
   /**
    * Method loops through all fields in query objects and throws an error if any properties exist which are not present in the schema.
    *
    * @param queryObject which is the client document field to update or insert into the database
-   * @param schemaMap which contains the schemaMap for the current level in the user's document
    * @returns true or undefined.
    */
-  checkDataFields(queryObject: Record<string, unknown>, schemaMap: Record<string, unknown>) {
-
+  checkDataFields(queryObject: Record<string, unknown>) {
     for (const property in queryObject) {
-      if (!Object.prototype.hasOwnProperty.call(schemaMap, property)) {
+      if (!Object.prototype.hasOwnProperty.call(this.schema.schemaMap, property)) {
         throw new Error ('Requested query object contains properties not present in the Schema.')
       }
     }
@@ -1036,38 +964,30 @@ class Query {
    * @param queryObject which is the client document field to update or insert into the database
    * @param propertyName which is the property key to check
    * @param propertyOptions which is the propertyOptions object for the given property from the schema
-   * @param updatedQueryObject which is the formatted version of the user's queryObject with properly coverted types for each value.
-   * This may refer to the outer object or embedded objects within.
    * @returns true or undefined.
    */
-  populateQuery(queryObject: Record<string, unknown>, propertyName: string, propertyOptions: optionsObject, updatedQueryObject: Record<string, unknown>) {
+  populateQuery(queryObject: Record<string, unknown>, propertyName: string, propertyOptions: optionsObject) {
     const valueAsDatatype = new propertyOptions.type(queryObject[propertyName]);
     valueAsDatatype.convertType();
     valueAsDatatype.validateType();
+    // console.log(valueAsDatatype)
     if (valueAsDatatype.valid === false) {
       throw new Error('Data was not able to be translated to given specified schema data type.');
     }
-    updatedQueryObject[propertyName] = valueAsDatatype.convertedValue;
+    this.updatedQueryObject[propertyName] = valueAsDatatype.convertedValue;
   }
 
   /**
    * Method queries the database to see if a document already exists with a duplicate value for the given property.
    *
+   * @param queryObject which is the client document field to update or insert into the database
    * @param propertyName which is the property key to check
-   * @param propertyOptions which is the propertyOptions object for the given property from the schema
-   * @param updatedQueryObject which is the formatted version of the user's queryObject with properly coverted types for each value
-   * This may refer to the outer object or embedded objects within.
-   * @param embeddedUniqueProperty When checking a property in an embedded document with the schema option unique, set to true, this array will
-   * contain property keys from outer levels
    * @returns true or undefined.
    */
-  async checkUnique(propertyName: string, propertyOptions: optionsObject, updatedQueryObject: Record<string, unknown>, embeddedUniqueProperty: string[]) {
+  async checkUnique(propertyName: string, propertyOptions: optionsObject) {
+    const queryObjectForUnique: Record <string, unknown> = {};
+    queryObjectForUnique[propertyName] = this.updatedQueryObject[propertyName];
     if (propertyOptions.unique === true) {
-      // query object to check if unique value already exists in database collection
-      const queryObjectForUnique: Record <string, unknown> = {};
-      // constructs correctly formatted string for property key of queryObjectForUnique
-      const formattedPropertyName = this.formatQueryField(propertyName, embeddedUniqueProperty);
-      queryObjectForUnique[formattedPropertyName] = updatedQueryObject[propertyName];
       const propertyExists = await this.findOne(queryObjectForUnique);
       if (propertyExists !== undefined) {
         throw new Error('Property designated as unique in Schema already exists.');
@@ -1080,58 +1000,27 @@ class Query {
    * Method queries the database to see if a document already exists with a duplicate value for the given property.
    * This method is different from checkUnique due to edge case where document property flagged as unique replaces itself.
    *
+   * @param queryObject which is the client document field to update or insert into the database
    * @param propertyName which is the property key to check
    * @param findObject The query used to match documents
-   * @param updatedQueryObject which is the formatted version of the user's queryObject with properly coverted types for each value
-   * This may refer to the outer object or embedded objects within.
-   * @param embeddedUniqueProperty When checking a property in an embedded document with the schema option unique, set to true, this array will
-   * contain property keys from outer levels
    * @returns true or undefined.
    */
-  async checkUniqueForReplace(propertyName: string, 
-    propertyOptions: optionsObject, 
-    findObject: Record<string, unknown>, 
-    updatedQueryObject: Record<string, unknown>, 
-    embeddedUniqueProperty: string[]) {
-
-      if (propertyOptions.unique === true) {
-        let originalPropertyValue = await this.findOne(findObject);
-        if (originalPropertyValue === undefined) {
-          throw new Error('No database entry found on query.');
+  async checkUniqueForReplace(propertyName: string, propertyOptions: optionsObject, findObject: Record<string, unknown>) {
+    const queryObjectForUnique: Record<string, unknown> = {}
+    queryObjectForUnique[propertyName] = this.updatedQueryObject[propertyName];
+    if (propertyOptions.unique === true) {
+      const originalPropertyValue = await this.findOne(findObject);
+      if (originalPropertyValue === undefined) {
+        throw new Error('No database entry found on query.');
+      }
+      else if (originalPropertyValue === null) throw new Error('No database entry found on query.')
+      else if (typeof originalPropertyValue === 'object') {
+        const propertyExists = await this.findOne(queryObjectForUnique);
+        //@ts-ignore Fix later.
+        if (propertyExists !== undefined && originalPropertyValue[propertyName] !== this.updatedQueryObject[propertyName]) {
+          throw new Error('Property designated as unique in Schema already exists.');
         }
-        else if (originalPropertyValue === null) throw new Error('No database entry found on query.')
-        else if (typeof originalPropertyValue === 'object') {
-          // iterate through embeddedUniqueProperty array to access embedded objects that directly contains current propertyName
-          if(embeddedUniqueProperty.length) {
-            embeddedUniqueProperty.forEach((prop) => {
-              //@ts-ignore Fix later.
-              originalPropertyValue = originalPropertyValue[prop];
-            })
-          }
-          // convert originalPropertyValue's type to match matching property's type in the updatedQueryObject
-          //@ts-ignore Fix later.
-          const valueAsDatatype = new propertyOptions.type(originalPropertyValue[propertyName]);
-          valueAsDatatype.convertType();
-          valueAsDatatype.validateType();
-          if (valueAsDatatype.valid === false) {
-            throw new Error('Data was not able to be translated to given specified schema data type.');
-          }
-          const formattedOriginalPropertyValue = JSON.stringify(valueAsDatatype.convertedValue);
-          const formattedUpdatedQueryObjectValue = JSON.stringify(updatedQueryObject[propertyName]);
-
-          // query object to check if unique value already exists in database collection
-          const queryObjectForUnique: Record<string, unknown> = {};
-          // constructs correctly formatted string for property key of queryObjectForUnique
-          const formattedPropertyName = this.formatQueryField(propertyName, embeddedUniqueProperty);
-          queryObjectForUnique[formattedPropertyName] = updatedQueryObject[propertyName];
-          const propertyExists = await this.findOne(queryObjectForUnique);
-
-          // If property value exists in database collection, AND the property value from the found document (ln 1096) doesn't match
-          // the property value in the updatedQueryObject, throw an error.
-          if (propertyExists !== undefined && formattedOriginalPropertyValue !== formattedUpdatedQueryObjectValue) {
-            throw new Error(`Property designated as unique in Schema already exists. ${formattedPropertyName}: ${formattedUpdatedQueryObjectValue}`);
-          }
-        }
+      }
     }
     return true;
   }
@@ -1139,8 +1028,8 @@ class Query {
   /**
    * Method validates that the casted datatype satisfies the user defined callback function.
    *
+   * @param queryObject which is the client document field to update or insert into the database
    * @param propertyName which is the property key to check
-   * @param propertyOptions which is the propertyOptions object for the given property from the schema
    * @returns true or undefined.
    */
   checkConstraints(propertyName: string, propertyOptions: optionsObject) {
@@ -1163,30 +1052,6 @@ class Query {
   resetQueryObject() {
     this.updatedQueryObject = {};
     return;
-  }
-
-    /**
-   * Method 
-   *
-   * @param propertyName which is the property key to check, will be the last property in the returned string
-   * @param embeddedUniqueProperty When checking a property in an embedded document with the schema option 'unique', set to true, this array will
-   * contain property keys from outer levels.
-   * @returns a string that is either equal to propertyName or a concatenated string containing properties from parent levels with dot notation
-   * in order to format a proper string key to execute a database query for a value inside an embedded document.
-   */
-  formatQueryField(propertyName: string, embeddedUniqueProperty: string[]) {
-    let string = '';
-    if(embeddedUniqueProperty.length === 0) {
-      return propertyName;
-    }
-    else {
-      while(embeddedUniqueProperty.length > 0) {
-        if(string === '') string += embeddedUniqueProperty.shift();
-        else string += `.${embeddedUniqueProperty.shift()}`;
-      }
-      string += `.${propertyName}`;
-    }
-    return string;
   }
 }
 
