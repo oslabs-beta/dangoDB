@@ -5,7 +5,7 @@ Table of Contents
 
 1. Background / Overview
 2. Getting Started
-3. Queries
+3. Query Functions
 4. Schema Options
 5. Schema Generator GUI
 6. Section for our tech stack?
@@ -14,9 +14,9 @@ Background / Overview
 
 // include a spiel about the lack of MongoDB ODM's for Deno?
 Deno is a relatively new(young?) runtime environment. At this time, there are no major ODM libraries for Deno that are similar Mongoose, Prisma
-or TypeORM. 
+or TypeORM, so that's where dangoDB comes in. 
 
-dangoDB is an Object Data Modeling (ODM) library for MongoDB that was developed for Deno. In Deno,
+dangoDB is a MongoDB Object Data Modeling (ODM) library that was developed for Deno. In Deno,
 developers using our library(or tool?) can construct schemas, models, and enforce them with our built-in 
 schema/type validation. The query functions available from the deno_mongo driver can all be accessed with ease. 
 
@@ -65,7 +65,7 @@ queried all the dinosaurs in our Dinosaur model in your MongoDB using dangoDB. E
 
 
 
-QUERIES
+QUERY FUNCTIONS
 
 All queries in dangoDB are performed using dangoDB models. Listed below are all the functions for CRUD operations.
 
@@ -99,60 +99,152 @@ Other Operations
 CRUD Operations
 
 Model.deleteMany()
+Parameters:
+- queryObject - Query to specify which documents to delete.
+- options - [optional]
+- callback - [callback]
+Returns:
+- object with property deletedCount, value number
+
+Deletes all of the documents that match the conditions from the DB collection. It returns an object with the property deletedCount,
+indicating how many documents were deleted. 
 
 Model.deleteOne()
+Parameters:
+- queryObject - The query used to find matching document.
+- options [optional]
+- callback [optional]
+Return:
+- object with property deletedCount, value number
+
+Deletes the first document that matches the conditions from the DB collection. It returns an object with the property deletedCount,
+indicating how many documents were deleted. 
 
 Model.find()
 Parameters:
 - queryObject - The query used to find matching documents.
-- [options] - Additional options for the operation (e.g. lean, populate, projection)
-- [callback] 
+- options - [optional] Additional options for the operation (e.g. lean, populate, projection)
+- callback - [optional]
 Returns:
-- Returns all matching documents in an array.
+- All matching documents in an array.
 
 Returns all documents that satisfy the specified query criteria on the collection or view. 
 
 Model.findById()
 Parameters:
-- queryObject - The query used to find matching documents, using id.
-- [options] - Additional options for the operation (e.g. lean, populate, projection)
-- [callback]
+- queryObject - The query used to find matching document, using id.
+- options - [optional] - Additional options for the operation (e.g. lean, populate, projection)
+- callback - [optional]
 Returns:
-- Returns first matching document found in database.
+- Matching document.
 
-
-
+Returns document that matches user provided ObjectId.
 
 Model.findByIdAndDelete()
 
-Model.findByIdAndRemove()
 
 Model.findByIdAndUpdate()
 
 Model.findOne()
+Parameters:
+- queryObject - Query used to find matching document. 
+- options - [optional]
+- callback - [optional]
+Return:
+- Matching document.
+
+Returns first document that matches query.
 
 Model.findOneAndDelete()
 
-Model.findOneAndRemove()
 
 Model.findOneAndReplace()
+Parameters:
+- filter - Query used to find matching document
+- replace - User document to replace matching document at database 
+- options - [optional]
+- callback - [optional]
+Return:
+- object displaying count for how many documents were upserted, matching, modified.
+
+Finds a matching document, removes it, and passes in user's document. Replacement document retains same ObjectId as original document. 
 
 Model.findOneAndUpdate()
 
 Model.insertOne()
 Parameters:
-- document - user provided object to be inserted into the database.
+- document - User provided object to be inserted into the database.
 Returns:
-- 
+- Returns ObjectId of inserted document.
+
+Inserts one document into database collection. 
 
 Model.insertMany()
+Parameters:
+- document - Array of document(s) to be inserted into database.
+- options - [optional] 
+- callback - [optional]
+Return:
+- documents that passed validation.
+
+Insert multiple documents into database. 
 
 Model.updateMany()
+Parameters:
+- document - query used to find document(s) to update
+- update - object containing field(s) and values to set them to
+- options - [optional]
+- callback - [optional]
+Returns:
+- object with properties upsertedId, upsertedCount, matchedCount, modifiedCount
+
+Updates all documents that match queryObject. The matching fields in the DB collection will be set to the values in the updateObject.
 
 Model.updateOne()
+Parameters:
+- document - query used to find document to update
+- update - object containing field(s) and values to set them to
+- options - [optional]
+- callback - [optional]
+Returns:
+- object with properties upsertedId, upsertedCount, matchedCount, modifiedCount
+
+Updates one document. The fields in the updateObject will be set to their respective values.
 
 
+SCHEMA OPTIONS
 
+When creating a schema, a type can be assigned to each property in string format, or an object with schema options properties.
+
+Schema Options
+- type - number, decimal128, stirng, boolean, objectid, UUID, date, object
+- required - true or false, specifies whether a value is required in an insert document or replacement document. 
+- default - default value if no value is provided by user
+- unique - true or false, specifies whether a value will be designated as unique for the property.
+- validator - user can provide function test that values to be inserted/update need to pass before being inserted.
+
+User object to pass into dango.schema(): 
+
+  { name: 'string', age: 'number' }
+
+  { name: 
+    { type: 'string', required: true, default: null, unique: true: validator: null }
+  }
+
+To set the type for an embedded object, create a schema for that object, and assign that schema to the property that corresponds with the object.
+
+addressSchema = dango.schema({ house_number: 'number', unit: 'string', street: 'string', city: 'string'});
+
+personSchema = dango.schema({ 
+  name: 'string', 
+  address: addressSchema 
+})
+
+
+SCHEMA GENERATOR GUI
+
+With dangoDB's easy to navigate web-based GUI, users can easily select schema options for each property in a schema, and generate proper
+schema code that can be copied and pasted directly into your project.
 
 
 

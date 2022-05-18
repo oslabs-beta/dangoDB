@@ -48,17 +48,17 @@ const infoSchema = dango.schema({
 const infoModel = dango.model('info', infoSchema);
 // TEST
 console.log(await infoModel.insertOne({
-  name: 'Mr. B',
+  name: 'Mr. Z',
   address: {
-    number: '10 Archer Ave',
-    unit: '8D',
+    number: '1555',
+    // unit: '8D',
     town: 'Bronx',
     state: 'NY',
     zipcode: '12222',
     phone: {
       cell: '718-100-5000',
     },
-    house_id: 99999,
+    house_id: 88888,
   },
   // test: 'test!!!',
   age: 35,
