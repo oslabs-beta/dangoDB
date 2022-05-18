@@ -219,6 +219,7 @@ Model.findOne()
 * @param options - [optional]
 * @param callback - [optional]
 * @returns Matching document.
+*/
 ```
 
 - Model.findOneAndDelete()
@@ -257,6 +258,7 @@ Model.findOneAndReplace()
 * @param options - [optional]
 * @param callback - [optional]
 * @returns object displaying count for how many documents were upserted, matching, modified.
+*/
 ```
 
 - Model.findOneAndUpdate()
@@ -270,6 +272,7 @@ Model.findOneAndUpdate()
 * @param callback [optional]
 * @returns the document matched
 */
+```
 
 - Model.insertOne()
 ```javascript
@@ -278,6 +281,7 @@ Model.insertOne()
 * @description Inserts one document into database collection. 
 * @param document - User provided object to be inserted into the database.
 * @returns ObjectId of inserted document.
+*/
 ```
 
 - Model.insertMany()
@@ -289,6 +293,7 @@ Model.insertMany()
 * @param options - [optional] 
 * @param callback - [optional]
 * @returns documents that passed validation.
+*/
 ```
 
 - Model.replaceOne()
@@ -301,6 +306,7 @@ Model.replaceOne()
 * @param options - [optional]
 * @param callback - [optional]
 * @returns The updated object.
+*/
 ```
 
 - Model.updateMany()
@@ -313,6 +319,7 @@ Model.updateMany()
 * @param options - [optional]
 * @param callback - [optional]
 * @returns object with properties upsertedId, upsertedCount, matchedCount, modifiedCount
+*/
 ```
 
 - Model.updateOne()
@@ -325,6 +332,7 @@ Model.updateOne()
 * @param options - [optional]
 * @param callback - [optional]
 * @returns object with properties upsertedId, upsertedCount, matchedCount, modifiedCount
+*/
 ```
 
 #### Other Operations
@@ -339,6 +347,7 @@ Model.aggregate()
 * Analyze data changes over time.
 * @param Aggregation pipeline as an array of objects.
 * @returns Documents returned are plain javascript documents; 
+*/
 ```
 
 - Model.countDocuments()
