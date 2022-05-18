@@ -1,3 +1,1 @@
-/**
- * @description Mod file exports all necessary local modules.
- */
+export { dango } from './lib/dango.ts';
