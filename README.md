@@ -1,251 +1,423 @@
-# dangoDB
-A MongoDB ODM for Deno
+<div align="center">
+  <img style="width: 70%" src="assets/dangoDB_logo_long_midboi.png" alt="dangoDB logo">
+</div>
 
-Table of Contents
+<h1 align="center">dangoDB</h1>
 
-1. Background / Overview
-2. Getting Started
-3. Query Functions
-4. Schema Options
-5. Schema Generator GUI
-6. Section for our tech stack?
+<div align="center">A MongoDB ODM for Deno</div>
+<br>
+<div align="center"><a href="https://dangodb-website.web.app/">Visit our Website</a></div>
+<br>
+<div align="center"><a href="https://dangodb-website.web.app/">Read our Medium Launch Article</a></div>
+<br>
 
-Background / Overview
+## Table of Contents
 
-// include a spiel about the lack of MongoDB ODM's for Deno?
-Deno is a relatively new(young?) runtime environment. At this time, there are no major ODM libraries for Deno that are similar Mongoose, Prisma
-or TypeORM, so that's where dangoDB comes in. 
+1. [Description](#description)
+2. [Getting Started](#get-started)
+3. [Query](#query)
+4. [Schema](#schema)
+5. [Authors](#authors)
+6. [License](#license)
 
-dangoDB is a MongoDB Object Data Modeling (ODM) library that was developed for Deno. In Deno,
-developers using our library(or tool?) can construct schemas, models, and enforce them with our built-in 
-schema/type validation. The query functions available from the deno_mongo driver can all be accessed with ease. 
+## <a name="description"></a>Description
+
+<strong>dangoDB</strong> is a light-weight MongoDB Object Document Mapper (ODM) library that was built for Deno. It provides the core functionality and familiar look and feel of established Node-based libraries for the Deno runtime. With dangoDB, developers can construct schemas, models, and enforce them type-casting and schema validation to structure their databases. The query functions available from the deno_mongo driver can all be accessed with ease. 
 
 In addition, we built a user-friendly web-based GUI that auto-generates schema for clients(users?) to copy and paste directly into their code. 
 (insert link)
 
 
-Getting Started
+## <a name="get-started"></a>Getting Started
 
-First be sure that you have Deno runtime installed. 
+First be sure that you have Deno runtime installed and configured.
 
-Installation
+### Quick Start
 
-In your TypeScript file, import the dango module from deno.land (website URL link)
+In your application, import the dangoDB module from the [deno.land module](https://deno.land/x/dangodb.mod.ts).
 
-import { dango } from ' ' // img?
+```javascript
+import { dango } from 'https://deno.land/x/dangodb.mod.ts'
+```
+
+### Connect to your Database
 
 The next thing we need to do is open a connection to your MongoDB database using your URI string.
 
-await dango.connect(URI); // img or shell
+```javascript
+await dango.connect('URI_STRING');
+
+await dango.disconnect();
+```
+
+### Define Your Schema
 
 Then we will want to define a schema and create a reference to it as illustrated below.
 
-const dinosaurSchema = dango.schema({
-  name: { type: 'string', required: true },
-});
+```javascript
+const dinosaurSchema = dango.schema(
+  {
+    name:                 // A property accepts the below options. Only type is required and must be a valid selection.
+      { 
+        type: 'string',   // Valid data types listed below.
+        required: true,   // A boolean to indicate if the inserted property must have a value specified. Defaults to false
+        unique: true,     // A boolean to indicate if the inserted property much be unique in its value in the collection. Defaults to false.
+        default: 'T-Rex', // A value to default to if none specified and required = false. Defaults to null.
+        validator: null   // A user provided validation function that must return true with the casted value as input for the data to pass schema validation. Defaults to null.
+      },
+    age: 'number',        // A property can also accept a schema value with only a type indicated.
+  }
+);
+
+/**
+*  Valid datatypes:
+*  - 'number'
+*  - 'decimal128'
+*  - 'string'
+*  - 'boolean'
+*  - 'objectid'
+*  - 'uuid'
+*  - 'date'
+*  - userSchema            // User defined schema.
+*  - array **              // In progress - Not yet implemented.
+*
+*/
+
+```
+
+### Create Your Model
 
 Great! Now we have a schema with one property, name, which will be a 'string.' The next step is compiling our schema into a Model.
 
+```javascript
 const Dinosaur = dango.model('Dinosaur', dinosaurSchema);
+```
+
+### Make a Query
 
 Now, let's insert a document into the Dinosaur model.
 
+```javascript
 await Dinosaur.insertOne({ name: 'Stegosaurus' });
+```
 
 Now, let's say we wanted to display all the dinosaurs in our collection. We can access all of the dinosaur documents through our Dinosaur model.
 
-
+```javascript
 const dinosaurs = await Dinosaur.find({ });
-console.log(dinosaurs); // [ { name: 'Triceratops' }, { name: 'Brontosaurus' }, { name: 'Stegosaurus' }];
+console.log(dinosaurs); 
+// [ { name: 'Triceratops', age: 70,000,000 }, { name: 'Brontosaurus', age: 150,000,000 }, { name: 'Stegosaurus', age: null }];
+```
 
-Now you've successfully inserted a document into the Person collection at your MongoDB database. 
+Now you've successfully inserted a document into the Dinosaur collection at your MongoDB database. 
 
-Congratulations. That's the end of our quick start. We imported dangoDB, opened up a connection, created a schema, inserted a document for Stegosaurus, and
+Congratulations! That's the end of our quick start. We imported dangoDB, opened up a connection, created a schema, inserted a document for Stegosaurus, and
 queried all the dinosaurs in our Dinosaur model in your MongoDB using dangoDB. Explore the rest of the readme.MD for more detailed instructions on how to use dangoDB.
 
 
 
-QUERY FUNCTIONS
+## <a name="query"></a>Query
 
-All queries in dangoDB are performed using dangoDB models. Listed below are all the functions for CRUD operations.
+All queries in dangoDB are performed using models. The queries are built on the [deno_mongo](https://deno.land/x/mongo@v0.29.4) drivers. The documentation there may help guide query options. Listed below are all the query functions available in the dangoDB library.
 
-CRUD Operations
+#### Create, Read, Update, Delete Operations
 
 - Model.deleteMany()
-- Model.deleteOne()
-- Model.find()
-- Model.findById()
-- Model.findByIdAndDelete()
-- Model.findByIdAndRemove()
-- Model.findByIdAndUpdate()
-- Model.findOne()
-- Model.findOneAndDelete()
-- Model.findOneAndRemove()
-- Model.findOneAndReplace()
-- Model.findOneAndUpdate()
-- Model.insertOne()
-- Model.insertMany()
-- Model.replaceOne()
-- Model.updateMany()
-- Model.updateOne()
+```javascript
+Model.deleteMany()
+/**
+* @description Deletes all of the documents that match the conditions from the DB collection. It returns an object with 
+* the property deletedCount, indicating how many documents were deleted. 
+* @param queryObject - Query to specify which documents to delete.
+* @param options - [optional]
+* @param callback - [callback]
+* @returns object with property deletedCount, value number 
+*/
+```
 
-Other Operations
+- Model.deleteOne()
+```javascript
+Model.deleteOne()
+/**
+* @description Deletes the first document that matches the conditions from the DB collection. It returns an object 
+* with the property deletedCount, indicating how many documents were deleted. 
+* @param queryObject - The query used to find matching document.
+* @param options [optional]
+* @param callback [optional]
+* @returns object with property deletedCount, value number
+*/
+```
+- Model.find()
+```javascript
+Model.find()
+/**
+* @ description Returns all documents that satisfy the specified query criteria on the collection or view. 
+* @param queryObject - The query used to find matching documents.
+* @param options - [optional] Additional options for the operation (e.g. lean, populate, projection)
+* @param callback - [optional]
+* @returns All matching documents in an array.
+*/
+```
+
+- Model.findById()
+```javascript
+Model.findById()
+/**
+* @description Returns document that matches user provided ObjectId.
+* @param queryObject - The query used to find matching document, using id.
+* @param options - [optional] - Additional options for the operation (e.g. lean, populate, projection)
+* @param callback - [optional]
+* @returns Matching document.
+*/
+```
+
+- Model.findByIdAndDelete()
+```javascript
+Model.findByIdAndDelete()
+/**
+* @description Deletes the first document that matches the id from the DB collection. It returns the document 
+* with the matched property. 
+* @param queryObject - The query used to find matching document, using id.
+* @param options [optional]
+* @param callback [optional]
+* @returns the deleted document.
+*/
+```
+
+- Model.findByIdAndRemove()
+```javascript
+Model.findByIdAndRemove()
+/**
+* @description Deletes the first document that matches the id from the DB collection. It returns the document 
+* with the matched property. 
+* @param queryObject - The query used to find matching document, using id.
+* @param options [optional]
+* @param callback [optional]
+* @returns the document matched and removed
+*/
+```
+
+- Model.findByIdAndUpdate()
+```javascript
+Model.findByIdAndUpdate()
+/**
+* @description Updates the first document that matches the id from the DB collection. It returns the document 
+* with the matched property. 
+* @param filter - id used to find matching document
+* @param replace - User document to replace matching document at database 
+* @param callback [optional]
+* @returns the document matched
+*/
+```
+
+- Model.findOne()
+```javascript
+Model.findOne()
+/**
+* @description Returns first document that matches query.
+* @param queryObject - Query used to find matching document. 
+* @param options - [optional]
+* @param callback - [optional]
+* @returns Matching document.
+```
+
+- Model.findOneAndDelete()
+```javascript
+Model.findOneAndDelete()
+/**
+* @description Deletes the first document that matches the filter from the DB collection. It returns the document 
+* with the matched property. 
+* @param queryObject - The query used to find matching document
+* @param options [optional]
+* @param callback [optional]
+* @returns the deleted document.
+*/
+```
+
+- Model.findOneAndRemove()
+```javascript
+Model.findOneAndRemove()
+/**
+* @description Deletes the first document that matches the filter from the DB collection. It returns the document 
+* with the matched property. 
+* @param queryObject - The query used to find matching document
+* @param options [optional]
+* @param callback [optional]
+* @returns the deleted document.
+*/
+```
+
+- Model.findOneAndReplace()
+```javascript
+Model.findOneAndReplace()
+/**
+* @description Finds a matching document, removes it, and passes in user's document. Replacement document retains same ObjectId as original document. 
+* @param filter - Query used to find matching document
+* @param replace - User document to replace matching document at database 
+* @param options - [optional]
+* @param callback - [optional]
+* @returns object displaying count for how many documents were upserted, matching, modified.
+```
+
+- Model.findOneAndUpdate()
+```javascript
+Model.findOneAndUpdate()
+/**
+* @description Updates the first document that matches filter from the DB collection. It returns the document 
+* with the matched property. 
+* @param filter - id used to find matching document
+* @param replace - User document to replace matching document at database 
+* @param callback [optional]
+* @returns the document matched
+*/
+
+- Model.insertOne()
+```javascript
+Model.insertOne()
+/** 
+* @description Inserts one document into database collection. 
+* @param document - User provided object to be inserted into the database.
+* @returns ObjectId of inserted document.
+```
+
+- Model.insertMany()
+```javascript
+Model.insertMany()
+/**
+* @description Insert multiple documents into database. 
+* @param document - Array of document(s) to be inserted into database.
+* @param options - [optional] 
+* @param callback - [optional]
+* @returns documents that passed validation.
+```
+
+- Model.replaceOne()
+```javascript
+Model.replaceOne()
+/**
+* @description Finds a matching document, removes it, and passes in user's document. Replacement document retains same ObjectId as original document. 
+* @param filter - Query used to find matching document
+* @param replace - User document to replace matching document at database 
+* @param options - [optional]
+* @param callback - [optional]
+* @returns The updated object.
+```
+
+- Model.updateMany()
+```javascript
+Model.updateMany()
+/**Parameters:
+* @description Updates all documents that match queryObject. The matching fields in the DB collection will be set to the values in the updateObject.
+* @param document - query used to find document(s) to update
+* @param update - object containing field(s) and values to set them to
+* @param options - [optional]
+* @param callback - [optional]
+* @returns object with properties upsertedId, upsertedCount, matchedCount, modifiedCount
+```
+
+- Model.updateOne()
+```javascript
+Model.updateOne()
+/**
+* @description Updates one document. The fields in the updateObject will be set to their respective values.
+* @param document - query used to find document to update
+* @param update - object containing field(s) and values to set them to
+* @param options - [optional]
+* @param callback - [optional]
+* @returns object with properties upsertedId, upsertedCount, matchedCount, modifiedCount
+```
+
+#### Other Operations
 
 - Model.aggregate()
+```javascript
+Model.aggregate()
+/**
+* @ description Aggregation operations process multiple documents and return computed results. You can use aggregation operations to:
+* Group values from multiple documents together.
+* Perform operations on the grouped data to return a single result.
+* Analyze data changes over time.
+* @param Aggregation pipeline as an array of objects.
+* @returns Documents returned are plain javascript documents; 
+```
+
 - Model.countDocuments()
+```javascript
+/**
+Model.countDocuments()
+* @description Counts number of documents matching filter in a database collection.
+* @param document - query used to find document to update 
+* @param options - [optional]
+* @param callback - [optional]
+* @returns a count (number);
+* example: query.countDocuments({ username: 'test' });
+*/
+```
+
 - Model.dropCollection()
+```javascript
+Model.dropCollection()
+/**
+* @description DropCollection drops current model/collection that user is connected to.
+* @returns undefined
+*/
+```
+
 - Model.estimatedCount()
+```javascript
+Model.estimatedCount()
+/**
+* @description Returns the count of all documents in a collection or view. The method wraps the count command.   
+* @param options - [optional]
+* @param callback - [optional]
+* @returns a count (number);
+*/
+```
 
-CRUD Operations
-
-Model.deleteMany()
-Parameters:
-- queryObject - Query to specify which documents to delete.
-- options - [optional]
-- callback - [callback]
-Returns:
-- object with property deletedCount, value number
-
-Deletes all of the documents that match the conditions from the DB collection. It returns an object with the property deletedCount,
-indicating how many documents were deleted. 
-
-Model.deleteOne()
-Parameters:
-- queryObject - The query used to find matching document.
-- options [optional]
-- callback [optional]
-Return:
-- object with property deletedCount, value number
-
-Deletes the first document that matches the conditions from the DB collection. It returns an object with the property deletedCount,
-indicating how many documents were deleted. 
-
-Model.find()
-Parameters:
-- queryObject - The query used to find matching documents.
-- options - [optional] Additional options for the operation (e.g. lean, populate, projection)
-- callback - [optional]
-Returns:
-- All matching documents in an array.
-
-Returns all documents that satisfy the specified query criteria on the collection or view. 
-
-Model.findById()
-Parameters:
-- queryObject - The query used to find matching document, using id.
-- options - [optional] - Additional options for the operation (e.g. lean, populate, projection)
-- callback - [optional]
-Returns:
-- Matching document.
-
-Returns document that matches user provided ObjectId.
-
-Model.findByIdAndDelete()
-
-
-Model.findByIdAndUpdate()
-
-Model.findOne()
-Parameters:
-- queryObject - Query used to find matching document. 
-- options - [optional]
-- callback - [optional]
-Return:
-- Matching document.
-
-Returns first document that matches query.
-
-Model.findOneAndDelete()
-
-
-Model.findOneAndReplace()
-Parameters:
-- filter - Query used to find matching document
-- replace - User document to replace matching document at database 
-- options - [optional]
-- callback - [optional]
-Return:
-- object displaying count for how many documents were upserted, matching, modified.
-
-Finds a matching document, removes it, and passes in user's document. Replacement document retains same ObjectId as original document. 
-
-Model.findOneAndUpdate()
-
-Model.insertOne()
-Parameters:
-- document - User provided object to be inserted into the database.
-Returns:
-- Returns ObjectId of inserted document.
-
-Inserts one document into database collection. 
-
-Model.insertMany()
-Parameters:
-- document - Array of document(s) to be inserted into database.
-- options - [optional] 
-- callback - [optional]
-Return:
-- documents that passed validation.
-
-Insert multiple documents into database. 
-
-Model.updateMany()
-Parameters:
-- document - query used to find document(s) to update
-- update - object containing field(s) and values to set them to
-- options - [optional]
-- callback - [optional]
-Returns:
-- object with properties upsertedId, upsertedCount, matchedCount, modifiedCount
-
-Updates all documents that match queryObject. The matching fields in the DB collection will be set to the values in the updateObject.
-
-Model.updateOne()
-Parameters:
-- document - query used to find document to update
-- update - object containing field(s) and values to set them to
-- options - [optional]
-- callback - [optional]
-Returns:
-- object with properties upsertedId, upsertedCount, matchedCount, modifiedCount
-
-Updates one document. The fields in the updateObject will be set to their respective values.
-
-
-SCHEMA OPTIONS
+## <a name="schema"></a>Schema
 
 When creating a schema, a type can be assigned to each property in string format, or an object with schema options properties.
 
-Schema Options
-- type - number, decimal128, stirng, boolean, objectid, UUID, date, object
-- required - true or false, specifies whether a value is required in an insert document or replacement document. 
-- default - default value if no value is provided by user
-- unique - true or false, specifies whether a value will be designated as unique for the property.
-- validator - user can provide function test that values to be inserted/update need to pass before being inserted.
-
-User object to pass into dango.schema(): 
-
-  { name: 'string', age: 'number' }
-
-  { name: 
-    { type: 'string', required: true, default: null, unique: true: validator: null }
-  }
+#### Schema Options
+- type - number, decimal128, string, boolean, objectid, UUID, date, object. Specified as a lowercase string.
+- required - boolean, specifies whether a value is required in an insert document or replacement document. 
+- unique - boolean, specifies whether a value will be designated as unique for the property.
+- default - default value if no value is provided by user. Defaults to null.
+- validator - user can provide function test that values to be inserted/update need to pass before being inserted. Defaults to null.
 
 To set the type for an embedded object, create a schema for that object, and assign that schema to the property that corresponds with the object.
 
-addressSchema = dango.schema({ house_number: 'number', unit: 'string', street: 'string', city: 'string'});
+```javascript
+addressSchema = dango.schema(
+  {
+    house_number: 'number', 
+    unit: 'string', 
+    street: 'string', 
+    city: 'string'
+  }
+);
 
-personSchema = dango.schema({ 
-  name: 'string', 
-  address: addressSchema 
-})
+personSchema = dango.schema(
+  { 
+    name: 'string', 
+    address: addressSchema 
+  }
+);
+```
 
 
-SCHEMA GENERATOR GUI
+## <a name="authors"></a>Authors
 
-With dangoDB's easy to navigate web-based GUI, users can easily select schema options for each property in a schema, and generate proper
-schema code that can be copied and pasted directly into your project.
+- [Bill Greco](https://github.com/wgreco13)
+- [Steve Jue](https://github.com/kaizenjoo)
+- [Celeste Knopf](https://github.com/DHolliday1881)
+- [Emilia Yoffie](https://github.com/emiliayoffie)
 
+## <a name="license"></a>License
 
+This product is licensed under the MIT License - see the LICENSE file for details.
 
+This is an open source product.
+
+This product is accelerated by <a href="https://opensourcelabs.io/">OS Labs.</a>
 
