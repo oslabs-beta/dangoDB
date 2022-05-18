@@ -134,6 +134,37 @@ describe('test Query methods', () => {
 
     })
 
+    it('will throw an error if assigned value in queryObject cannot be converted to specified type in schema', () => {
+      queryObject = { age: true };
+      propertyName = 'age';
+      propertyOptions = testSchema.schemaMap[propertyName];
+      assertThrows(() => { query.populateQuery(queryObject, propertyName, propertyOptions, updatedQueryObject) });
+    })
+
+  })
+
+  // need to figure out how to mock or craete a fake evalauted result from invoking findOne query
+  // describe('checkUnique', () => {
+  //   let propertyName: string;
+  //   let propertyOptions: SchemaOptions;
+  //   let updatedQueryObject: Record<string, unknown> = {};
+  //   let embeddedUniqueProperty: string[];
+  // })
+
+  // checkUniqueForReplace
+
+  describe('checkConstraints', () => {
+    let propertyName: string;
+    let propertyOptions: SchemaOptions;
+
+    it('will return true if validator property is set to null', () => {
+      propertyName = 'name';
+      propertyOptions = testSchema.schemaMap[propertyName];
+      assertStrictEquals(query.checkConstraints(propertyName, propertyOptions), true);
+    })
+
+
+
 
   })
 
