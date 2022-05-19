@@ -33,12 +33,9 @@ class Query {
   public connection: Connection | boolean;
   public schema: Schema;
   public updatedQueryObject: { [key: string]: unknown };
-  // We need to add schema to the collection
+
   constructor(collectionName: string, schema: Schema) {
     this.collectionName = collectionName;
-    // this.connection = new Connection(
-    //   'mongodb+srv://wgreco13:g3HUuathwbVEisEj@cluster0.adcc3.mongodb.net/dangoDB?authMechanism=SCRAM-SHA-1'
-    // );
     this.connection = dango.currentConnection;
     this.schema = schema;
     this.updatedQueryObject = {};
@@ -58,8 +55,6 @@ class Query {
     callback?: (input: unknown) => unknown
   ) {
     try {
-      // const db = await this.connection.connect();
-      // const collection = db.collection(this.collectionName);
       if (
         typeof this.connection === 'boolean' ||
         typeof this.connection.db === 'boolean'
@@ -72,12 +67,7 @@ class Query {
         const data = await collection.find(allQueryObjects, options);
         const dataRes = await data.toArray();
 
-        // console.log("LOOK HERE", dango.currentConnection);
-
         if (callback) return callback(data);
-        // await this.connection.disconnect();
-
-        // console.log(`find successful`);
 
         return dataRes;
       }
@@ -114,9 +104,6 @@ class Query {
 
         if (callback) return callback(data);
 
-        // await this.connection.disconnect();
-
-        // console.log(`findOne successful`, data);
         return data;
       }
     } catch (error) {
@@ -149,7 +136,7 @@ class Query {
 
         if (callback) return callback(data);
         console.log(data);
-        // await this.connection.disconnect();
+
         return data;
       }
     } catch (error) {
@@ -176,7 +163,6 @@ class Query {
         const collection = this.connection.db.collection(this.collectionName);
         const data = await collection.estimatedDocumentCount();
 
-        // await this.connection.disconnect();
         return data;
       }
     } catch (error) {
@@ -209,7 +195,6 @@ class Query {
         const data = await collection.aggregate(arg1);
         const dataRes = await data.toArray();
 
-        // await this.connection.disconnect();
         return dataRes;
       }
     } catch (error) {
@@ -234,8 +219,6 @@ class Query {
     options?: FindAndModifyOptions
   ) {
     try {
-      // const db = await this.connection.connect();
-      // const collection = db.collection(this.collectionName);
       if (
         typeof this.connection === 'boolean' ||
         typeof this.connection.db === 'boolean'
@@ -247,7 +230,6 @@ class Query {
         const collection = this.connection.db.collection(this.collectionName);
         const data = await collection.findAndModify(filter, options);
 
-        // await this.connection.disconnect();
         console.log('findByIdAndModify Successful', data);
         return data;
       }
@@ -289,10 +271,8 @@ class Query {
         console.log('findByIdAndDelete Successful', data);
 
         if (callback) {
-          // await this.connection.disconnect();
           return callback(data);
         } else {
-          // await this.connection.disconnect();
           return data;
         }
       }
@@ -330,10 +310,8 @@ class Query {
         console.log('findOneAndRemove Successful', data);
 
         if (callback) {
-          // await this.connection.disconnect();
           return callback(data);
         } else {
-          // await this.connection.disconnect();
           return data;
         }
       }
@@ -356,8 +334,7 @@ class Query {
   ) {
     try {
       const stringId = new Bson.ObjectId(id);
-      // const db = await this.connection.connect();
-      // const collection = db.collection(this.collectionName);
+
       if (
         typeof this.connection === 'boolean' ||
         typeof this.connection.db === 'boolean'
@@ -375,7 +352,6 @@ class Query {
         console.log('findByIdAndRemove Successful', data);
 
         if (callback) return callback(data);
-        // await this.connection.disconnect();
 
         return data;
       }
@@ -489,7 +465,7 @@ class Query {
         }
       } else {
         const collection = this.connection.db.collection(this.collectionName);
-        // check if options is a function and reassign callback to options if so - so that we can bypass the options param
+
         if (typeof options === 'function') callback = options;
         options = {};
 
@@ -530,8 +506,6 @@ class Query {
     callback?: (input: unknown) => unknown
   ) {
     try {
-      // const db = await this.connection.connect();
-      // const collection = db.collection(this.collectionName);
       if (
         typeof this.connection === 'boolean' ||
         typeof this.connection.db === 'boolean'
@@ -553,7 +527,6 @@ class Query {
         this.resetQueryObject();
         if (callback) return callback(data);
 
-        // await this.connection.disconnect();
         return data;
       }
     } catch (error) {
@@ -577,8 +550,6 @@ class Query {
     callback?: (input: unknown) => unknown
   ) {
     try {
-      // const db = await this.connection.connect();
-      // const collection = db.collection(this.collectionName);
       if (
         typeof this.connection === 'boolean' ||
         typeof this.connection.db === 'boolean'
@@ -604,7 +575,6 @@ class Query {
         this.resetQueryObject();
         if (callback) return callback(data);
 
-        // await this.connection.disconnect();
         return data;
       }
     } catch (error) {
@@ -643,10 +613,8 @@ class Query {
 
         const data = await collection.findOne({ _id: stringId }, options);
         if (callback) {
-          // await this.connection.disconnect();
           return callback(data);
         } else {
-          // await this.connection.disconnect();
           return data;
         }
       }
@@ -684,24 +652,21 @@ class Query {
       } else {
         const collection = this.connection.db.collection(this.collectionName);
 
-        // update the value of update with the $set operator
         await this.validateUpdateAgainstSchema(
           update,
           this.schema,
           this.updatedQueryObject
         );
         const newUpdate = { $set: this.updatedQueryObject };
-        // check if options is a function and reassign callback to options if so - so that we can bypass the options param
+
         if (typeof options === 'function') callback = options;
         options = {};
 
         const data = await collection.updateOne(filter, newUpdate, options);
         this.resetQueryObject();
         if (callback) {
-          // await this.connection.disconnect();
           return callback(data);
         } else {
-          // await this.connection.disconnect();
           return data;
         }
       }
@@ -710,8 +675,6 @@ class Query {
     }
   }
 
-  // UPDATED STEVE
-
   /**
    * DropCollection drops current model/collection that user is connected to.
    * @returns undefined
@@ -719,8 +682,6 @@ class Query {
    */
   public async dropCollection() {
     try {
-      // const db = await this.connection.connect();
-      // const collection = db.collection(this.collectionName);
       if (
         typeof this.connection === 'boolean' ||
         typeof this.connection.db === 'boolean'
@@ -734,7 +695,6 @@ class Query {
 
         console.log('Collection successfully dropped.');
 
-        // await this.connection.disconnect();
         return data;
       }
     } catch (error) {
@@ -756,9 +716,6 @@ class Query {
     callback?: (input: unknown) => unknown
   ) {
     try {
-      // const db = await this.connection.connect();
-      // const collection = db.collection(this.collectionName);
-      // check if options is a function and reassign callback to options if so - so that we can bypass the options param
       if (typeof options === 'function') {
         callback = options;
         options = {};
@@ -772,14 +729,13 @@ class Query {
         }
       } else {
         const collection = this.connection.db.collection(this.collectionName);
-        // returns number of deleted documents
+
         const data = await collection.deleteOne(document, options);
         if (callback) {
-          // await this.connection.disconnect();
           return callback(data);
         } else {
           const formattedReturnObj = { deletedCount: data };
-          // await this.connection.disconnect();
+
           return formattedReturnObj;
         }
       }
@@ -814,12 +770,12 @@ class Query {
         if (typeof options === 'function') {
           callback = options;
           options = {};
-          // returns number of deleted documents
+
           const data = await collection.deleteMany(document, options);
           const formattedReturnObj = { deletedCount: data };
           console.log(formattedReturnObj);
           if (callback) return callback(data);
-          // await this.connection.disconnect();
+
           return formattedReturnObj;
         }
       }
@@ -857,7 +813,7 @@ class Query {
           callback = options;
           options = {};
         }
-        //  $set operator, sets field in updateObject to corresponding value, check mongoDB atlas docs for updateOne for ref
+
         await this.validateUpdateAgainstSchema(
           update,
           this.schema,
@@ -871,7 +827,7 @@ class Query {
           options
         );
         this.resetQueryObject();
-        // console.log(data);
+
         if (callback) return callback(data);
 
         return data;
@@ -912,7 +868,7 @@ class Query {
           callback = options;
           options = {};
         }
-        //  $set operator, sets field in updateObject to corresponding value, check mongoDB atlas docs for updateOne for ref
+
         await this.validateUpdateAgainstSchema(
           update,
           this.schema,
@@ -925,7 +881,7 @@ class Query {
           options
         );
         this.resetQueryObject();
-        // console.log(data);
+
         if (callback) return callback(data);
 
         return data;

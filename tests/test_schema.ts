@@ -7,23 +7,23 @@ import {
   it,
 } from '../deps.ts';
 
+import { Schema, SchemaOptions } from '../lib/schema.ts';
+
 import {
-  Schema,
-  SchemaOptions
-} from '../lib/schema.ts';
+  SchemaNumber,
+  SchemaDecimal128,
+  SchemaString,
+  SchemaBoolean,
+  SchemaObjectId,
+  SchemaUUID,
+  SchemaDate,
+} from '../lib/datatypes.ts';
 
-import { 
-  SchemaNumber, 
-  SchemaDecimal128, 
-  SchemaString, 
-  SchemaBoolean, 
-  SchemaObjectId, 
-  SchemaUUID, 
-  SchemaDate 
-} from '../lib/datatypes.ts'
-
-import { spy, assertSpyCall, assertSpyCalls } from "https://deno.land/std@0.139.0/testing/mock.ts";
-
+import {
+  spy,
+  assertSpyCall,
+  assertSpyCalls,
+} from 'https://deno.land/std@0.139.0/testing/mock.ts';
 
 describe('SchemaOptions Class', () => {
   let newObject: unknown;
@@ -41,7 +41,7 @@ describe('SchemaOptions Class', () => {
         //@ts-ignore Ignore TS warning to run test
         newObject = new SchemaOptions({
           required: true,
-          unique: true
+          unique: true,
         });
       });
     });
@@ -51,7 +51,7 @@ describe('SchemaOptions Class', () => {
       assertThrows(() => {
         //@ts-ignore Ignore TS warning to run test
         newObject = new SchemaOptions({
-          type: 'dangoDB'
+          type: 'dangoDB',
         });
       });
     });
@@ -61,245 +61,245 @@ describe('SchemaOptions Class', () => {
       describe('the type is number', () => {
         beforeEach(() => {
           newObject = new SchemaOptions({
-            type: 'number'
+            type: 'number',
           });
         });
         it('will create an instance of the class', () => {
           assertInstanceOf(newObject, SchemaOptions);
         });
         it('will have assign the type property the class definition of the data type', () => {
-          if (newObject instanceof SchemaOptions){
-            assertStrictEquals(newObject.type, SchemaNumber)
+          if (newObject instanceof SchemaOptions) {
+            assertStrictEquals(newObject.type, SchemaNumber);
           }
         });
         it('will have a default required property with the value of false', () => {
-          if (newObject instanceof SchemaOptions){
-            assertStrictEquals(newObject.required, false)
+          if (newObject instanceof SchemaOptions) {
+            assertStrictEquals(newObject.required, false);
           }
         });
         it('will have a default unique property with the value of false', () => {
-          if (newObject instanceof SchemaOptions){
-            assertStrictEquals(newObject.unique, false)
+          if (newObject instanceof SchemaOptions) {
+            assertStrictEquals(newObject.unique, false);
           }
         });
         it('will have a default default property with the value of null', () => {
-          if (newObject instanceof SchemaOptions){
-            assertStrictEquals(newObject.default, null)
+          if (newObject instanceof SchemaOptions) {
+            assertStrictEquals(newObject.default, null);
           }
         });
         it('will have a default validator property with the value of null', () => {
-          if (newObject instanceof SchemaOptions){
-            assertStrictEquals(newObject.validator, null)
+          if (newObject instanceof SchemaOptions) {
+            assertStrictEquals(newObject.validator, null);
           }
         });
       });
       describe('the type is decimal128', () => {
         beforeEach(() => {
           newObject = new SchemaOptions({
-            type: 'decimal128'
+            type: 'decimal128',
           });
         });
         it('will create an instance of the class', () => {
           assertInstanceOf(newObject, SchemaOptions);
         });
         it('will have assign the type property the class definition of the data type', () => {
-          if (newObject instanceof SchemaOptions){
-            assertStrictEquals(newObject.type, SchemaDecimal128)
+          if (newObject instanceof SchemaOptions) {
+            assertStrictEquals(newObject.type, SchemaDecimal128);
           }
         });
         it('will have a default required property with the value of false', () => {
-          if (newObject instanceof SchemaOptions){
-            assertStrictEquals(newObject.required, false)
+          if (newObject instanceof SchemaOptions) {
+            assertStrictEquals(newObject.required, false);
           }
         });
         it('will have a default unique property with the value of false', () => {
-          if (newObject instanceof SchemaOptions){
-            assertStrictEquals(newObject.unique, false)
+          if (newObject instanceof SchemaOptions) {
+            assertStrictEquals(newObject.unique, false);
           }
         });
         it('will have a default default property with the value of null', () => {
-          if (newObject instanceof SchemaOptions){
-            assertStrictEquals(newObject.default, null)
+          if (newObject instanceof SchemaOptions) {
+            assertStrictEquals(newObject.default, null);
           }
         });
         it('will have a default validator property with the value of null', () => {
-          if (newObject instanceof SchemaOptions){
-            assertStrictEquals(newObject.validator, null)
+          if (newObject instanceof SchemaOptions) {
+            assertStrictEquals(newObject.validator, null);
           }
         });
       });
       describe('the type is string', () => {
         beforeEach(() => {
           newObject = new SchemaOptions({
-            type: 'string'
+            type: 'string',
           });
         });
         it('will create an instance of the class', () => {
           assertInstanceOf(newObject, SchemaOptions);
         });
         it('will have assign the type property the class definition of the data type', () => {
-          if (newObject instanceof SchemaOptions){
-            assertStrictEquals(newObject.type, SchemaString)
+          if (newObject instanceof SchemaOptions) {
+            assertStrictEquals(newObject.type, SchemaString);
           }
         });
         it('will have a default required property with the value of false', () => {
-          if (newObject instanceof SchemaOptions){
-            assertStrictEquals(newObject.required, false)
+          if (newObject instanceof SchemaOptions) {
+            assertStrictEquals(newObject.required, false);
           }
         });
         it('will have a default unique property with the value of false', () => {
-          if (newObject instanceof SchemaOptions){
-            assertStrictEquals(newObject.unique, false)
+          if (newObject instanceof SchemaOptions) {
+            assertStrictEquals(newObject.unique, false);
           }
         });
         it('will have a default default property with the value of null', () => {
-          if (newObject instanceof SchemaOptions){
-            assertStrictEquals(newObject.default, null)
+          if (newObject instanceof SchemaOptions) {
+            assertStrictEquals(newObject.default, null);
           }
         });
         it('will have a default validator property with the value of null', () => {
-          if (newObject instanceof SchemaOptions){
-            assertStrictEquals(newObject.validator, null)
+          if (newObject instanceof SchemaOptions) {
+            assertStrictEquals(newObject.validator, null);
           }
         });
       });
       describe('the type is boolean', () => {
         beforeEach(() => {
           newObject = new SchemaOptions({
-            type: 'boolean'
+            type: 'boolean',
           });
         });
         it('will create an instance of the class', () => {
           assertInstanceOf(newObject, SchemaOptions);
         });
         it('will have assign the type property the class definition of the data type', () => {
-          if (newObject instanceof SchemaOptions){
-            assertStrictEquals(newObject.type, SchemaBoolean)
+          if (newObject instanceof SchemaOptions) {
+            assertStrictEquals(newObject.type, SchemaBoolean);
           }
         });
         it('will have a default required property with the value of false', () => {
-          if (newObject instanceof SchemaOptions){
-            assertStrictEquals(newObject.required, false)
+          if (newObject instanceof SchemaOptions) {
+            assertStrictEquals(newObject.required, false);
           }
         });
         it('will have a default unique property with the value of false', () => {
-          if (newObject instanceof SchemaOptions){
-            assertStrictEquals(newObject.unique, false)
+          if (newObject instanceof SchemaOptions) {
+            assertStrictEquals(newObject.unique, false);
           }
         });
         it('will have a default default property with the value of null', () => {
-          if (newObject instanceof SchemaOptions){
-            assertStrictEquals(newObject.default, null)
+          if (newObject instanceof SchemaOptions) {
+            assertStrictEquals(newObject.default, null);
           }
         });
         it('will have a default validator property with the value of null', () => {
-          if (newObject instanceof SchemaOptions){
-            assertStrictEquals(newObject.validator, null)
+          if (newObject instanceof SchemaOptions) {
+            assertStrictEquals(newObject.validator, null);
           }
         });
       });
       describe('the type is objectid', () => {
         beforeEach(() => {
           newObject = new SchemaOptions({
-            type: 'objectid'
+            type: 'objectid',
           });
         });
         it('will create an instance of the class', () => {
           assertInstanceOf(newObject, SchemaOptions);
         });
         it('will have assign the type property the class definition of the data type', () => {
-          if (newObject instanceof SchemaOptions){
-            assertStrictEquals(newObject.type, SchemaObjectId)
+          if (newObject instanceof SchemaOptions) {
+            assertStrictEquals(newObject.type, SchemaObjectId);
           }
         });
         it('will have a default required property with the value of false', () => {
-          if (newObject instanceof SchemaOptions){
-            assertStrictEquals(newObject.required, false)
+          if (newObject instanceof SchemaOptions) {
+            assertStrictEquals(newObject.required, false);
           }
         });
         it('will have a default unique property with the value of false', () => {
-          if (newObject instanceof SchemaOptions){
-            assertStrictEquals(newObject.unique, false)
+          if (newObject instanceof SchemaOptions) {
+            assertStrictEquals(newObject.unique, false);
           }
         });
         it('will have a default default property with the value of null', () => {
-          if (newObject instanceof SchemaOptions){
-            assertStrictEquals(newObject.default, null)
+          if (newObject instanceof SchemaOptions) {
+            assertStrictEquals(newObject.default, null);
           }
         });
         it('will have a default validator property with the value of null', () => {
-          if (newObject instanceof SchemaOptions){
-            assertStrictEquals(newObject.validator, null)
+          if (newObject instanceof SchemaOptions) {
+            assertStrictEquals(newObject.validator, null);
           }
         });
       });
       describe('the type is objectid', () => {
         beforeEach(() => {
           newObject = new SchemaOptions({
-            type: 'UUID'
+            type: 'UUID',
           });
         });
         it('will create an instance of the class', () => {
           assertInstanceOf(newObject, SchemaOptions);
         });
         it('will have assign the type property the class definition of the data type', () => {
-          if (newObject instanceof SchemaOptions){
-            assertStrictEquals(newObject.type, SchemaUUID)
+          if (newObject instanceof SchemaOptions) {
+            assertStrictEquals(newObject.type, SchemaUUID);
           }
         });
         it('will have a default required property with the value of false', () => {
-          if (newObject instanceof SchemaOptions){
-            assertStrictEquals(newObject.required, false)
+          if (newObject instanceof SchemaOptions) {
+            assertStrictEquals(newObject.required, false);
           }
         });
         it('will have a default unique property with the value of false', () => {
-          if (newObject instanceof SchemaOptions){
-            assertStrictEquals(newObject.unique, false)
+          if (newObject instanceof SchemaOptions) {
+            assertStrictEquals(newObject.unique, false);
           }
         });
         it('will have a default default property with the value of null', () => {
-          if (newObject instanceof SchemaOptions){
-            assertStrictEquals(newObject.default, null)
+          if (newObject instanceof SchemaOptions) {
+            assertStrictEquals(newObject.default, null);
           }
         });
         it('will have a default validator property with the value of null', () => {
-          if (newObject instanceof SchemaOptions){
-            assertStrictEquals(newObject.validator, null)
+          if (newObject instanceof SchemaOptions) {
+            assertStrictEquals(newObject.validator, null);
           }
         });
       });
       describe('the type is date', () => {
         beforeEach(() => {
           newObject = new SchemaOptions({
-            type: 'date'
+            type: 'date',
           });
         });
         it('will create an instance of the class', () => {
           assertInstanceOf(newObject, SchemaOptions);
         });
         it('will have assign the type property the class definition of the data type', () => {
-          if (newObject instanceof SchemaOptions){
-            assertStrictEquals(newObject.type, SchemaDate)
+          if (newObject instanceof SchemaOptions) {
+            assertStrictEquals(newObject.type, SchemaDate);
           }
         });
         it('will have a default required property with the value of false', () => {
-          if (newObject instanceof SchemaOptions){
-            assertStrictEquals(newObject.required, false)
+          if (newObject instanceof SchemaOptions) {
+            assertStrictEquals(newObject.required, false);
           }
         });
         it('will have a default unique property with the value of false', () => {
-          if (newObject instanceof SchemaOptions){
-            assertStrictEquals(newObject.unique, false)
+          if (newObject instanceof SchemaOptions) {
+            assertStrictEquals(newObject.unique, false);
           }
         });
         it('will have a default default property with the value of null', () => {
-          if (newObject instanceof SchemaOptions){
-            assertStrictEquals(newObject.default, null)
+          if (newObject instanceof SchemaOptions) {
+            assertStrictEquals(newObject.default, null);
           }
         });
         it('will have a default validator property with the value of null', () => {
-          if (newObject instanceof SchemaOptions){
-            assertStrictEquals(newObject.validator, null)
+          if (newObject instanceof SchemaOptions) {
+            assertStrictEquals(newObject.validator, null);
           }
         });
       });
@@ -308,150 +308,150 @@ describe('SchemaOptions Class', () => {
       beforeEach(() => {
         newObject = new SchemaOptions({
           type: 'number',
-          required: true
+          required: true,
         });
       });
       it('will create an instance of the class', () => {
         assertInstanceOf(newObject, SchemaOptions);
       });
       it('will have assign the type property the class definition of the data type', () => {
-        if (newObject instanceof SchemaOptions){
-          assertStrictEquals(newObject.type, SchemaNumber)
+        if (newObject instanceof SchemaOptions) {
+          assertStrictEquals(newObject.type, SchemaNumber);
         }
       });
       it('will have a required property with the value of true', () => {
-        if (newObject instanceof SchemaOptions){
-          assertStrictEquals(newObject.required, true)
+        if (newObject instanceof SchemaOptions) {
+          assertStrictEquals(newObject.required, true);
         }
       });
       it('will have a default unique property with the value of false', () => {
-        if (newObject instanceof SchemaOptions){
-          assertStrictEquals(newObject.unique, false)
+        if (newObject instanceof SchemaOptions) {
+          assertStrictEquals(newObject.unique, false);
         }
       });
       it('will have a default default property with the value of null', () => {
-        if (newObject instanceof SchemaOptions){
-          assertStrictEquals(newObject.default, null)
+        if (newObject instanceof SchemaOptions) {
+          assertStrictEquals(newObject.default, null);
         }
       });
       it('will have a default validator property with the value of null', () => {
-        if (newObject instanceof SchemaOptions){
-          assertStrictEquals(newObject.validator, null)
+        if (newObject instanceof SchemaOptions) {
+          assertStrictEquals(newObject.validator, null);
         }
-      });  
+      });
     });
     describe('the only properties are type and unique', () => {
       beforeEach(() => {
         newObject = new SchemaOptions({
           type: 'number',
-          unique: true
+          unique: true,
         });
       });
       it('will create an instance of the class', () => {
         assertInstanceOf(newObject, SchemaOptions);
       });
       it('will have assign the type property the class definition of the data type', () => {
-        if (newObject instanceof SchemaOptions){
-          assertStrictEquals(newObject.type, SchemaNumber)
+        if (newObject instanceof SchemaOptions) {
+          assertStrictEquals(newObject.type, SchemaNumber);
         }
       });
       it('will have a default required property with the value of false', () => {
-        if (newObject instanceof SchemaOptions){
-          assertStrictEquals(newObject.required, false)
+        if (newObject instanceof SchemaOptions) {
+          assertStrictEquals(newObject.required, false);
         }
       });
       it('will have a unique property with the value of true', () => {
-        if (newObject instanceof SchemaOptions){
-          assertStrictEquals(newObject.unique, true)
+        if (newObject instanceof SchemaOptions) {
+          assertStrictEquals(newObject.unique, true);
         }
       });
       it('will have a default default property with the value of null', () => {
-        if (newObject instanceof SchemaOptions){
-          assertStrictEquals(newObject.default, null)
+        if (newObject instanceof SchemaOptions) {
+          assertStrictEquals(newObject.default, null);
         }
       });
       it('will have a default validator property with the value of null', () => {
-        if (newObject instanceof SchemaOptions){
-          assertStrictEquals(newObject.validator, null)
+        if (newObject instanceof SchemaOptions) {
+          assertStrictEquals(newObject.validator, null);
         }
       });
-    });  
+    });
     describe('the only properties are type and default', () => {
       beforeEach(() => {
         newObject = new SchemaOptions({
           type: 'number',
-          default: 54
+          default: 54,
         });
       });
       it('will create an instance of the class', () => {
         assertInstanceOf(newObject, SchemaOptions);
       });
       it('will have assign the type property the class definition of the data type', () => {
-        if (newObject instanceof SchemaOptions){
-          assertStrictEquals(newObject.type, SchemaNumber)
+        if (newObject instanceof SchemaOptions) {
+          assertStrictEquals(newObject.type, SchemaNumber);
         }
       });
       it('will have a default required property with the value of false', () => {
-        if (newObject instanceof SchemaOptions){
-          assertStrictEquals(newObject.required, false)
+        if (newObject instanceof SchemaOptions) {
+          assertStrictEquals(newObject.required, false);
         }
       });
       it('will have a default unique property with the value of false', () => {
-        if (newObject instanceof SchemaOptions){
-          assertStrictEquals(newObject.unique, false)
+        if (newObject instanceof SchemaOptions) {
+          assertStrictEquals(newObject.unique, false);
         }
       });
       it('will have a default property with the value of 54', () => {
-        if (newObject instanceof SchemaOptions){
-          assertStrictEquals(newObject.default, 54)
+        if (newObject instanceof SchemaOptions) {
+          assertStrictEquals(newObject.default, 54);
         }
       });
       it('will have a default validator property with the value of null', () => {
-        if (newObject instanceof SchemaOptions){
-          assertStrictEquals(newObject.validator, null)
+        if (newObject instanceof SchemaOptions) {
+          assertStrictEquals(newObject.validator, null);
         }
-      });  
+      });
     });
     describe('the only properties are type and validator', () => {
-      let testFunc!: Function
+      let testFunc!: Function;
       beforeEach(() => {
         testFunc = (num: number): boolean => num > 5;
         newObject = new SchemaOptions({
           type: 'number',
-          validator: testFunc 
+          validator: testFunc,
         });
       });
       it('will create an instance of the class', () => {
         assertInstanceOf(newObject, SchemaOptions);
       });
       it('will have assign the type property the class definition of the data type', () => {
-        if (newObject instanceof SchemaOptions){
-          assertStrictEquals(newObject.type, SchemaNumber)
+        if (newObject instanceof SchemaOptions) {
+          assertStrictEquals(newObject.type, SchemaNumber);
         }
       });
       it('will have a default required property with the value of false', () => {
-        if (newObject instanceof SchemaOptions){
-          assertStrictEquals(newObject.required, false)
+        if (newObject instanceof SchemaOptions) {
+          assertStrictEquals(newObject.required, false);
         }
       });
       it('will have a default unique property with the value of false', () => {
-        if (newObject instanceof SchemaOptions){
-          assertStrictEquals(newObject.unique, false)
+        if (newObject instanceof SchemaOptions) {
+          assertStrictEquals(newObject.unique, false);
         }
       });
       it('will have a default default property with the value of null', () => {
-        if (newObject instanceof SchemaOptions){
-          assertStrictEquals(newObject.default, null)
+        if (newObject instanceof SchemaOptions) {
+          assertStrictEquals(newObject.default, null);
         }
       });
       it('will have a validator property with the value of testFunc', () => {
-        if (newObject instanceof SchemaOptions){
-          assertStrictEquals(newObject.validator, testFunc)
+        if (newObject instanceof SchemaOptions) {
+          assertStrictEquals(newObject.validator, testFunc);
         }
-      });  
+      });
     });
     describe('all options properties are provided to SchemaOptions', () => {
-      let testFunc!: Function
+      let testFunc!: Function;
       beforeEach(() => {
         testFunc = (num: number): boolean => num > 5;
         newObject = new SchemaOptions({
@@ -459,40 +459,40 @@ describe('SchemaOptions Class', () => {
           required: true,
           unique: true,
           default: 315,
-          validator: testFunc 
+          validator: testFunc,
         });
       });
       it('will create an instance of the class', () => {
         assertInstanceOf(newObject, SchemaOptions);
       });
       it('will have assign the type property the class definition of the data type', () => {
-        if (newObject instanceof SchemaOptions){
-          assertStrictEquals(newObject.type, SchemaNumber)
+        if (newObject instanceof SchemaOptions) {
+          assertStrictEquals(newObject.type, SchemaNumber);
         }
       });
       it('will have a required property with the value of true', () => {
-        if (newObject instanceof SchemaOptions){
-          assertStrictEquals(newObject.required, true)
+        if (newObject instanceof SchemaOptions) {
+          assertStrictEquals(newObject.required, true);
         }
       });
       it('will have a unique property with the value of true', () => {
-        if (newObject instanceof SchemaOptions){
-          assertStrictEquals(newObject.unique, true)
+        if (newObject instanceof SchemaOptions) {
+          assertStrictEquals(newObject.unique, true);
         }
       });
       it('will have a default property with the value of 315', () => {
-        if (newObject instanceof SchemaOptions){
-          assertStrictEquals(newObject.default, 315)
+        if (newObject instanceof SchemaOptions) {
+          assertStrictEquals(newObject.default, 315);
         }
       });
       it('will have a validator property with the value of testFunc', () => {
-        if (newObject instanceof SchemaOptions){
-          assertStrictEquals(newObject.validator, testFunc)
+        if (newObject instanceof SchemaOptions) {
+          assertStrictEquals(newObject.validator, testFunc);
         }
-      });  
+      });
     });
     describe('an unknown options property was provided to SchemaOptions', () => {
-      let testFunc!: Function
+      let testFunc!: Function;
       beforeEach(() => {
         testFunc = (num: number): boolean => num > 5;
         newObject = new SchemaOptions({
@@ -502,40 +502,43 @@ describe('SchemaOptions Class', () => {
           default: 315,
           validator: testFunc,
           //@ts-ignore Ignore TS warning to run test
-          unknownProp: false
+          unknownProp: false,
         });
       });
       it('will create an instance of the class', () => {
         assertInstanceOf(newObject, SchemaOptions);
       });
       it('will have assign the type property the class definition of the data type', () => {
-        if (newObject instanceof SchemaOptions){
-          assertStrictEquals(newObject.type, SchemaNumber)
+        if (newObject instanceof SchemaOptions) {
+          assertStrictEquals(newObject.type, SchemaNumber);
         }
       });
       it('will have a required property with the value of true', () => {
-        if (newObject instanceof SchemaOptions){
-          assertStrictEquals(newObject.required, true)
+        if (newObject instanceof SchemaOptions) {
+          assertStrictEquals(newObject.required, true);
         }
       });
       it('will have a unique property with the value of true', () => {
-        if (newObject instanceof SchemaOptions){
-          assertStrictEquals(newObject.unique, true)
+        if (newObject instanceof SchemaOptions) {
+          assertStrictEquals(newObject.unique, true);
         }
       });
       it('will have a default property with the value of 315', () => {
-        if (newObject instanceof SchemaOptions){
-          assertStrictEquals(newObject.default, 315)
+        if (newObject instanceof SchemaOptions) {
+          assertStrictEquals(newObject.default, 315);
         }
       });
       it('will have a validator property with the value of testFunc', () => {
-        if (newObject instanceof SchemaOptions){
-          assertStrictEquals(newObject.validator, testFunc)
+        if (newObject instanceof SchemaOptions) {
+          assertStrictEquals(newObject.validator, testFunc);
         }
-      });  
+      });
       it('will not have unknownProp as a property', () => {
-        if (newObject instanceof SchemaOptions){
-          assertStrictEquals(Object.prototype.hasOwnProperty.call(newObject, 'unknownProp'), false);
+        if (newObject instanceof SchemaOptions) {
+          assertStrictEquals(
+            Object.prototype.hasOwnProperty.call(newObject, 'unknownProp'),
+            false
+          );
         }
       });
     });
@@ -557,7 +560,7 @@ describe('Schema Class', () => {
       it('will throw an error', () => {
         assertThrows(() => {
           newObject = new Schema({
-            name: 'dangoDB'
+            name: 'dangoDB',
           });
         });
       });
@@ -565,30 +568,36 @@ describe('Schema Class', () => {
     describe('and the schema object only has one property with only type defined with a valid type', () => {
       beforeEach(() => {
         newObject = new Schema({
-          name: 'string'
+          name: 'string',
         });
       });
       it('will create an instance of the class', () => {
         assertInstanceOf(newObject, Schema);
       });
       it('will have a property schemaMap', () => {
-        if (newObject instanceof Schema){
-          assertStrictEquals(Object.prototype.hasOwnProperty.call(newObject, 'schemaMap'), true);
+        if (newObject instanceof Schema) {
+          assertStrictEquals(
+            Object.prototype.hasOwnProperty.call(newObject, 'schemaMap'),
+            true
+          );
         }
       });
       it('will have a property schemaMap with the property name', () => {
-        if (newObject instanceof Schema){
-          assertStrictEquals(Object.prototype.hasOwnProperty.call(newObject.schemaMap, 'name'), true);
+        if (newObject instanceof Schema) {
+          assertStrictEquals(
+            Object.prototype.hasOwnProperty.call(newObject.schemaMap, 'name'),
+            true
+          );
         }
       });
       it('will have a property schemaMap with the property name which is an instance of SchemaOptions', () => {
-        if (newObject instanceof Schema){
-          assertInstanceOf(newObject.schemaMap.name, SchemaOptions)
+        if (newObject instanceof Schema) {
+          assertInstanceOf(newObject.schemaMap.name, SchemaOptions);
         }
       });
     });
     describe('and the schema object only has one property with a value of an options object', () => {
-      let testFunc!: (param: string) => boolean
+      let testFunc!: (param: string) => boolean;
       beforeEach(() => {
         newObject = new Schema({
           name: {
@@ -596,26 +605,32 @@ describe('Schema Class', () => {
             required: true,
             unique: true,
             default: 'dangoDB',
-            validator: testFunc = (str: string): boolean => str[0] === 'b'
-          }
+            validator: (testFunc = (str: string): boolean => str[0] === 'b'),
+          },
         });
       });
       it('will create an instance of the class', () => {
         assertInstanceOf(newObject, Schema);
       });
       it('will have a property schemaMap', () => {
-        if (newObject instanceof Schema){
-          assertStrictEquals(Object.prototype.hasOwnProperty.call(newObject, 'schemaMap'), true);
+        if (newObject instanceof Schema) {
+          assertStrictEquals(
+            Object.prototype.hasOwnProperty.call(newObject, 'schemaMap'),
+            true
+          );
         }
       });
       it('will have a property schemaMap with the property name', () => {
-        if (newObject instanceof Schema){
-          assertStrictEquals(Object.prototype.hasOwnProperty.call(newObject.schemaMap, 'name'), true);
+        if (newObject instanceof Schema) {
+          assertStrictEquals(
+            Object.prototype.hasOwnProperty.call(newObject.schemaMap, 'name'),
+            true
+          );
         }
       });
       it('will have a property schemaMap with the property name which is an instance of SchemaOptions', () => {
-        if (newObject instanceof Schema){
-          assertInstanceOf(newObject.schemaMap.name, SchemaOptions)
+        if (newObject instanceof Schema) {
+          assertInstanceOf(newObject.schemaMap.name, SchemaOptions);
         }
       });
     });

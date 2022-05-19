@@ -13,20 +13,13 @@ import {
   it,
 } from '../deps.ts';
 
-import { 
-  dotenv
-} from '../deps.ts'
+import { dotenv } from '../deps.ts';
 
-import { 
-  MongoClient,
-  Database
-} from '../deps.ts'
+import { MongoClient, Database } from '../deps.ts';
 
-import { 
-  Connection
-} from '../lib/connections.ts'
+import { Connection } from '../lib/connections.ts';
 
-const ENV = dotenv.config({path: '../.env'})
+const ENV = dotenv.config({ path: '../.env' });
 
 describe('Connection constructor', () => {
   let newObject: unknown;
@@ -150,14 +143,14 @@ describe('Connection methods', () => {
       it('should reset the value of the connected property', async () => {
         if (newObject instanceof Connection) {
           await newObject.connect();
-          await newObject.disconnect()
+          await newObject.disconnect();
           assertStrictEquals(newObject.connected, false);
         }
       });
       it('should reset the value of the db property', async () => {
         if (newObject instanceof Connection) {
           await newObject.connect();
-          await newObject.disconnect()
+          await newObject.disconnect();
           assertStrictEquals(newObject.db, false);
         }
       });
