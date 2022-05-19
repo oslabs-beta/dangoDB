@@ -1,31 +1,31 @@
 // deno-lint-ignore-file no-explicit-any
 
 /**
- * 
+ *
  * @description This file exports the main dango object.
- * 
+ *
  */
 
 import { Connection } from './connections.ts';
 import { model } from './model.ts';
 import { Schema } from './schema.ts';
-import { 
-  SchemaNumber, 
-  SchemaDecimal128, 
-  SchemaString, SchemaBoolean, 
-  SchemaObjectId, 
-  SchemaUUID, 
+import {
+  SchemaNumber,
+  SchemaDecimal128,
+  SchemaString,
+  SchemaBoolean,
+  SchemaObjectId,
+  SchemaUUID,
   SchemaDate,
-  SchemaObject, 
-} from './datatypes.ts'
+  SchemaObject,
+} from './datatypes.ts';
 
 /**
-  * Class definition of Dango..
-  * @returns An object of class SchemaOptions.
-  */
+ * Class definition of Dango..
+ * @returns An object of class SchemaOptions.
+ */
 class Dango {
-
-  currentConnection: boolean | Connection
+  currentConnection: boolean | Connection;
   model: typeof model;
   types: Record<string, any>;
 
@@ -41,15 +41,15 @@ class Dango {
       UUID: SchemaUUID,
       date: SchemaDate,
       object: SchemaObject,
-    }
+    };
   }
 
   /**
-  * Establishes a new connection to a database. Invokes the connect method of a Connection object.
-  * @param connectionString A database URI
-  * 
-  * @returns The connection object.
-  */
+   * Establishes a new connection to a database. Invokes the connect method of a Connection object.
+   * @param connectionString A database URI
+   *
+   * @returns The connection object.
+   */
   async connect(connectionString: string) {
     this.currentConnection = new Connection(connectionString);
     await this.currentConnection.connect();
@@ -57,10 +57,10 @@ class Dango {
   }
 
   /**
-  * Disconnects an existing connection to a database. Invokes the disconnect method of a Connection object.
-  * 
-  * @returns undefined
-  */
+   * Disconnects an existing connection to a database. Invokes the disconnect method of a Connection object.
+   *
+   * @returns undefined
+   */
   async disconnect() {
     if (typeof this.currentConnection === 'boolean') {
       if (this.currentConnection === false) {
@@ -74,11 +74,11 @@ class Dango {
   }
 
   /**
-  * Creates a new instance of a Schema object.
-  * @param schemaObj A user-defined schema.
-  * 
-  * @returns A schema object
-  */
+   * Creates a new instance of a Schema object.
+   * @param schemaObj A user-defined schema.
+   *
+   * @returns A schema object
+   */
   schema(schemaObj: Record<string, any>) {
     return new Schema(schemaObj);
   }
