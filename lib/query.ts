@@ -1224,8 +1224,8 @@ class Query {
           });
         }
         // convert originalPropertyValue's type to match matching property's type in the updatedQueryObject
-        //@ts-ignore Fix later.
         const valueAsDatatype = new propertyOptions.type(
+          //@ts-ignore Fix later.
           originalPropertyValue[propertyName]
         );
         valueAsDatatype.convertType();
