@@ -33,10 +33,10 @@ First, be sure that you have [Deno](https://deno.land) runtime installed and con
 
 ### Quick Start
 
-In your application, import the dangoDB module from the [deno.land module](https://deno.land/x/dangodb.mod.ts).
+In your application, import the dangoDB module from the deno.land [module](https://doc.deno.land/https://deno.land/x/dangodb@v1.0.1/mod.ts/~/dango).
 
 ```javascript
-import { dango } from 'https://deno.land/x/dangodb.mod.ts'
+import { dango } from "https://deno.land/x/dangodb@v1.0.2/mod.ts";
 ```
 
 ### Connect to your Database
@@ -111,7 +111,7 @@ console.log(dinosaurs);
 Now you've successfully inserted a document into the Dinosaur collection at your MongoDB database. 
 
 Congratulations! That's the end of the quick start. You've successfully imported dangoDB, opened up a connection, created a schema, inserted a document for Stegosaurus, and
-queried all the dinosaurs in your Dinosaur model in your MongoDB database using dangoDB. Explore the rest of the readme.MD for more detailed instructions on how to use dangoDB.
+queried all the dinosaurs in your Dinosaur model using dangoDB. Explore the rest of the readme.MD for more detailed instructions on how to use dangoDB.
 
 
 
