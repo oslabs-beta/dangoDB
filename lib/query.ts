@@ -15,9 +15,8 @@ import {
   FindOptions,
   DeleteOptions,
 } from '../deps.ts';
-import { dango } from './dango.ts'
-import { Schema, optionsObject } from './schema.ts'
-
+import { dango } from './dango.ts';
+import { Schema, optionsObject } from './schema.ts';
 
 interface MatchInterface {
   $match: { [unknownKeyName: string]: string };
@@ -33,7 +32,7 @@ class Query {
   public collectionName: string;
   public connection: Connection | boolean;
   public schema: Schema;
-  public updatedQueryObject: {[key: string]: unknown}
+  public updatedQueryObject: { [key: string]: unknown };
   // We need to add schema to the collection
   constructor(collectionName: string, schema: Schema) {
     this.collectionName = collectionName;
@@ -61,12 +60,14 @@ class Query {
     try {
       // const db = await this.connection.connect();
       // const collection = db.collection(this.collectionName);
-      if (typeof this.connection === 'boolean' || typeof this.connection.db === 'boolean') {
+      if (
+        typeof this.connection === 'boolean' ||
+        typeof this.connection.db === 'boolean'
+      ) {
         if (this.connection === false) {
-          throw new Error('No connection established before query.')
+          throw new Error('No connection established before query.');
         }
       } else {
-      
         const collection = this.connection.db.collection(this.collectionName);
         const data = await collection.find(allQueryObjects, options);
         const dataRes = await data.toArray();
@@ -100,12 +101,14 @@ class Query {
     callback?: (input: unknown) => unknown
   ) {
     try {
-      if (typeof this.connection === 'boolean' || typeof this.connection.db === 'boolean') {
+      if (
+        typeof this.connection === 'boolean' ||
+        typeof this.connection.db === 'boolean'
+      ) {
         if (this.connection === false) {
-          throw new Error('No connection established before query.')
+          throw new Error('No connection established before query.');
         }
       } else {
-      
         const collection = this.connection.db.collection(this.collectionName);
         const data = await collection.findOne(queryObject, options);
 
@@ -133,12 +136,14 @@ class Query {
     callback?: (input: unknown) => unknown
   ) {
     try {
-      if (typeof this.connection === 'boolean' || typeof this.connection.db === 'boolean') {
+      if (
+        typeof this.connection === 'boolean' ||
+        typeof this.connection.db === 'boolean'
+      ) {
         if (this.connection === false) {
-          throw new Error('No connection established before query.')
+          throw new Error('No connection established before query.');
         }
       } else {
-      
         const collection = this.connection.db.collection(this.collectionName);
         const data = await collection.countDocuments(queryObject);
 
@@ -160,12 +165,14 @@ class Query {
     */
   public async estimatedDocumentCount() {
     try {
-      if (typeof this.connection === 'boolean' || typeof this.connection.db === 'boolean') {
+      if (
+        typeof this.connection === 'boolean' ||
+        typeof this.connection.db === 'boolean'
+      ) {
         if (this.connection === false) {
-          throw new Error('No connection established before query.')
+          throw new Error('No connection established before query.');
         }
       } else {
-      
         const collection = this.connection.db.collection(this.collectionName);
         const data = await collection.estimatedDocumentCount();
 
@@ -190,12 +197,14 @@ class Query {
   */
   public async aggregate(arg1: [MatchInterface, GroupInterface]) {
     try {
-      if (typeof this.connection === 'boolean' || typeof this.connection.db === 'boolean') {
+      if (
+        typeof this.connection === 'boolean' ||
+        typeof this.connection.db === 'boolean'
+      ) {
         if (this.connection === false) {
-          throw new Error('No connection established before query.')
+          throw new Error('No connection established before query.');
         }
       } else {
-      
         const collection = this.connection.db.collection(this.collectionName);
         const data = await collection.aggregate(arg1);
         const dataRes = await data.toArray();
@@ -227,18 +236,20 @@ class Query {
     try {
       // const db = await this.connection.connect();
       // const collection = db.collection(this.collectionName);
-      if (typeof this.connection === 'boolean' || typeof this.connection.db === 'boolean') {
+      if (
+        typeof this.connection === 'boolean' ||
+        typeof this.connection.db === 'boolean'
+      ) {
         if (this.connection === false) {
-          throw new Error('No connection established before query.')
+          throw new Error('No connection established before query.');
         }
       } else {
-      
         const collection = this.connection.db.collection(this.collectionName);
-      const data = await collection.findAndModify(filter, options);
+        const data = await collection.findAndModify(filter, options);
 
-      // await this.connection.disconnect();
-      console.log('findByIdAndModify Successful', data);
-      return data;
+        // await this.connection.disconnect();
+        console.log('findByIdAndModify Successful', data);
+        return data;
       }
     } catch (error) {
       throw new Error(`Error in findandModify function. ${error}`);
@@ -259,12 +270,14 @@ class Query {
   ) {
     try {
       const stringId = new Bson.ObjectId(id);
-      if (typeof this.connection === 'boolean' || typeof this.connection.db === 'boolean') {
+      if (
+        typeof this.connection === 'boolean' ||
+        typeof this.connection.db === 'boolean'
+      ) {
         if (this.connection === false) {
-          throw new Error('No connection established before query.')
+          throw new Error('No connection established before query.');
         }
       } else {
-      
         const collection = this.connection.db.collection(this.collectionName);
 
         if (typeof options === 'function') {
@@ -301,12 +314,14 @@ class Query {
     callback?: (input: unknown) => unknown
   ) {
     try {
-      if (typeof this.connection === 'boolean' || typeof this.connection.db === 'boolean') {
+      if (
+        typeof this.connection === 'boolean' ||
+        typeof this.connection.db === 'boolean'
+      ) {
         if (this.connection === false) {
-          throw new Error('No connection established before query.')
+          throw new Error('No connection established before query.');
         }
       } else {
-      
         const collection = this.connection.db.collection(this.collectionName);
         const data = await collection.findAndModify(queryObject, {
           remove: true,
@@ -343,9 +358,12 @@ class Query {
       const stringId = new Bson.ObjectId(id);
       // const db = await this.connection.connect();
       // const collection = db.collection(this.collectionName);
-      if (typeof this.connection === 'boolean' || typeof this.connection.db === 'boolean') {
+      if (
+        typeof this.connection === 'boolean' ||
+        typeof this.connection.db === 'boolean'
+      ) {
         if (this.connection === false) {
-          throw new Error('No connection established before query.')
+          throw new Error('No connection established before query.');
         }
       } else {
         const collection = this.connection.db.collection(this.collectionName);
@@ -357,8 +375,8 @@ class Query {
         console.log('findByIdAndRemove Successful', data);
 
         if (callback) return callback(data);
-          // await this.connection.disconnect();
-          
+        // await this.connection.disconnect();
+
         return data;
       }
     } catch (error) {
@@ -379,12 +397,15 @@ class Query {
     filter: Record<string, unknown>,
     document: Record<string, unknown>,
     options?: UpdateOptions | ((input: unknown) => unknown),
-    callback?: (input: unknown) => unknown) 
-    {
+    callback?: (input: unknown) => unknown
+  ) {
     try {
-      if (typeof this.connection === 'boolean' || typeof this.connection.db === 'boolean') {
+      if (
+        typeof this.connection === 'boolean' ||
+        typeof this.connection.db === 'boolean'
+      ) {
         if (this.connection === false) {
-          throw new Error('No connection established before query.')
+          throw new Error('No connection established before query.');
         }
       } else {
         const collection = this.connection.db.collection(this.collectionName);
@@ -392,11 +413,11 @@ class Query {
         options = {};
 
         const data = await collection.replaceOne(filter, document, options);
-        
+
         console.log('Successfully executed replaceOne', data);
 
         if (callback) return callback(data);
-      
+
         return data;
       }
     } catch (error) {
@@ -412,27 +433,37 @@ class Query {
    * @returns The inserted document.
    * example: await query.insertOne({username: 'Celeste'});
    */
-  public async insertOne(document: Record<string, unknown>, writeConcern?: InsertOptions) {
+  public async insertOne(
+    document: Record<string, unknown>,
+    writeConcern?: InsertOptions
+  ) {
     try {
-      if (typeof this.connection === 'boolean' || typeof this.connection.db === 'boolean') {
+      if (
+        typeof this.connection === 'boolean' ||
+        typeof this.connection.db === 'boolean'
+      ) {
         if (this.connection === false) {
-          throw new Error('No connection established before query.')
+          throw new Error('No connection established before query.');
         }
       } else {
         const collection = this.connection.db.collection(this.collectionName);
-        await this.validateInsertAgainstSchema(document, this.schema, this.updatedQueryObject);
-        const id = await collection.insertOne(this.updatedQueryObject, writeConcern);
+        await this.validateInsertAgainstSchema(
+          document,
+          this.schema,
+          this.updatedQueryObject
+        );
+        const id = await collection.insertOne(
+          this.updatedQueryObject,
+          writeConcern
+        );
         this.resetQueryObject();
-        console.log('Successfully insertedOne')
+        console.log('Successfully insertedOne');
         return id;
       }
     } catch (error) {
       throw new Error(`Error in insertOne function. ${error}`);
     }
   }
-
-
-
 
   /**
    * Insert Many inserts an array or object into the database.
@@ -449,9 +480,12 @@ class Query {
     callback?: (input: unknown) => unknown
   ) {
     try {
-      if (typeof this.connection === 'boolean' || typeof this.connection.db === 'boolean') {
+      if (
+        typeof this.connection === 'boolean' ||
+        typeof this.connection.db === 'boolean'
+      ) {
         if (this.connection === false) {
-          throw new Error('No connection established before query.')
+          throw new Error('No connection established before query.');
         }
       } else {
         const collection = this.connection.db.collection(this.collectionName);
@@ -460,22 +494,24 @@ class Query {
         options = {};
 
         const validatedDocuments = [];
-        for(const doc of document) {
-          await this.validateInsertAgainstSchema(doc, this.schema, this.updatedQueryObject);
+        for (const doc of document) {
+          await this.validateInsertAgainstSchema(
+            doc,
+            this.schema,
+            this.updatedQueryObject
+          );
           validatedDocuments.push(this.updatedQueryObject);
           this.resetQueryObject();
         }
         const ids = await collection.insertMany(validatedDocuments, options);
         if (callback) return callback(ids);
-      
+
         return ids;
       }
-     
     } catch (error) {
       throw new Error(`Error in insertMany function. ${error}`);
     }
   }
-
 
   /**
    * Find One And Update finds a matching document, updates it according to the update arg, passing any options, and returns the found document (if any) to the callbacks.
@@ -496,24 +532,30 @@ class Query {
     try {
       // const db = await this.connection.connect();
       // const collection = db.collection(this.collectionName);
-      if (typeof this.connection === 'boolean' || typeof this.connection.db === 'boolean') {
+      if (
+        typeof this.connection === 'boolean' ||
+        typeof this.connection.db === 'boolean'
+      ) {
         if (this.connection === false) {
-          throw new Error('No connection established before query.')
+          throw new Error('No connection established before query.');
         }
       } else {
         const collection = this.connection.db.collection(this.collectionName);
-        await this.validateUpdateAgainstSchema(update, this.schema, this.updatedQueryObject);
+        await this.validateUpdateAgainstSchema(
+          update,
+          this.schema,
+          this.updatedQueryObject
+        );
         const newUpdate = { $set: this.updatedQueryObject };
         if (typeof options === 'function') callback = options;
         options = {};
         const data = await collection.updateOne(filter, newUpdate, options);
-        this.resetQueryObject(); 
+        this.resetQueryObject();
         if (callback) return callback(data);
-   
-         // await this.connection.disconnect();
+
+        // await this.connection.disconnect();
         return data;
       }
-
     } catch (error) {
       throw new Error(`Error in findOneAndUpdate function. ${error}`);
     }
@@ -525,7 +567,7 @@ class Query {
    * @param Replacement is the client input for which document will be replacing the filter
    * @param Additional options
    * @param Callback function
-   * @returns 
+   * @returns
    * example: await query.findOneAndReplace({ username: "OneandUpdating" }, { username: "Iron_Man"}, (input) => {console.log('callback executed', input)})
    */
   public async findOneAndReplace(
@@ -537,24 +579,34 @@ class Query {
     try {
       // const db = await this.connection.connect();
       // const collection = db.collection(this.collectionName);
-      if (typeof this.connection === 'boolean' || typeof this.connection.db === 'boolean') {
+      if (
+        typeof this.connection === 'boolean' ||
+        typeof this.connection.db === 'boolean'
+      ) {
         if (this.connection === false) {
-          throw new Error('No connection established before query.')
+          throw new Error('No connection established before query.');
         }
       } else {
-
         const collection = this.connection.db.collection(this.collectionName);
         if (typeof options === 'function') callback = options;
         options = {};
-        await this.validateReplaceAgainstSchema(filter, replacement, this.schema, this.updatedQueryObject);
-        const data = await collection.replaceOne(filter, this.updatedQueryObject, options);
+        await this.validateReplaceAgainstSchema(
+          filter,
+          replacement,
+          this.schema,
+          this.updatedQueryObject
+        );
+        const data = await collection.replaceOne(
+          filter,
+          this.updatedQueryObject,
+          options
+        );
         this.resetQueryObject();
         if (callback) return callback(data);
 
         // await this.connection.disconnect();
         return data;
       }
-
     } catch (error) {
       throw new Error(`Error in findOneAndReplace function. ${error}`);
     }
@@ -572,31 +624,32 @@ class Query {
     id: string,
     options?: FindOptions | ((input: unknown) => unknown),
     callback?: (input: unknown) => unknown
-    )
-   {
+  ) {
     try {
       const stringId = new Bson.ObjectId(id);
 
-      if (typeof this.connection === 'boolean' || typeof this.connection.db === 'boolean') {
+      if (
+        typeof this.connection === 'boolean' ||
+        typeof this.connection.db === 'boolean'
+      ) {
         if (this.connection === false) {
-          throw new Error('No connection established before query.')
+          throw new Error('No connection established before query.');
         }
       } else {
-      
         const collection = this.connection.db.collection(this.collectionName);
 
-      if (typeof options === 'function') callback = options;
-      options = {};
-      
-      const data = await collection.findOne({ _id: stringId }, options);
-      if (callback) {
-        // await this.connection.disconnect();
-        return callback(data);
-      } else {
-        // await this.connection.disconnect();
-        return data;
+        if (typeof options === 'function') callback = options;
+        options = {};
+
+        const data = await collection.findOne({ _id: stringId }, options);
+        if (callback) {
+          // await this.connection.disconnect();
+          return callback(data);
+        } else {
+          // await this.connection.disconnect();
+          return data;
+        }
       }
-    }
     } catch (error) {
       throw new Error(`Error in findById function. ${error}`);
     }
@@ -614,38 +667,44 @@ class Query {
   public async findByIdAndUpdate(
     id: string,
     update: Record<string, unknown>,
-    options?: UpdateOptions  | ((input: unknown) => unknown),
+    options?: UpdateOptions | ((input: unknown) => unknown),
     callback?: (input: unknown) => unknown
   ) {
     try {
       const filter = { _id: new Bson.ObjectId(id) };
       console.log(filter);
 
-      if (typeof this.connection === 'boolean' || typeof this.connection.db === 'boolean') {
+      if (
+        typeof this.connection === 'boolean' ||
+        typeof this.connection.db === 'boolean'
+      ) {
         if (this.connection === false) {
-          throw new Error('No connection established before query.')
+          throw new Error('No connection established before query.');
         }
       } else {
-      
         const collection = this.connection.db.collection(this.collectionName);
 
-      // update the value of update with the $set operator
-      await this.validateUpdateAgainstSchema(update, this.schema, this.updatedQueryObject);
-      const newUpdate = { $set: this.updatedQueryObject };
-      // check if options is a function and reassign callback to options if so - so that we can bypass the options param
-      if (typeof options === 'function') callback = options;
-      options = {};
-      
-      const data = await collection.updateOne(filter, newUpdate, options);
-      this.resetQueryObject();
-      if (callback) {
-        // await this.connection.disconnect();
-        return callback(data);
-      } else {
-        // await this.connection.disconnect();
-        return data;
+        // update the value of update with the $set operator
+        await this.validateUpdateAgainstSchema(
+          update,
+          this.schema,
+          this.updatedQueryObject
+        );
+        const newUpdate = { $set: this.updatedQueryObject };
+        // check if options is a function and reassign callback to options if so - so that we can bypass the options param
+        if (typeof options === 'function') callback = options;
+        options = {};
+
+        const data = await collection.updateOne(filter, newUpdate, options);
+        this.resetQueryObject();
+        if (callback) {
+          // await this.connection.disconnect();
+          return callback(data);
+        } else {
+          // await this.connection.disconnect();
+          return data;
+        }
       }
-    }
     } catch (error) {
       throw new Error(`Error in findByIdAndUpdate function. ${error}`);
     }
@@ -662,9 +721,12 @@ class Query {
     try {
       // const db = await this.connection.connect();
       // const collection = db.collection(this.collectionName);
-      if (typeof this.connection === 'boolean' || typeof this.connection.db === 'boolean') {
+      if (
+        typeof this.connection === 'boolean' ||
+        typeof this.connection.db === 'boolean'
+      ) {
         if (this.connection === false) {
-          throw new Error('No connection established before query.')
+          throw new Error('No connection established before query.');
         }
       } else {
         const collection = this.connection.db.collection(this.collectionName);
@@ -685,7 +747,7 @@ class Query {
    * @param document which is the client input for which document will be found
    * @param additional options deleteOptions
    * @param callback function
-   * @returns an object with the property deletedCount indicating how many documents were deleted. 
+   * @returns an object with the property deletedCount indicating how many documents were deleted.
    * example: await query.deleteOne({ username: "test"}, (input) => {console.log('callback executed', input)})
    */
   public async deleteOne(
@@ -701,9 +763,12 @@ class Query {
         callback = options;
         options = {};
       }
-      if (typeof this.connection === 'boolean' || typeof this.connection.db === 'boolean') {
+      if (
+        typeof this.connection === 'boolean' ||
+        typeof this.connection.db === 'boolean'
+      ) {
         if (this.connection === false) {
-          throw new Error('No connection established before query.')
+          throw new Error('No connection established before query.');
         }
       } else {
         const collection = this.connection.db.collection(this.collectionName);
@@ -723,7 +788,7 @@ class Query {
     }
   }
 
-    /**
+  /**
    * Delete Many deletes all of the documents that match conditions from the collection
    * @param document which is the client input for which document will be found
    * @param additional options deleteOptions
@@ -737,30 +802,32 @@ class Query {
     callback?: (input: unknown) => unknown
   ) {
     try {
-      if (typeof this.connection === 'boolean' || typeof this.connection.db === 'boolean') {
+      if (
+        typeof this.connection === 'boolean' ||
+        typeof this.connection.db === 'boolean'
+      ) {
         if (this.connection === false) {
-          throw new Error('No connection established before query.')
+          throw new Error('No connection established before query.');
         }
       } else {
-      
         const collection = this.connection.db.collection(this.collectionName);
-          if (typeof options === 'function') {
-            callback = options;
-            options = {};
-        // returns number of deleted documents
-        const data = await collection.deleteMany(document, options);
-        const formattedReturnObj = { deletedCount: data };
-        console.log(formattedReturnObj);
-        if (callback) return callback(data);
-        // await this.connection.disconnect();
-        return formattedReturnObj;
-       }  
+        if (typeof options === 'function') {
+          callback = options;
+          options = {};
+          // returns number of deleted documents
+          const data = await collection.deleteMany(document, options);
+          const formattedReturnObj = { deletedCount: data };
+          console.log(formattedReturnObj);
+          if (callback) return callback(data);
+          // await this.connection.disconnect();
+          return formattedReturnObj;
+        }
       }
     } catch (error) {
       throw new Error(`Error in deleteMany function. ${error}`);
     }
   }
-   /**
+  /**
    * Update One finds a matching document, updates it according to the update arg, passing any options. Will update only the first document that matches filter regardless of the value of the multi option.
    *
    * @param document which is the client input for the document to find
@@ -777,31 +844,37 @@ class Query {
     callback?: (input: unknown) => unknown
   ) {
     try {
-      if (typeof this.connection === 'boolean' || typeof this.connection.db === 'boolean') {
+      if (
+        typeof this.connection === 'boolean' ||
+        typeof this.connection.db === 'boolean'
+      ) {
         if (this.connection === false) {
-          throw new Error('No connection established before query.')
+          throw new Error('No connection established before query.');
         }
       } else {
-      
         const collection = this.connection.db.collection(this.collectionName);
-      if (typeof options === 'function') {
-        callback = options;
-        options = {};
-      }
-      //  $set operator, sets field in updateObject to corresponding value, check mongoDB atlas docs for updateOne for ref
-      await this.validateUpdateAgainstSchema(update, this.schema, this.updatedQueryObject);
-      const setUpdateObject = { $set: this.updatedQueryObject };
+        if (typeof options === 'function') {
+          callback = options;
+          options = {};
+        }
+        //  $set operator, sets field in updateObject to corresponding value, check mongoDB atlas docs for updateOne for ref
+        await this.validateUpdateAgainstSchema(
+          update,
+          this.schema,
+          this.updatedQueryObject
+        );
+        const setUpdateObject = { $set: this.updatedQueryObject };
 
-      const data = await collection.updateOne(
-        document,
-        setUpdateObject,
-        options
-      );
-      this.resetQueryObject(); 
-      // console.log(data);
-      if (callback) return callback(data);
-   
-      return data;
+        const data = await collection.updateOne(
+          document,
+          setUpdateObject,
+          options
+        );
+        this.resetQueryObject();
+        // console.log(data);
+        if (callback) return callback(data);
+
+        return data;
       }
     } catch (error) {
       throw new Error(`Error in updateOne function. ${error}`);
@@ -821,34 +894,41 @@ class Query {
   public async updateMany(
     document: Record<string, unknown>,
     update: Record<string, unknown>,
-    options?: UpdateOptions  | ((input: unknown) => unknown),
+    options?: UpdateOptions | ((input: unknown) => unknown),
     callback?: (input: unknown) => unknown
-  ) { 
+  ) {
     // if upsert is true, and no matching documents are found, updateObject( regardless of how complete it is) will be inserted.
     try {
-      if (typeof this.connection === 'boolean' || typeof this.connection.db === 'boolean') {
+      if (
+        typeof this.connection === 'boolean' ||
+        typeof this.connection.db === 'boolean'
+      ) {
         if (this.connection === false) {
-          throw new Error('No connection established before query.')
+          throw new Error('No connection established before query.');
         }
       } else {
         const collection = this.connection.db.collection(this.collectionName);
-      if (typeof options === 'function') {
-        callback = options;
-        options = {};
-      }
-      //  $set operator, sets field in updateObject to corresponding value, check mongoDB atlas docs for updateOne for ref
-      await this.validateUpdateAgainstSchema(update, this.schema, this.updatedQueryObject);
-      const setUpdateObject = { $set: this.updatedQueryObject };
-      const data = await collection.updateMany(
-        document,
-        setUpdateObject,
-        options
-      );
-      this.resetQueryObject();
-      // console.log(data);
-      if (callback) return callback(data);
-   
-      return data;
+        if (typeof options === 'function') {
+          callback = options;
+          options = {};
+        }
+        //  $set operator, sets field in updateObject to corresponding value, check mongoDB atlas docs for updateOne for ref
+        await this.validateUpdateAgainstSchema(
+          update,
+          this.schema,
+          this.updatedQueryObject
+        );
+        const setUpdateObject = { $set: this.updatedQueryObject };
+        const data = await collection.updateMany(
+          document,
+          setUpdateObject,
+          options
+        );
+        this.resetQueryObject();
+        // console.log(data);
+        if (callback) return callback(data);
+
+        return data;
       }
     } catch (error) {
       throw new Error(`Error in updateMany function. ${error}`);
@@ -865,32 +945,55 @@ class Query {
    * contain property keys from outer levels
    * @returns true or undefined.
    */
-  async validateInsertAgainstSchema(queryObject: Record<string, unknown>, 
-    schema: Schema, 
-    updatedQueryObject: Record<string, unknown>, 
-    embeddedUniqueProperty: string[] = []) {
-    
+  async validateInsertAgainstSchema(
+    queryObject: Record<string, unknown>,
+    schema: Schema,
+    updatedQueryObject: Record<string, unknown>,
+    embeddedUniqueProperty: string[] = []
+  ) {
     const currentSchemaMap = schema.schemaMap;
 
     this.checkDataFields(queryObject, currentSchemaMap);
     for (const property in currentSchemaMap) {
       // current SchemaMap's current property value is either an instance of a Schema or a SchemaOption
       // If Schema is stored, validate embedded object.
-      if(currentSchemaMap[property] instanceof Schema) {
+      if (currentSchemaMap[property] instanceof Schema) {
         updatedQueryObject[property] = {};
         embeddedUniqueProperty.push(property);
-        await this.validateInsertAgainstSchema(queryObject[property] as Record<string, unknown>, 
-          currentSchemaMap[property] as Schema, 
+        await this.validateInsertAgainstSchema(
+          queryObject[property] as Record<string, unknown>,
+          currentSchemaMap[property] as Schema,
           updatedQueryObject[property] as Record<string, unknown>,
-          embeddedUniqueProperty);
+          embeddedUniqueProperty
+        );
         embeddedUniqueProperty.pop();
-      }
-      else {
-        this.checkRequired(queryObject, property, currentSchemaMap[property] as optionsObject);
-        this.setDefault(queryObject, property, currentSchemaMap[property] as optionsObject);
-        this.populateQuery(queryObject, property, currentSchemaMap[property] as optionsObject, updatedQueryObject);
-        await this.checkUnique(property, currentSchemaMap[property] as optionsObject, updatedQueryObject, embeddedUniqueProperty);
-        this.checkConstraints(property, currentSchemaMap[property] as optionsObject);
+      } else {
+        this.checkRequired(
+          queryObject,
+          property,
+          currentSchemaMap[property] as optionsObject
+        );
+        this.setDefault(
+          queryObject,
+          property,
+          currentSchemaMap[property] as optionsObject
+        );
+        this.populateQuery(
+          queryObject,
+          property,
+          currentSchemaMap[property] as optionsObject,
+          updatedQueryObject
+        );
+        await this.checkUnique(
+          property,
+          currentSchemaMap[property] as optionsObject,
+          updatedQueryObject,
+          embeddedUniqueProperty
+        );
+        this.checkConstraints(
+          property,
+          currentSchemaMap[property] as optionsObject
+        );
       }
     }
     return true;
@@ -908,32 +1011,45 @@ class Query {
    * contain property keys from outer levels
    * @returns true or undefined.
    */
-  async validateReplaceAgainstSchema(findObject: Record<string, unknown>, 
-    queryObject: Record<string, unknown>, 
-    schema: Schema, 
-    updatedQueryObject: Record<string, unknown>, 
-    embeddedUniqueProperty: string[] = []) {
-    
+  async validateReplaceAgainstSchema(
+    findObject: Record<string, unknown>,
+    queryObject: Record<string, unknown>,
+    schema: Schema,
+    updatedQueryObject: Record<string, unknown>,
+    embeddedUniqueProperty: string[] = []
+  ) {
     const currentSchemaMap = schema.schemaMap;
     this.checkDataFields(queryObject, currentSchemaMap);
     for (const property in currentSchemaMap) {
       // current SchemaMap's current property value is either an instance of a Schema or a SchemaOption
       // If Schema is stored, validate embedded object.
-      if(currentSchemaMap[property] instanceof Schema) {
+      if (currentSchemaMap[property] instanceof Schema) {
         updatedQueryObject[property] = {};
         embeddedUniqueProperty.push(property);
-        await this.validateReplaceAgainstSchema(findObject, 
-          queryObject[property] as Record<string, unknown>, 
-          currentSchemaMap[property] as Schema, 
+        await this.validateReplaceAgainstSchema(
+          findObject,
+          queryObject[property] as Record<string, unknown>,
+          currentSchemaMap[property] as Schema,
           updatedQueryObject[property] as Record<string, unknown>,
-          embeddedUniqueProperty);
+          embeddedUniqueProperty
+        );
         embeddedUniqueProperty.pop();
-      }
-      else {
+      } else {
         this.checkRequired(queryObject, property, currentSchemaMap[property]);
         this.setDefault(queryObject, property, currentSchemaMap[property]);
-        this.populateQuery(queryObject, property, currentSchemaMap[property], updatedQueryObject);
-        await this.checkUniqueForReplace(property, currentSchemaMap[property], findObject, updatedQueryObject, embeddedUniqueProperty);
+        this.populateQuery(
+          queryObject,
+          property,
+          currentSchemaMap[property],
+          updatedQueryObject
+        );
+        await this.checkUniqueForReplace(
+          property,
+          currentSchemaMap[property],
+          findObject,
+          updatedQueryObject,
+          embeddedUniqueProperty
+        );
         this.checkConstraints(property, currentSchemaMap[property]);
       }
     }
@@ -951,32 +1067,44 @@ class Query {
    * contain property keys from outer levels
    * @returns true or undefined.
    */
-  async validateUpdateAgainstSchema(queryObject: Record<string, unknown>, 
-    schema: Schema, 
-    updatedQueryObject: Record<string, unknown>, 
-    embeddedUniqueProperty: string[] = []) {
-
+  async validateUpdateAgainstSchema(
+    queryObject: Record<string, unknown>,
+    schema: Schema,
+    updatedQueryObject: Record<string, unknown>,
+    embeddedUniqueProperty: string[] = []
+  ) {
     const currentSchemaMap = schema.schemaMap;
     this.checkDataFields(queryObject, currentSchemaMap);
     for (const property in queryObject) {
       // current SchemaMap's current property value is either an instance of a Schema or a SchemaOption
       // If Schema is stored, validate embedded object.
-      if(currentSchemaMap[property] instanceof Schema) {
+      if (currentSchemaMap[property] instanceof Schema) {
         updatedQueryObject[property] = {};
         embeddedUniqueProperty.push(property);
-        await this.validateUpdateAgainstSchema(queryObject[property] as Record<string, unknown>, 
-          currentSchemaMap[property], 
+        await this.validateUpdateAgainstSchema(
+          queryObject[property] as Record<string, unknown>,
+          currentSchemaMap[property],
           updatedQueryObject[property] as Record<string, unknown>,
-          embeddedUniqueProperty);
+          embeddedUniqueProperty
+        );
         embeddedUniqueProperty.pop();
-      }
-      else {
-        this.populateQuery(queryObject, property, currentSchemaMap[property], updatedQueryObject);
-        await this.checkUnique(property, currentSchemaMap[property], updatedQueryObject, embeddedUniqueProperty);
+      } else {
+        this.populateQuery(
+          queryObject,
+          property,
+          currentSchemaMap[property],
+          updatedQueryObject
+        );
+        await this.checkUnique(
+          property,
+          currentSchemaMap[property],
+          updatedQueryObject,
+          embeddedUniqueProperty
+        );
         this.checkConstraints(property, currentSchemaMap[property]);
       }
     }
-    return true; 
+    return true;
   }
 
   /**
@@ -986,11 +1114,15 @@ class Query {
    * @param schemaMap which contains the schemaMap for the current level in the user's document
    * @returns true or undefined.
    */
-  checkDataFields(queryObject: Record<string, unknown>, schemaMap: Record<string, unknown>) {
-
+  checkDataFields(
+    queryObject: Record<string, unknown>,
+    schemaMap: Record<string, unknown>
+  ) {
     for (const property in queryObject) {
       if (!Object.prototype.hasOwnProperty.call(schemaMap, property)) {
-        throw new Error ('Requested query object contains properties not present in the Schema.')
+        throw new Error(
+          'Requested query object contains properties not present in the Schema.'
+        );
       }
     }
     return true;
@@ -1004,10 +1136,14 @@ class Query {
    * @param propertyOptions which is the propertyOptions object for the given property from the schema
    * @returns true or undefined.
    */
-  checkRequired(queryObject: Record<string, unknown>, propertyName: string, propertyOptions: optionsObject) {
+  checkRequired(
+    queryObject: Record<string, unknown>,
+    propertyName: string,
+    propertyOptions: optionsObject
+  ) {
     if (propertyOptions.required === true) {
       if (!Object.prototype.hasOwnProperty.call(queryObject, propertyName)) {
-        throw new Error (`${propertyName} is Required by the Schema.`)
+        throw new Error(`${propertyName} is Required by the Schema.`);
       }
     }
     return true;
@@ -1021,7 +1157,11 @@ class Query {
    * @param propertyOptions which is the propertyOptions object for the given property from the schema
    * @returns true or undefined.
    */
-  setDefault(queryObject: Record<string, unknown>, propertyName: string, propertyOptions: optionsObject) {
+  setDefault(
+    queryObject: Record<string, unknown>,
+    propertyName: string,
+    propertyOptions: optionsObject
+  ) {
     if (!Object.prototype.hasOwnProperty.call(queryObject, propertyName)) {
       queryObject[propertyName] = propertyOptions.default;
     }
@@ -1040,12 +1180,19 @@ class Query {
    * This may refer to the outer object or embedded objects within.
    * @returns true or undefined.
    */
-  populateQuery(queryObject: Record<string, unknown>, propertyName: string, propertyOptions: optionsObject, updatedQueryObject: Record<string, unknown>) {
+  populateQuery(
+    queryObject: Record<string, unknown>,
+    propertyName: string,
+    propertyOptions: optionsObject,
+    updatedQueryObject: Record<string, unknown>
+  ) {
     const valueAsDatatype = new propertyOptions.type(queryObject[propertyName]);
     valueAsDatatype.convertType();
     valueAsDatatype.validateType();
     if (valueAsDatatype.valid === false) {
-      throw new Error('Data was not able to be translated to given specified schema data type.');
+      throw new Error(
+        'Data was not able to be translated to given specified schema data type.'
+      );
     }
     updatedQueryObject[propertyName] = valueAsDatatype.convertedValue;
   }
@@ -1061,16 +1208,27 @@ class Query {
    * contain property keys from outer levels
    * @returns true or undefined.
    */
-  async checkUnique(propertyName: string, propertyOptions: optionsObject, updatedQueryObject: Record<string, unknown>, embeddedUniqueProperty: string[]) {
+  async checkUnique(
+    propertyName: string,
+    propertyOptions: optionsObject,
+    updatedQueryObject: Record<string, unknown>,
+    embeddedUniqueProperty: string[]
+  ) {
     if (propertyOptions.unique === true) {
       // query object to check if unique value already exists in database collection
-      const queryObjectForUnique: Record <string, unknown> = {};
+      const queryObjectForUnique: Record<string, unknown> = {};
       // constructs correctly formatted string for property key of queryObjectForUnique
-      const formattedPropertyName = this.formatQueryField(propertyName, embeddedUniqueProperty);
-      queryObjectForUnique[formattedPropertyName] = updatedQueryObject[propertyName];
+      const formattedPropertyName = this.formatQueryField(
+        propertyName,
+        embeddedUniqueProperty
+      );
+      queryObjectForUnique[formattedPropertyName] =
+        updatedQueryObject[propertyName];
       const propertyExists = await this.findOne(queryObjectForUnique);
       if (propertyExists !== undefined) {
-        throw new Error('Property designated as unique in Schema already exists.');
+        throw new Error(
+          'Property designated as unique in Schema already exists.'
+        );
       }
     }
     return true;
@@ -1088,50 +1246,68 @@ class Query {
    * contain property keys from outer levels
    * @returns true or undefined.
    */
-  async checkUniqueForReplace(propertyName: string, 
-    propertyOptions: optionsObject, 
-    findObject: Record<string, unknown>, 
-    updatedQueryObject: Record<string, unknown>, 
-    embeddedUniqueProperty: string[]) {
-
-      if (propertyOptions.unique === true) {
-        let originalPropertyValue = await this.findOne(findObject);
-        if (originalPropertyValue === undefined) {
-          throw new Error('No database entry found on query.');
+  async checkUniqueForReplace(
+    propertyName: string,
+    propertyOptions: optionsObject,
+    findObject: Record<string, unknown>,
+    updatedQueryObject: Record<string, unknown>,
+    embeddedUniqueProperty: string[]
+  ) {
+    if (propertyOptions.unique === true) {
+      let originalPropertyValue = await this.findOne(findObject);
+      if (originalPropertyValue === undefined) {
+        throw new Error('No database entry found on query.');
+      } else if (originalPropertyValue === null)
+        throw new Error('No database entry found on query.');
+      else if (typeof originalPropertyValue === 'object') {
+        // iterate through embeddedUniqueProperty array to access embedded objects that directly contains current propertyName
+        if (embeddedUniqueProperty.length) {
+          embeddedUniqueProperty.forEach((prop) => {
+            //@ts-ignore Fix later.
+            originalPropertyValue = originalPropertyValue[prop];
+          });
         }
-        else if (originalPropertyValue === null) throw new Error('No database entry found on query.')
-        else if (typeof originalPropertyValue === 'object') {
-          // iterate through embeddedUniqueProperty array to access embedded objects that directly contains current propertyName
-          if(embeddedUniqueProperty.length) {
-            embeddedUniqueProperty.forEach((prop) => {
-              //@ts-ignore Fix later.
-              originalPropertyValue = originalPropertyValue[prop];
-            })
-          }
-          // convert originalPropertyValue's type to match matching property's type in the updatedQueryObject
-          //@ts-ignore Fix later.
-          const valueAsDatatype = new propertyOptions.type(originalPropertyValue[propertyName]);
-          valueAsDatatype.convertType();
-          valueAsDatatype.validateType();
-          if (valueAsDatatype.valid === false) {
-            throw new Error('Data was not able to be translated to given specified schema data type.');
-          }
-          const formattedOriginalPropertyValue = JSON.stringify(valueAsDatatype.convertedValue);
-          const formattedUpdatedQueryObjectValue = JSON.stringify(updatedQueryObject[propertyName]);
-
-          // query object to check if unique value already exists in database collection
-          const queryObjectForUnique: Record<string, unknown> = {};
-          // constructs correctly formatted string for property key of queryObjectForUnique
-          const formattedPropertyName = this.formatQueryField(propertyName, embeddedUniqueProperty);
-          queryObjectForUnique[formattedPropertyName] = updatedQueryObject[propertyName];
-          const propertyExists = await this.findOne(queryObjectForUnique);
-
-          // If property value exists in database collection, AND the property value from the found document (ln 1096) doesn't match
-          // the property value in the updatedQueryObject, throw an error.
-          if (propertyExists !== undefined && formattedOriginalPropertyValue !== formattedUpdatedQueryObjectValue) {
-            throw new Error(`Property designated as unique in Schema already exists. ${formattedPropertyName}: ${formattedUpdatedQueryObjectValue}`);
-          }
+        // convert originalPropertyValue's type to match matching property's type in the updatedQueryObject
+        //@ts-ignore Fix later.
+        const valueAsDatatype = new propertyOptions.type(
+          originalPropertyValue[propertyName]
+        );
+        valueAsDatatype.convertType();
+        valueAsDatatype.validateType();
+        if (valueAsDatatype.valid === false) {
+          throw new Error(
+            'Data was not able to be translated to given specified schema data type.'
+          );
         }
+        const formattedOriginalPropertyValue = JSON.stringify(
+          valueAsDatatype.convertedValue
+        );
+        const formattedUpdatedQueryObjectValue = JSON.stringify(
+          updatedQueryObject[propertyName]
+        );
+
+        // query object to check if unique value already exists in database collection
+        const queryObjectForUnique: Record<string, unknown> = {};
+        // constructs correctly formatted string for property key of queryObjectForUnique
+        const formattedPropertyName = this.formatQueryField(
+          propertyName,
+          embeddedUniqueProperty
+        );
+        queryObjectForUnique[formattedPropertyName] =
+          updatedQueryObject[propertyName];
+        const propertyExists = await this.findOne(queryObjectForUnique);
+
+        // If property value exists in database collection, AND the property value from the found document (ln 1096) doesn't match
+        // the property value in the updatedQueryObject, throw an error.
+        if (
+          propertyExists !== undefined &&
+          formattedOriginalPropertyValue !== formattedUpdatedQueryObjectValue
+        ) {
+          throw new Error(
+            `Property designated as unique in Schema already exists. ${formattedPropertyName}: ${formattedUpdatedQueryObjectValue}`
+          );
+        }
+      }
     }
     return true;
   }
@@ -1146,9 +1322,13 @@ class Query {
   checkConstraints(propertyName: string, propertyOptions: optionsObject) {
     if (propertyOptions.validator === null) return true;
     if (typeof propertyOptions.validator !== 'function') {
-      throw new Error('Callback given as validator in Schema is not a function.');
+      throw new Error(
+        'Callback given as validator in Schema is not a function.'
+      );
     }
-    const isConstraintMet = propertyOptions.validator(this.updatedQueryObject[propertyName])
+    const isConstraintMet = propertyOptions.validator(
+      this.updatedQueryObject[propertyName]
+    );
     if (isConstraintMet !== true) {
       throw new Error('Callback given as validator in Schema is violated.');
     }
@@ -1165,8 +1345,8 @@ class Query {
     return;
   }
 
-    /**
-   * Method 
+  /**
+   * Method
    *
    * @param propertyName which is the property key to check, will be the last property in the returned string
    * @param embeddedUniqueProperty When checking a property in an embedded document with the schema option 'unique', set to true, this array will
@@ -1176,12 +1356,11 @@ class Query {
    */
   formatQueryField(propertyName: string, embeddedUniqueProperty: string[]) {
     let string = '';
-    if(embeddedUniqueProperty.length === 0) {
+    if (embeddedUniqueProperty.length === 0) {
       return propertyName;
-    }
-    else {
-      while(embeddedUniqueProperty.length > 0) {
-        if(string === '') string += embeddedUniqueProperty.shift();
+    } else {
+      while (embeddedUniqueProperty.length > 0) {
+        if (string === '') string += embeddedUniqueProperty.shift();
         else string += `.${embeddedUniqueProperty.shift()}`;
       }
       string += `.${propertyName}`;
