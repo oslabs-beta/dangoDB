@@ -770,14 +770,15 @@ class Query {
         if (typeof options === 'function') {
           callback = options;
           options = {};
-
-          const data = await collection.deleteMany(document, options);
-          const formattedReturnObj = { deletedCount: data };
-          console.log(formattedReturnObj);
-          if (callback) return callback(data);
-
-          return formattedReturnObj;
         }
+        
+        const data = await collection.deleteMany(document, options);
+        const formattedReturnObj = { deletedCount: data };
+        console.log(formattedReturnObj);
+        if (callback) return callback(data);
+
+        return formattedReturnObj;
+        
       }
     } catch (error) {
       throw new Error(`Error in deleteMany function. ${error}`);
