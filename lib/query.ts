@@ -1129,24 +1129,25 @@ class Query {
     return true;
   }
 
-    /**
-   * Method loops through all properties in the given schema and attempts to remove each property with select set as false from the current query.
-   *
-   * @param document which is the matched document from the database
-   * @param schemaMap which contains the schemaMap for the current level in the user's document
-   * @returns the document with filtered fields.
-   */
-     filterSelectedFields(
-      document: Record<string, unknown>,
-      schemaMap: Record<string, optionsObject>,
-    ) {
-      Object.entries(schemaMap).forEach(([propertyName, propertyOptions]) => {
-        if (!propertyOptions.select) {
-            delete document[propertyName];
-        }
-      })
-      return document;
-    }
+   /**
+  * Method loops through all properties in the given schema and attempts to remove each property with select set as false from the current query.
+  *
+  * @param document which is the matched document from the database
+  * @param schemaMap which contains the schemaMap for the current level in the user's document
+  * @returns the document with filtered fields.
+  */
+  filterSelectedFields(
+   document: Record<string, unknown>,
+   schemaMap: Record<string, optionsObject>,
+   ) {
+    Object.entries(schemaMap).forEach(([propertyName, propertyOptions]) => {
+     if (!propertyOptions.select) {
+         delete document[propertyName];
+     }
+   })
+   return document;
+  }
+   
 
   /**
    * Method populates the property updatedQueryObject object to be used in the actual query.
