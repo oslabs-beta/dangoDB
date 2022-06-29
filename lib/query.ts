@@ -101,7 +101,6 @@ class Query {
         }
       } else {
         const collection = this.connection.db.collection(this.collectionName);
-        console.log(queryObject)
         const data = await collection.findOne(queryObject, options);
 
         if (callback) return callback(data);
