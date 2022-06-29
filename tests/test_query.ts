@@ -1,4 +1,5 @@
 import {
+  assert,
   assertInstanceOf,
   assertStrictEquals,
   assertThrows,
@@ -15,7 +16,7 @@ import { model } from '../lib/model.ts';
 
 import { Bson } from '../deps.ts';
 
-import { Schema, SchemaOptions } from '../lib/schema.ts';
+import { Schema, SchemaOptions, optionsObject } from '../lib/schema.ts';
 
 import { dango } from '../lib/dango.ts';
 
@@ -34,6 +35,10 @@ describe('test Query methods', () => {
       type: 'number',
       required: false,
       default: null,
+    },
+    password: {
+      type: 'string',
+      select: false,
     },
   };
 
@@ -187,6 +192,21 @@ describe('test Query methods', () => {
     const updatedQueryObjectKeys = Object.keys(query.updatedQueryObject);
     it('will reset updatedQuery object', () => {
       assertStrictEquals(updatedQueryObjectKeys.length, 0);
+    });
+  });
+
+  describe('filterSelectedFields result ', () => {
+    let document: Record<string, unknown>;
+    let schemaMap: Record<string, optionsObject>;
+    
+    beforeEach(() => {
+      document = { name: 'Mr. A', age: 25, password: '123456' };
+      schemaMap = testSchema.schemaMap;
+    });
+
+    it('will delete property from document when the property option select is false', () => {
+      query.filterSelectedFields(document, schemaMap);
+      assert(!Object.keys(document).includes('password'));
     });
   });
 
