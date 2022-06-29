@@ -63,9 +63,10 @@ class Query {
           throw new Error('No connection established before query.');
         }
       } else {
+        const currentSchemaMap = this.schema.schemaMap;
         const collection = this.connection.db.collection(this.collectionName);
         const data = await collection.find(allQueryObjects, options);
-        const dataRes = await data.toArray();
+        const dataRes = await data.map(doc => this.filterSelectedFields(doc, currentSchemaMap));
 
         if (callback) return callback(data);
 
@@ -100,6 +101,7 @@ class Query {
         }
       } else {
         const collection = this.connection.db.collection(this.collectionName);
+        console.log(queryObject)
         const data = await collection.findOne(queryObject, options);
 
         if (callback) return callback(data);
@@ -606,12 +608,15 @@ class Query {
           throw new Error('No connection established before query.');
         }
       } else {
+        const currentSchemaMap = this.schema.schemaMap;
         const collection = this.connection.db.collection(this.collectionName);
 
         if (typeof options === 'function') callback = options;
         options = {};
 
         const data = await collection.findOne({ _id: stringId }, options);
+        if (data) this.filterSelectedFields(data as Record<string, unknown>, currentSchemaMap)
+
         if (callback) {
           return callback(data);
         } else {
@@ -1123,6 +1128,25 @@ class Query {
     }
     return true;
   }
+
+    /**
+   * Method loops through all properties in the given schema and attempts to remove each property with select set as false from the current query.
+   *
+   * @param document which is the matched document from the database
+   * @param schemaMap which contains the schemaMap for the current level in the user's document
+   * @returns the document with filtered fields.
+   */
+     filterSelectedFields(
+      document: Record<string, unknown>,
+      schemaMap: Record<string, optionsObject>,
+    ) {
+      Object.entries(schemaMap).forEach(([propertyName, propertyOptions]) => {
+        if (!propertyOptions.select) {
+            delete document[propertyName];
+        }
+      })
+      return document;
+    }
 
   /**
    * Method populates the property updatedQueryObject object to be used in the actual query.
