@@ -57,6 +57,7 @@ export interface optionsObject {
   unique?: boolean;
   default?: any;
   validator?: Function | null;
+  select?: boolean;
 }
 
 /**
@@ -72,6 +73,7 @@ export class SchemaOptions {
   unique?: boolean;
   default?: any;
   validator?: Function | null;
+  select?: boolean;
 
   constructor(options: optionsObject) {
     if (!Object.prototype.hasOwnProperty.call(options, 'type')) {
@@ -82,6 +84,7 @@ export class SchemaOptions {
     this.unique = false;
     this.default = null;
     this.validator = null;
+    this.select = true;
     for (const key in options) {
       if (key === 'type') {
         if (Object.prototype.hasOwnProperty.call(dango.types, options[key])) {
