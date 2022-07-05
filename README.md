@@ -8,7 +8,7 @@
 <br>
 <div align="center"><a href="https://dangodb.land">Visit our Website</a></div>
 <br>
-<div align="center"><a href="https://dangodb-website.web.app/">Read our Medium Launch Article</a></div>
+<div align="center"><a href="https://medium.com/@stephen-jue/dangodb-a-mongodb-odm-for-deno-9ac46943fe54">Read our Medium Launch Article</a></div>
 <br>
 
 ## Table of Contents
@@ -24,7 +24,7 @@
 
 <strong>dangoDB</strong> is a light-weight MongoDB Object Document Mapper (ODM) library built for the Deno runtime. It provides the core functionality and familiar look and feel of established Node-based libraries. With dangoDB, developers can construct schemas and models, and they can enforce strict type-casting and schema validation to structure their databases. The query functions available from the deno_mongo driver can all be accessed with ease. 
 
-In addition, we built a user-friendly web-based [GUI](https://dangodb.land/schema) that auto-generates schema for users to copy and paste directly into their code. 
+In addition, we built a user-friendly web-based [GUI](https://dangodb.land/#/schema) that auto-generates schema for users to copy and paste directly into their code. 
 
 
 ## <a name="get-started"></a>Getting Started
@@ -33,10 +33,10 @@ First, be sure that you have [Deno](https://deno.land) runtime installed and con
 
 ### Quick Start
 
-In your application, import the dangoDB module from the [deno.land module](https://deno.land/x/dangodb.mod.ts).
+In your application, import the dangoDB module from the deno.land [module](https://deno.land/x/dangodb).
 
 ```javascript
-import { dango } from 'https://deno.land/x/dangodb.mod.ts'
+import { dango } from "https://deno.land/x/dangodb@v1.0.2/mod.ts";
 ```
 
 ### Connect to your Database
@@ -111,7 +111,7 @@ console.log(dinosaurs);
 Now you've successfully inserted a document into the Dinosaur collection at your MongoDB database. 
 
 Congratulations! That's the end of the quick start. You've successfully imported dangoDB, opened up a connection, created a schema, inserted a document for Stegosaurus, and
-queried all the dinosaurs in your Dinosaur model in your MongoDB database using dangoDB. Explore the rest of the readme.MD for more detailed instructions on how to use dangoDB.
+queried all the dinosaurs in your Dinosaur model using dangoDB. Explore the rest of the readme.MD for more detailed instructions on how to use dangoDB.
 
 
 
