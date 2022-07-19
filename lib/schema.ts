@@ -34,7 +34,11 @@ export class Schema {
         // SJ: assign Schema
         this.schemaMap[property] = schemaObj[property];
       } else if (typeof schemaObj[property] === 'object') {
-        this.schemaMap[property] = new SchemaOptions(schemaObj[property]);
+        // Start Array objects
+        if (Array.isArray(schemaObj[property])) {
+          
+        }
+        else this.schemaMap[property] = new SchemaOptions(schemaObj[property]);
       } else if (
         typeof schemaObj[property] !== 'object' &&
         Object.prototype.hasOwnProperty.call(dango.types, schemaObj[property])
