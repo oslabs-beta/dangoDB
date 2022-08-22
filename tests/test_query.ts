@@ -111,7 +111,7 @@ describe('test Query methods', () => {
       propertyName = 'createdAt'
       propertyOptions = testSchema.schemaMap[propertyName];
       query.setDefault(queryObject, propertyName, propertyOptions);
-      assertInstanceOf(queryObject['createdAt'], Date);
+      assertInstanceOf(queryObject[propertyName], Date);
     })
 
     it('will not assign a default value to a property in queryObject if it already has an assigned value', () => {
