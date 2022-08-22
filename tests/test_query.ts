@@ -35,6 +35,11 @@ describe('test Query methods', () => {
       required: false,
       default: null,
     },
+    createdAt: {
+      type: 'date',
+      required: false,
+      default: () => new Date()
+    }
   };
 
   const collectionName = 'testCollection';
@@ -100,6 +105,14 @@ describe('test Query methods', () => {
       query.setDefault(queryObject, propertyName, propertyOptions);
       assertStrictEquals(queryObject[propertyName], null);
     });
+
+    it('will set property value in queryObject by calling default if it is a function', () => {
+      queryObject = { name: 'Mr. D' };
+      propertyName = 'createdAt'
+      propertyOptions = testSchema.schemaMap[propertyName];
+      query.setDefault(queryObject, propertyName, propertyOptions);
+      assertInstanceOf(queryObject[propertyName], Date);
+    })
 
     it('will not assign a default value to a property in queryObject if it already has an assigned value', () => {
       queryObject = { name: 'Mr. D', occupation: 'baker' };

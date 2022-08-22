@@ -1120,7 +1120,11 @@ class Query {
     propertyOptions: optionsObject
   ) {
     if (!Object.prototype.hasOwnProperty.call(queryObject, propertyName)) {
-      queryObject[propertyName] = propertyOptions.default;
+      if (typeof propertyOptions.default === 'function') {
+        queryObject[propertyName] = propertyOptions.default();
+      } else {
+        queryObject[propertyName] = propertyOptions.default;
+      }
     }
     return true;
   }
