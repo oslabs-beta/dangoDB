@@ -30,6 +30,7 @@ describe('non-core query methods', async () => {
 
     const UserSchema = {
       name: 'string',
+      occupation: 'string',
     };
     
     const testSchema = dango.schema(UserSchema);
@@ -42,11 +43,19 @@ describe('non-core query methods', async () => {
     await dango.disconnect();
   });
 
-  it('estimatedCount matches number of documents in collection', async () => {
+  it('estimatedDocumentCount matches number of documents in collection', async () => {
 
     const result = await test_query.estimatedDocumentCount();
     // console.log('result: ', await result);
+    assertEquals(await result, 4);
+  });
+
+  it('countDocuments returns correct number of documents matching filter', async () => {
+    queryObject = { occupation: 'Software Engineer'};
+    const result = await test_query.countDocuments(queryObject);
+    // console.log('countDocuments Software Engineer: ', await result);
     assertEquals(await result, 2);
+
   });
 
 });
