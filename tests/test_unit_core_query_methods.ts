@@ -92,7 +92,7 @@ describe('Core query methods', async () => {
     mockAddress.forEach((person: Person) => {
       if(person.firstName.match(firstNameRegex) !== null) firstNameCount +=1;
     });
-    console.log('nameCount: ', firstNameCount);
+    // console.log('nameCount: ', firstNameCount);
 
   });
 
@@ -155,6 +155,118 @@ describe('Core query methods', async () => {
 
   });
 
+  // findById
+
+  // findByIdAndDelete
+  it('findByIdAndDelete', async () => {
+
+    const directoryArray = await directoryQuery.find();
+    const randomNumber = Math.floor(Math.random() * directoryArray.length);
+    const randomPerson = directoryArray[randomNumber];
+    // console.log('randomPerson: ', randomPerson);
+    // const formattedId = JSON.stringify(randomPerson._id);
+    // console.log('stringify:', formattedId);
+    const result = await directoryQuery.findByIdAndDelete(randomPerson._id);
+    assertEquals(result, 1);
+    const check = await directoryQuery.findById(randomPerson._id);
+    assertEquals(check, undefined);
+    
+    // doesn't work with strings???
+  });
+
+
+  // findByIdAndRemove
+  it('findByIdAndRemove', async () => {
+
+    const directoryArray = await directoryQuery.find();
+    const randomNumber = Math.floor(Math.random() * directoryArray.length);
+    const randomPerson = directoryArray[randomNumber];
+    // console.log('randomPerson: ', randomPerson);
+    // const formattedId = JSON.stringify(randomPerson._id);
+    // console.log('stringify:', formattedId);
+    const result = await directoryQuery.findByIdAndDelete(randomPerson._id);
+    // console.log('result from findByIdAndRemove: ', result);
+    assertEquals(result, 1);
+    const check = await directoryQuery.findById(randomPerson._id);
+    assertEquals(check, undefined);
+    
+    // doesn't work with strings???
+  });
+
+  // findByIdAndUpdate
+
+  // findAndModify DEPRECATED
+
+  // findOneAndDelete ??? Doesn't exist as dango method
+
+
+  // findOneAndRemove DEPRECATED!!!!
+  // it('findOneAndRemove', async () => {
+
+  //   const directoryArray = await directoryQuery.find();
+  //   const randomNumber = Math.floor(Math.random() * directoryArray.length);
+  //   const randomPerson = directoryArray[randomNumber];
+
+  //   console.log('randomPerson: ', randomPerson);
+  //   // const formattedId = JSON.stringify(randomPerson._id);
+  //   // console.log('stringify:', formattedId);
+  //   const result = await directoryQuery.findOneAndRemove(randomPerson.firstName);
+  //   // console.log('result from findByIdAndRemove: ', result);
+  //   assertEquals(result, 1);
+  //   const check = await directoryQuery.findById(randomPerson._id);
+  //   assertEquals(check, undefined);
+    
+  //   // doesn't work with strings???
+  // });
+
+  // findOneAndReplace
+
+
+
+  // findOneAndUpdate
+  it('findOneAndUpdate', async () => {
+    // generate random person
+    const directoryArray = await directoryQuery.find();
+    const randomNumber = Math.floor(Math.random() * directoryArray.length);
+    const randomPerson = directoryArray[randomNumber];
+    // change value
+    const newPhoneNumber = '6461234567';
+
+    queryObject = { lastName: randomPerson.lastName };
+    const updateQueryObject = { phoneNumber: newPhoneNumber }
+
+    const result = await directoryQuery.findOneAndUpdate(queryObject, updateQueryObject);
+    console.log('findOneAndUpdate result: ', result);
+    const check = await directoryQuery.findById(randomPerson._id);
+    console.log('findOneAndUpdate check: ', check);
+
+  });
+
+
+  // replaceOne
+  it('replaceOne replace entire document', async () => {
+
+    // generate random person
+    const directoryArray = await directoryQuery.find();
+    const randomNumber = Math.floor(Math.random() * directoryArray.length);
+    const randomPerson = directoryArray[randomNumber];
+    // change value
+    randomPerson.address = { 
+      type: 'house',
+      streetNumber: '100',
+      street: '100th St',
+      city: 'Greenwich',
+      state: 'CT',
+      zipcode: '06830',
+     }
+
+     queryObject = { lastName: randomPerson.lastName };
+
+    const result = await directoryQuery.replaceOne(queryObject, randomPerson);
+    const check = await directoryQuery.findById(randomPerson._id);
+
+  });
+
   // updateOne
   it('updateOne', async () => {
 
@@ -164,11 +276,39 @@ describe('Core query methods', async () => {
     delete findDoc._id;
     findDoc.phoneNumber = '2121234567';
     const result = await directoryQuery.updateOne(queryObject, findDoc);
-    console.log('updateOne returned result', result);
-    console.log(await directoryQuery.findOne({ _id: objID}));
+    // console.log('updateOne returned result', result);
+    const checkDoc = await directoryQuery.findOne({ _id: objID});
+    assertEquals(checkDoc.phoneNumber, findDoc.phoneNumber);
 
   });
 
+  // it('updateOne with embedded value', async () => {
+
+  //   const nameQueryObject  = { firstName: 'Fiona', lastName: "Soo"};
+  //   const fionaObj = await directoryQuery.findOne(nameQueryObject);
+  //   console.log('fionaObj: ', fionaObj);
+  //   const nameID = fionaObj._id;
+
+  //   const updateQueryObject = { "lastName": "Su" } ;
+
+  //   const newState = await directoryQuery.updateOne(nameQueryObject, updateQueryObject);
+  //   console.log('updated Fiona: ', await directoryQuery.findOne({ _id: nameID}));
+
+  // });
+
   // updateMany
+  it('updateMany updates multiple documents', async () => {
+    const firstNameQueryObject = { firstName: 'Alex' };
+    const updateQueryObject = { lastName: 'Jenson'};
+
+    const directoryArray = await directoryQuery.find(firstNameQueryObject);
+    console.log('updateMany array: ', directoryArray);
+
+    const result = await directoryQuery.updateMany(firstNameQueryObject, updateQueryObject);
+    console.log('updateMany result: ', result);
+    const check = await directoryQuery.find(firstNameQueryObject);
+    console.log('updateMany check: ', check);
+
+  });
 
 });
