@@ -92,7 +92,6 @@ describe('Core query methods', async () => {
     mockAddress.forEach((person: Person) => {
       if(person.firstName.match(firstNameRegex) !== null) firstNameCount +=1;
     });
-    // console.log('nameCount: ', firstNameCount);
 
   });
 
@@ -104,7 +103,6 @@ describe('Core query methods', async () => {
   it('find method retrieves multiple instances of field data', async () => {
     queryObject = { firstName: 'Alex'};
     const result = await directoryQuery.find(queryObject);
-    // console.log('result: ', await result);
     assertEquals(firstNameCount, result.length);
   });
 
@@ -125,11 +123,9 @@ describe('Core query methods', async () => {
 
     queryObject = { firstName: "Johnson"};
     const result = await directoryQuery.findOne(queryObject);
-    // console.log('data not found: ', result);
     assertEquals(result, undefined);
   });
 
-  // deleteOne
   it('deleteOne method successfully deletes document', async () => {
     queryObject = { firstName: 'Chad', lastName: 'Jenkins'};
 
@@ -140,17 +136,13 @@ describe('Core query methods', async () => {
 
   });
 
-  // deleteMany
   it('deleteMany method deletes multiple documents', async () => {
 
     queryObject = { 'address.state': 'NJ' };
     const existingDoc = await directoryQuery.find({ 'address.state': 'NJ'});
-    // console.log('existingCount: ', existingDoc.length);
     const result = await directoryQuery.deleteMany(queryObject);
     assertEquals(existingDoc.length, result.deletedCount);
-    // console.log('result: ', result);
     const findDeletedDoc = await directoryQuery.find({queryObject});
-    // console.log('findDeletedDoc: ', findDeletedDoc);
     assertEquals(0, findDeletedDoc.length);
 
   });
@@ -163,67 +155,38 @@ describe('Core query methods', async () => {
     const directoryArray = await directoryQuery.find();
     const randomNumber = Math.floor(Math.random() * directoryArray.length);
     const randomPerson = directoryArray[randomNumber];
-    // console.log('randomPerson: ', randomPerson);
-    // const formattedId = JSON.stringify(randomPerson._id);
-    // console.log('stringify:', formattedId);
     const result = await directoryQuery.findByIdAndDelete(randomPerson._id);
     assertEquals(result, 1);
     const check = await directoryQuery.findById(randomPerson._id);
     assertEquals(check, undefined);
     
-    // doesn't work with strings???
+    // doesn't work with strings
   });
 
 
-  // findByIdAndRemove
   it('findByIdAndRemove', async () => {
 
     const directoryArray = await directoryQuery.find();
     const randomNumber = Math.floor(Math.random() * directoryArray.length);
     const randomPerson = directoryArray[randomNumber];
-    // console.log('randomPerson: ', randomPerson);
-    // const formattedId = JSON.stringify(randomPerson._id);
-    // console.log('stringify:', formattedId);
     const result = await directoryQuery.findByIdAndDelete(randomPerson._id);
-    // console.log('result from findByIdAndRemove: ', result);
     assertEquals(result, 1);
     const check = await directoryQuery.findById(randomPerson._id);
     assertEquals(check, undefined);
     
-    // doesn't work with strings???
+    // doesn't work with strings
   });
 
   // findByIdAndUpdate
 
   // findAndModify DEPRECATED
 
-  // findOneAndDelete ??? Doesn't exist as dango method
-
+  // findOneAndDelete - not in dango query methods
 
   // findOneAndRemove DEPRECATED!!!!
-  // it('findOneAndRemove', async () => {
-
-  //   const directoryArray = await directoryQuery.find();
-  //   const randomNumber = Math.floor(Math.random() * directoryArray.length);
-  //   const randomPerson = directoryArray[randomNumber];
-
-  //   console.log('randomPerson: ', randomPerson);
-  //   // const formattedId = JSON.stringify(randomPerson._id);
-  //   // console.log('stringify:', formattedId);
-  //   const result = await directoryQuery.findOneAndRemove(randomPerson.firstName);
-  //   // console.log('result from findByIdAndRemove: ', result);
-  //   assertEquals(result, 1);
-  //   const check = await directoryQuery.findById(randomPerson._id);
-  //   assertEquals(check, undefined);
-    
-  //   // doesn't work with strings???
-  // });
 
   // findOneAndReplace
 
-
-
-  // findOneAndUpdate
   it('findOneAndUpdate', async () => {
     // generate random person
     const directoryArray = await directoryQuery.find();
@@ -236,14 +199,11 @@ describe('Core query methods', async () => {
     const updateQueryObject = { phoneNumber: newPhoneNumber }
 
     const result = await directoryQuery.findOneAndUpdate(queryObject, updateQueryObject);
-    console.log('findOneAndUpdate result: ', result);
     const check = await directoryQuery.findById(randomPerson._id);
-    console.log('findOneAndUpdate check: ', check);
 
   });
 
 
-  // replaceOne
   it('replaceOne replace entire document', async () => {
 
     // generate random person
@@ -264,50 +224,36 @@ describe('Core query methods', async () => {
 
     const result = await directoryQuery.replaceOne(queryObject, randomPerson);
     const check = await directoryQuery.findById(randomPerson._id);
+    assertEquals(randomPerson, check);
 
   });
 
-  // updateOne
   it('updateOne', async () => {
 
-    queryObject = { phoneNumber: '2129089900' };
+    queryObject = { firstName: 'Alex', lastName: 'Abe' };
     let findDoc = await directoryQuery.findOne(queryObject);
-    const objID = findDoc._id;
-    delete findDoc._id;
     findDoc.phoneNumber = '2121234567';
-    const result = await directoryQuery.updateOne(queryObject, findDoc);
-    // console.log('updateOne returned result', result);
-    const checkDoc = await directoryQuery.findOne({ _id: objID});
+    const updateQueryObject = { phoneNumber: findDoc.phoneNumber };
+    await directoryQuery.updateOne(queryObject, updateQueryObject);
+    const checkDoc = await directoryQuery.findOne(queryObject);
     assertEquals(checkDoc.phoneNumber, findDoc.phoneNumber);
 
   });
 
-  // it('updateOne with embedded value', async () => {
+  // it('updateOne with embedded value',
 
-  //   const nameQueryObject  = { firstName: 'Fiona', lastName: "Soo"};
-  //   const fionaObj = await directoryQuery.findOne(nameQueryObject);
-  //   console.log('fionaObj: ', fionaObj);
-  //   const nameID = fionaObj._id;
-
-  //   const updateQueryObject = { "lastName": "Su" } ;
-
-  //   const newState = await directoryQuery.updateOne(nameQueryObject, updateQueryObject);
-  //   console.log('updated Fiona: ', await directoryQuery.findOne({ _id: nameID}));
-
-  // });
-
-  // updateMany
   it('updateMany updates multiple documents', async () => {
     const firstNameQueryObject = { firstName: 'Alex' };
     const updateQueryObject = { lastName: 'Jenson'};
 
-    const directoryArray = await directoryQuery.find(firstNameQueryObject);
-    console.log('updateMany array: ', directoryArray);
-
-    const result = await directoryQuery.updateMany(firstNameQueryObject, updateQueryObject);
-    console.log('updateMany result: ', result);
+    await directoryQuery.updateMany(firstNameQueryObject, updateQueryObject);
     const check = await directoryQuery.find(firstNameQueryObject);
-    console.log('updateMany check: ', check);
+
+    check.forEach((person: Person) => {
+      if(person.firstName === 'Alex') {
+        assertEquals(person.lastName, updateQueryObject.lastName);
+      }
+    });
 
   });
 

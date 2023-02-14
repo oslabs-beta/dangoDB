@@ -3,10 +3,6 @@
 //  - --allow-net
 
 import {
-  assertInstanceOf,
-  assertStrictEquals,
-  assertThrows,
-  beforeEach,
   assertEquals,
   afterAll, 
   beforeAll,
@@ -26,7 +22,7 @@ const connection_string = ENV.URI_STRING;
 describe('non-core query methods', async () => {
 
   if(!connection_string) {
-    console.log('No Connection String, ending test_unit_core_query_method tests');
+    console.log('No Connection String, ending test_unit_other_query tests');
     return;
   }
 
@@ -74,7 +70,6 @@ describe('non-core query methods', async () => {
 
     const length = mockAddress.length;
     const result = await directoryQuery.estimatedDocumentCount();
-    // console.log('result: ', await result);
     assertEquals(result,length);
   });
 
@@ -125,7 +120,7 @@ describe('non-core query methods', async () => {
     console.log('aggregate with match and group stages: ', result);
     let returnNYCount = 0;
     let returnNJCount = 0;
-    // Note: TS did not like it if both counts were typed as 'Number' or 'number'.
+    // Note: TS error if either returnNYCount or returnNJCOunt were typed as 'Number' or 'number'.
     // Needed to assign both to zeros for implicit type assignment
 
     result.forEach((data: ReturnCountData) => {
@@ -138,6 +133,5 @@ describe('non-core query methods', async () => {
 
   });
 
-  // 
 
 });
