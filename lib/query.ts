@@ -815,12 +815,33 @@ class Query {
           options = {};
         }
 
-        await this.validateUpdateAgainstSchema(
-          update,
-          this.schema,
-          this.updatedQueryObject
-        );
-        const setUpdateObject = { $set: this.updatedQueryObject };
+        const setUpdateObject: Record<string, unknown> = {};
+
+        // iterate through update
+        for(const operator in update) {
+          if(operator === '$set') {
+            // call validateUpdateAgainstSchema
+            // if validated, the correct update object should be saved to setUpdateObject
+            // unless all this is saved to this.updatedQueryObject ???
+            // await this.validateUpdateAgainstSchema(
+            //   update[operator],
+            //   this.schema,
+            //   this.updatedQueryObject,
+            //   operator
+            // );
+            setUpdateObject[operator] = update[operator];
+
+          } else {
+            setUpdateObject[operator] = update[operator];
+          }
+        }
+
+        // await this.validateUpdateAgainstSchema(
+        //   update,
+        //   this.schema,
+        //   this.updatedQueryObject
+        // );
+        // const setUpdateObject = { $set: this.updatedQueryObject };
 
         const data = await collection.updateOne(
           document,
@@ -1028,7 +1049,8 @@ class Query {
     queryObject: Record<string, unknown>,
     schema: Schema,
     updatedQueryObject: Record<string, unknown>,
-    embeddedUniqueProperty: string[] = []
+    operator: string = '',
+    embeddedUniqueProperty: string[] = [],
   ) {
     const currentSchemaMap = schema.schemaMap;
     this.checkDataFields(queryObject, currentSchemaMap);
@@ -1042,6 +1064,7 @@ class Query {
           queryObject[property] as Record<string, unknown>,
           currentSchemaMap[property],
           updatedQueryObject[property] as Record<string, unknown>,
+          operator,
           embeddedUniqueProperty
         );
         embeddedUniqueProperty.pop();
@@ -1050,13 +1073,15 @@ class Query {
           queryObject,
           property,
           currentSchemaMap[property],
-          updatedQueryObject
+          updatedQueryObject,
+          operator
         );
         await this.checkUnique(
           property,
           currentSchemaMap[property],
           updatedQueryObject,
-          embeddedUniqueProperty
+          embeddedUniqueProperty,
+          operator
         );
         this.checkConstraints(property, currentSchemaMap[property]);
       }
@@ -1141,7 +1166,8 @@ class Query {
     queryObject: Record<string, unknown>,
     propertyName: string,
     propertyOptions: optionsObject,
-    updatedQueryObject: Record<string, unknown>
+    updatedQueryObject: Record<string, unknown>,
+    operator?: string
   ) {
     const valueAsDatatype = new propertyOptions.type(queryObject[propertyName]);
     valueAsDatatype.convertType();
@@ -1151,7 +1177,11 @@ class Query {
         'Data was not able to be translated to given specified schema data type.'
       );
     }
-    updatedQueryObject[propertyName] = valueAsDatatype.convertedValue;
+    if(operator !== '') {
+      // updatedQueryObject[operator] = valueAsDatatype.convertedValue;
+    } else {
+      updatedQueryObject[propertyName] = valueAsDatatype.convertedValue;
+    }
   }
 
   /**
@@ -1169,7 +1199,8 @@ class Query {
     propertyName: string,
     propertyOptions: optionsObject,
     updatedQueryObject: Record<string, unknown>,
-    embeddedUniqueProperty: string[]
+    embeddedUniqueProperty: string[],
+    operator?: string
   ) {
     if (propertyOptions.unique === true) {
       // query object to check if unique value already exists in database collection
@@ -1179,8 +1210,10 @@ class Query {
         propertyName,
         embeddedUniqueProperty
       );
-      queryObjectForUnique[formattedPropertyName] =
-        updatedQueryObject[propertyName];
+      
+      // need to check if this is a nested object
+      // if it's a sub property, the format should be updatedQueryObject[propName][propName]
+      queryObjectForUnique[formattedPropertyName] = updatedQueryObject[propertyName];
       const propertyExists = await this.findOne(queryObjectForUnique);
       if (propertyExists !== undefined) {
         throw new Error(
