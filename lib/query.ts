@@ -816,32 +816,28 @@ class Query {
         }
 
         const setUpdateObject: Record<string, unknown> = {};
-
+        // console.log('update param in updateOne: ', update);
         // iterate through update
         for(const operator in update) {
           if(operator === '$set') {
-            // call validateUpdateAgainstSchema
+            // console.log('inside of for in loop when operator is $set');
+            // console.log('update[operator]: ', update[operator]);
             // if validated, the correct update object should be saved to setUpdateObject
             // unless all this is saved to this.updatedQueryObject ???
-            // await this.validateUpdateAgainstSchema(
-            //   update[operator],
-            //   this.schema,
-            //   this.updatedQueryObject,
-            //   operator
-            // );
-            setUpdateObject[operator] = update[operator];
+            
+            setUpdateObject[operator] = await this.validateUpdateAgainstSchema(
+              update[operator] as Record<string, unknown>,
+              this.schema,
+              this.updatedQueryObject,
+              operator
+            );
+            // console.log('updatedQueryObject after validation: ', this.updatedQueryObject);
+            this.resetQueryObject();
 
           } else {
             setUpdateObject[operator] = update[operator];
           }
         }
-
-        // await this.validateUpdateAgainstSchema(
-        //   update,
-        //   this.schema,
-        //   this.updatedQueryObject
-        // );
-        // const setUpdateObject = { $set: this.updatedQueryObject };
 
         const data = await collection.updateOne(
           document,
@@ -1051,42 +1047,47 @@ class Query {
     updatedQueryObject: Record<string, unknown>,
     operator: string = '',
     embeddedUniqueProperty: string[] = [],
+    index: number = 0,
   ) {
     const currentSchemaMap = schema.schemaMap;
-    this.checkDataFields(queryObject, currentSchemaMap);
+    this.checkDataFields(queryObject, currentSchemaMap, index);
+    // console.log('inside validUpdateAS: queryObject: ', queryObject);
     for (const property in queryObject) {
+      // console.log('inside queryObject, field: ', property);
+      const currentProperty = property.split('.')[index];
       // current SchemaMap's current property value is either an instance of a Schema or a SchemaOption
       // If Schema is stored, validate embedded object.
-      if (currentSchemaMap[property] instanceof Schema) {
+      if (currentSchemaMap[currentProperty] instanceof Schema) {
         updatedQueryObject[property] = {};
         embeddedUniqueProperty.push(property);
         await this.validateUpdateAgainstSchema(
-          queryObject[property] as Record<string, unknown>,
-          currentSchemaMap[property],
-          updatedQueryObject[property] as Record<string, unknown>,
+          queryObject as Record<string, unknown>,
+          currentSchemaMap[currentProperty],
+          updatedQueryObject,
           operator,
-          embeddedUniqueProperty
+          embeddedUniqueProperty,
+          index += 1,
         );
         embeddedUniqueProperty.pop();
       } else {
         this.populateQuery(
           queryObject,
           property,
-          currentSchemaMap[property],
+          currentSchemaMap[currentProperty],
           updatedQueryObject,
-          operator
+          // operator
         );
         await this.checkUnique(
           property,
-          currentSchemaMap[property],
+          currentSchemaMap[currentProperty],
           updatedQueryObject,
           embeddedUniqueProperty,
-          operator
+          // operator
         );
-        this.checkConstraints(property, currentSchemaMap[property]);
+        this.checkConstraints(property, currentSchemaMap[currentProperty]);
       }
     }
-    return true;
+    return operator !== '' ? this.updatedQueryObject : true;
   }
 
   /**
@@ -1098,9 +1099,15 @@ class Query {
    */
   checkDataFields(
     queryObject: Record<string, unknown>,
-    schemaMap: Record<string, unknown>
+    schemaMap: Record<string, unknown>,
+    index?: number
   ) {
-    for (const property in queryObject) {
+    for (let property in queryObject) {
+      // if nested document is being checked, parse it
+      if(property.includes('.')) {
+        property = property.split('.')[index as number];
+        console.log('inside checkDataFields for nestedDoc, currentProperty: ', property);
+      }
       if (!Object.prototype.hasOwnProperty.call(schemaMap, property)) {
         throw new Error(
           'Requested query object contains properties not present in the Schema.'
@@ -1167,7 +1174,8 @@ class Query {
     propertyName: string,
     propertyOptions: optionsObject,
     updatedQueryObject: Record<string, unknown>,
-    operator?: string
+    // index?: number
+    // operator?: string
   ) {
     const valueAsDatatype = new propertyOptions.type(queryObject[propertyName]);
     valueAsDatatype.convertType();
@@ -1177,11 +1185,7 @@ class Query {
         'Data was not able to be translated to given specified schema data type.'
       );
     }
-    if(operator !== '') {
-      // updatedQueryObject[operator] = valueAsDatatype.convertedValue;
-    } else {
-      updatedQueryObject[propertyName] = valueAsDatatype.convertedValue;
-    }
+    updatedQueryObject[propertyName] = valueAsDatatype.convertedValue;
   }
 
   /**
@@ -1200,7 +1204,7 @@ class Query {
     propertyOptions: optionsObject,
     updatedQueryObject: Record<string, unknown>,
     embeddedUniqueProperty: string[],
-    operator?: string
+    // operator?: string
   ) {
     if (propertyOptions.unique === true) {
       // query object to check if unique value already exists in database collection
