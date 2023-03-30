@@ -788,7 +788,7 @@ class Query {
    * Update One finds a matching document, updates it according to the update arg, passing any options. Will update only the first document that matches filter regardless of the value of the multi option.
    *
    * @param document which is the client input for the document to find
-   * @param Update which is the clients input for what portion will be updated within the document
+   * @param Update which is the clients input for what portion will be updated within the document using update operators
    * @param Additonal options UpdateOptions
    * @param callback function params are (error, writeOpResult)
    * @returns the found document
@@ -816,22 +816,15 @@ class Query {
         }
 
         const setUpdateObject: Record<string, unknown> = {};
-        // console.log('update param in updateOne: ', update);
-        // iterate through update
+        // iterate through update operators 
         for(const operator in update) {
           if(operator === '$set') {
-            // console.log('inside of for in loop when operator is $set');
-            // console.log('update[operator]: ', update[operator]);
-            // if validated, the correct update object should be saved to setUpdateObject
-            // unless all this is saved to this.updatedQueryObject ???
-            
             setUpdateObject[operator] = await this.validateUpdateAgainstSchema(
               update[operator] as Record<string, unknown>,
               this.schema,
               this.updatedQueryObject,
               operator
             );
-            // console.log('updatedQueryObject after validation: ', this.updatedQueryObject);
             this.resetQueryObject();
 
           } else {
@@ -1051,9 +1044,7 @@ class Query {
   ) {
     const currentSchemaMap = schema.schemaMap;
     this.checkDataFields(queryObject, currentSchemaMap, index);
-    // console.log('inside validUpdateAS: queryObject: ', queryObject);
     for (const property in queryObject) {
-      // console.log('inside queryObject, field: ', property);
       const currentProperty = property.split('.')[index];
       // current SchemaMap's current property value is either an instance of a Schema or a SchemaOption
       // If Schema is stored, validate embedded object.
@@ -1075,14 +1066,12 @@ class Query {
           property,
           currentSchemaMap[currentProperty],
           updatedQueryObject,
-          // operator
         );
         await this.checkUnique(
           property,
           currentSchemaMap[currentProperty],
           updatedQueryObject,
           embeddedUniqueProperty,
-          // operator
         );
         this.checkConstraints(property, currentSchemaMap[currentProperty]);
       }
@@ -1174,8 +1163,6 @@ class Query {
     propertyName: string,
     propertyOptions: optionsObject,
     updatedQueryObject: Record<string, unknown>,
-    // index?: number
-    // operator?: string
   ) {
     const valueAsDatatype = new propertyOptions.type(queryObject[propertyName]);
     valueAsDatatype.convertType();
@@ -1204,7 +1191,6 @@ class Query {
     propertyOptions: optionsObject,
     updatedQueryObject: Record<string, unknown>,
     embeddedUniqueProperty: string[],
-    // operator?: string
   ) {
     if (propertyOptions.unique === true) {
       // query object to check if unique value already exists in database collection
