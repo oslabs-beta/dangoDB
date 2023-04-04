@@ -177,16 +177,6 @@ describe('Core query methods', async () => {
     // doesn't work with strings
   });
 
-  // findByIdAndUpdate
-
-  // findAndModify DEPRECATED
-
-  // findOneAndDelete - not in dango query methods
-
-  // findOneAndRemove DEPRECATED!!!!
-
-  // findOneAndReplace
-
   it('findOneAndUpdate', async () => {
     // generate random person
     const directoryArray = await directoryQuery.find();
