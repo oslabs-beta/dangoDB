@@ -1092,7 +1092,7 @@ class Query {
     index?: number
   ) {
     for (let property in queryObject) {
-      // if nested document is being checked, parse it
+      // if nested property within a nested document is being checked, parse it
       if(property.includes('.')) {
         property = property.split('.')[index as number];
         console.log('inside checkDataFields for nestedDoc, currentProperty: ', property);
