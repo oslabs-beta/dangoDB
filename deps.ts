@@ -54,5 +54,4 @@ export {
   unreachable,
 } from 'https://deno.land/std@0.138.0/testing/asserts.ts';
 
-import * as dotenv from "https://deno.land/x/dotenv@v3.2.0/mod.ts";
-export { dotenv }
+export { load } from "https://deno.land/std/dotenv/mod.ts";
