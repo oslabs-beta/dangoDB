@@ -1,6 +1,7 @@
 // Required Flags for Test:
 //  - --allow-read
 //  - --allow-net
+//  - --allow-env
 
 import {
   assertInstanceOf,
@@ -9,7 +10,6 @@ import {
   beforeEach,
   describe,
   it,
-  dotenv
 // @ts-ignore
 } from '../deps.ts';
 
@@ -26,6 +26,7 @@ import { Schema, SchemaOptions } from '../lib/schema.ts';
 import { dango } from '../lib/dango.ts';
 import { afterAll, beforeAll } from '../deps.ts';
 import { assertEquals } from '../deps.ts';
+import { load } from "https://deno.land/std/dotenv/mod.ts";
 
 interface Person {
   firstName: string,
@@ -44,8 +45,8 @@ interface Address {
   zipcode: string,
 }
 
-const ENV = dotenv.config({ path: '../.env'});
-const connection_string = ENV.URI_STRING;
+const env = await load();
+const connection_string = env["URI_STRING"];
 
 describe('Core query methods', async () => {
   if(!connection_string) {
@@ -218,13 +219,13 @@ describe('Core query methods', async () => {
 
   });
 
-  it('updateOne', async () => {
+  it('updateOne using $set operator', async () => {
 
     queryObject = { firstName: 'Alex', lastName: 'Abe' };
     let findDoc = await directoryQuery.findOne(queryObject);
     findDoc.phoneNumber = '2121234567';
     const updateQueryObject = { phoneNumber: findDoc.phoneNumber };
-    await directoryQuery.updateOne(queryObject, updateQueryObject);
+    await directoryQuery.updateOne(queryObject, { $set: updateQueryObject});
     const checkDoc = await directoryQuery.findOne(queryObject);
     assertEquals(checkDoc.phoneNumber, findDoc.phoneNumber);
 
