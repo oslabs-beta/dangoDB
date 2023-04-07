@@ -1,6 +1,7 @@
 // Required Flags for Test:
 //  - --allow-read
 //  - --allow-net
+//  - --allow-env
 
 import {
   assertInstanceOf,
@@ -13,13 +14,14 @@ import {
   it,
 } from '../deps.ts';
 
-import { dotenv } from '../deps.ts';
+import { load } from '../deps.ts';
 
 import { MongoClient, Database } from '../deps.ts';
 
 import { Connection } from '../lib/connections.ts';
 
-const ENV = dotenv.config({ path: '../.env' });
+const env = await load();
+const CONNECTION_STRING = env["URI_STRING"];
 
 describe('Connection constructor', () => {
   let newObject: unknown;
@@ -33,7 +35,7 @@ describe('Connection constructor', () => {
   });
   describe('creating an instance of the class with a valid URI string', () => {
     beforeEach(() => {
-      newObject = new Connection(ENV.URI_STRING);
+      newObject = new Connection(CONNECTION_STRING);
     });
     it('will create an instance of the class', () => {
       assertInstanceOf(newObject, Connection);
@@ -46,7 +48,7 @@ describe('Connection constructor', () => {
     it('will have a connectionString property assigned the value of the URI connection string', () => {
       if (newObject instanceof Connection) {
         //@ts-ignore Ignore TS warning to run test
-        assertStrictEquals(newObject.connectionString, ENV.URI_STRING);
+        assertStrictEquals(newObject.connectionString, CONNECTION_STRING);
       }
     });
     it('will have a db property assigned the value of false', () => {
@@ -77,7 +79,7 @@ describe('Connection methods', () => {
   describe('using the connect method', () => {
     describe('creating a Connection object with a valid URI', () => {
       beforeEach(() => {
-        newObject = new Connection(ENV.URI_STRING);
+        newObject = new Connection(CONNECTION_STRING);
       });
       afterEach(async () => {
         if (newObject instanceof Connection) {
@@ -138,7 +140,7 @@ describe('Connection methods', () => {
   describe('using the disconnect method', () => {
     describe('invoking disconnect after a connection is established', () => {
       beforeEach(() => {
-        newObject = new Connection(ENV.URI_STRING);
+        newObject = new Connection(CONNECTION_STRING);
       });
       it('should reset the value of the connected property', async () => {
         if (newObject instanceof Connection) {

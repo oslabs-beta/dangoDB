@@ -1,6 +1,7 @@
 // Required Flags for Test:
 //  - --allow-read
 //  - --allow-net
+//  - --allow-env
 
 import {
   assertEquals,
@@ -8,20 +9,19 @@ import {
   beforeAll,
   describe,
   it,
-  dotenv,
   // @ts-ignore
 } from '../deps.ts';
 
 import { dango } from '../lib/dango.ts';
-
+import { load } from '../deps.ts';
 import { mockAddress } from './mock_address.js';
 
-const ENV = dotenv.config({ path: '../.env'});
-const connection_string = ENV.URI_STRING;
+const env = await load();
+const CONNECTION_STRING = env["URI_STRING"];
 
 describe('non-core query methods', async () => {
 
-  if(!connection_string) {
+  if(!CONNECTION_STRING) {
     console.log('No Connection String, ending test_unit_other_query tests');
     return;
   }
@@ -32,7 +32,7 @@ describe('non-core query methods', async () => {
 
   beforeAll( async () => {
 
-    await dango.connect(connection_string);
+    await dango.connect(CONNECTION_STRING);
 
     const addressSchemaTemplate = {
       type: 'string',

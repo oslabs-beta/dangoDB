@@ -7,12 +7,6 @@ import {
   it,
 } from '../deps.ts';
 
-// import {
-//   Query
-// } from '../lib/query.ts';
-
-import { model } from '../lib/model.ts';
-
 import { Bson } from '../deps.ts';
 
 import { Schema, SchemaOptions } from '../lib/schema.ts';
@@ -39,18 +33,15 @@ describe('test Query methods', () => {
 
   const collectionName = 'testCollection';
   const testSchema = dango.schema(UserSchema);
-  // console.log('testSchema: ', testSchema);
   let queryObject: Record<string, unknown>;
 
   const query = dango.model(collectionName, testSchema);
 
   describe('checkDataFields', () => {
-    // let queryObject: Record<string, unknown>;
     let schemaMap: Record<string, unknown>;
 
     schemaMap = testSchema.schemaMap;
     queryObject = { name: 'Mr. A', age: 25 };
-    // console.log('queryObject: ', queryObject);
     it('it will throw an error if extra properties are present in the queryObject', () => {
       queryObject = { name: 'Mr. A', school: 'Furinkan HS' };
       assertThrows(() => query.checkDataFields(queryObject, schemaMap));
@@ -92,7 +83,6 @@ describe('test Query methods', () => {
     beforeEach(() => {
       propertyName = 'occupation';
       propertyOptions = testSchema.schemaMap[propertyName];
-      // queryObject = { name: 'Mr. D' };
     });
 
     it('will set property value in queryObject to default if value not assigned', () => {
@@ -156,16 +146,6 @@ describe('test Query methods', () => {
       });
     });
   });
-
-  // need to figure out how to mock or craete a fake evalauted result from invoking findOne query
-  // describe('checkUnique', () => {
-  //   let propertyName: string;
-  //   let propertyOptions: SchemaOptions;
-  //   let updatedQueryObject: Record<string, unknown> = {};
-  //   let embeddedUniqueProperty: string[];
-  // })
-
-  // checkUniqueForReplace
 
   describe('checkConstraints', () => {
     let propertyName: string;

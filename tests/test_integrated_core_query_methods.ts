@@ -26,7 +26,7 @@ import { Schema, SchemaOptions } from '../lib/schema.ts';
 import { dango } from '../lib/dango.ts';
 import { afterAll, beforeAll } from '../deps.ts';
 import { assertEquals } from '../deps.ts';
-import { load } from "https://deno.land/std/dotenv/mod.ts";
+import { load } from '../deps.ts';
 
 interface Person {
   firstName: string,
@@ -46,10 +46,10 @@ interface Address {
 }
 
 const env = await load();
-const connection_string = env["URI_STRING"];
+const CONNECTION_STRING = env["URI_STRING"];
 
 describe('Core query methods', async () => {
-  if(!connection_string) {
+  if(!CONNECTION_STRING) {
     console.log('No Connection String, ending test_unit_core_query_method tests');
     return;
   }
@@ -61,7 +61,7 @@ describe('Core query methods', async () => {
 
   beforeAll( async () => {
 
-    await dango.connect(connection_string);
+    await dango.connect(CONNECTION_STRING);
 
     const addressSchemaTemplate = {
       type: 'string',
