@@ -28,11 +28,13 @@ interface GroupInterface {
   };
 }
 
+type updatedQueryObjectProp = { [key: string]: unknown };
+
 class Query {
   public collectionName: string;
   public connection: Connection | boolean;
   public schema: Schema;
-  public updatedQueryObject: { [key: string]: unknown };
+  public updatedQueryObject: updatedQueryObjectProp;
 
   constructor(collectionName: string, schema: Schema) {
     this.collectionName = collectionName;
@@ -469,7 +471,7 @@ class Query {
         if (typeof options === 'function') callback = options;
         options = {};
 
-        const validatedDocuments = [];
+        const validatedDocuments: updatedQueryObjectProp[] = [];
         for (const doc of document) {
           await this.validateInsertAgainstSchema(
             doc,
