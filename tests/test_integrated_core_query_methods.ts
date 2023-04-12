@@ -27,8 +27,10 @@ import { dango } from '../lib/dango.ts';
 import { afterAll, beforeAll } from '../deps.ts';
 import { assertEquals } from '../deps.ts';
 import { load } from '../deps.ts';
+import { SchemaObjectId } from '../lib/datatypes.ts';
 
 interface Person {
+  _id?: SchemaObjectId,
   firstName: string,
   lastName: string,
   gender: string,
@@ -47,6 +49,95 @@ interface Address {
 
 const env = await load();
 const CONNECTION_STRING = env["URI_STRING"];
+
+describe('core query methods - insertOne and insertMany', async () => {
+  if(!CONNECTION_STRING) {
+    console.log('No Connection String, ending test_unit_core_query_method tests for insertOne and insertMany');
+    return;
+  }
+
+  let insertDirectoryModel: any;
+  let firstNameCount = 0;
+
+  let queryObject: Record<string, unknown>;
+
+  beforeAll( async () => {
+
+    await dango.connect(CONNECTION_STRING);
+
+    const addressSchemaTemplate = {
+      type: 'string',
+      houseNumber: 'string',
+      street: 'string',
+      city: 'string',
+      state: 'string',
+      zipcode: 'string',
+    }
+
+    const AddressSchema = dango.schema(addressSchemaTemplate);
+
+    const personSchemaTemplate = {
+      firstName: 'string',
+      lastName: 'string',
+      gender: 'string',
+      address: AddressSchema,
+      phoneNumber: 'string',
+    };
+    
+    const PersonSchema = dango.schema(personSchemaTemplate);
+    const collectionName = 'insertPersonDirectory';
+    insertDirectoryModel = dango.model(collectionName, PersonSchema);
+
+  });
+
+  afterAll( async () => {
+    await insertDirectoryModel.dropCollection();
+    await dango.disconnect();
+  });
+
+  it('insertOne method', async () => {
+    const randomNumber = Math.floor(Math.random() * mockAddress.length);
+    const randomPerson = mockAddress[randomNumber];
+    const result = await insertDirectoryModel.insertOne(randomPerson);
+    const findOneResult = await insertDirectoryModel.findOne({ _id: result });
+    assertEquals(findOneResult.firstName, randomPerson.firstName);
+    assertEquals(findOneResult.lastName, randomPerson.lastName);
+    assertEquals(findOneResult.address.zipcode, randomPerson.address.zipcode);
+    await insertDirectoryModel.deleteOne({_id: result});
+  });
+
+  it('insertMany method', async () => {
+    
+    const result = await insertDirectoryModel.insertMany(mockAddress);
+    assertEquals(result.insertedCount, mockAddress.length);
+    const insertedIds = result.insertedIds;
+
+    const findOneResult = await insertDirectoryModel.find();
+    assertEquals(mockAddress.length, findOneResult.length);
+
+    const mockPersonHashmap: Record<string, Person> = {};
+    findOneResult.forEach((person: Person) => {
+      const name = person.firstName + person.lastName;
+      mockPersonHashmap[name] = person;
+    }); 
+
+    mockAddress.forEach(person => {
+      const firstLast = person.firstName + person.lastName;
+      assertEquals(mockPersonHashmap[firstLast].phoneNumber, person.phoneNumber);
+    });
+
+    // delete all
+    const deleteQuery = insertedIds.map((objectId: SchemaObjectId) => {
+      return { _id: objectId };
+    });
+
+    for(const query of deleteQuery) {
+      const res = await insertDirectoryModel.deleteOne(query);
+    }
+
+  });
+
+});
 
 describe('Core query methods', async () => {
   if(!CONNECTION_STRING) {
@@ -220,14 +311,17 @@ describe('Core query methods', async () => {
   });
 
   it('updateOne using $set operator', async () => {
+    const list = await directoryQuery.find();
+    const randomNumber = Math.floor(Math.random() * list.length);
+    const randomPersonId = list[randomNumber]._id;
+    const randomPersonFind = await directoryQuery.findOne({ _id: randomPersonId._id});
 
-    queryObject = { firstName: 'Alex', lastName: 'Abe' };
-    let findDoc = await directoryQuery.findOne(queryObject);
-    findDoc.phoneNumber = '2121234567';
-    const updateQueryObject = { phoneNumber: findDoc.phoneNumber };
+    randomPersonFind.phoneNumber = '2121234567';
+    const updateQueryObject = { phoneNumber: randomPersonFind.phoneNumber };
     await directoryQuery.updateOne(queryObject, { $set: updateQueryObject});
     const checkDoc = await directoryQuery.findOne(queryObject);
-    assertEquals(checkDoc.phoneNumber, findDoc.phoneNumber);
+
+    assertEquals(checkDoc.phoneNumber, randomPersonFind.phoneNumber);
 
   });
 
