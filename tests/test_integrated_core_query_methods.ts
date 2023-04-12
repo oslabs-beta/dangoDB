@@ -343,20 +343,3 @@ describe('Core query methods', async () => {
   });
 
 });
-
-// test updateOne using $set operator ... FAILED (7ms)
-// TypeError: Cannot set properties of undefined (setting 'phoneNumber')
-//     at Object.<anonymous> (file:///Users/stephenjue/Programming/projects/dangoDB/tests/test_integrated_core_query_methods.ts:318:24)
-//     at async Function.runTest (https://deno.land/std@0.138.0/testing/_test_suite.ts:354:7)
-//     at async Function.runTest (https://deno.land/std@0.138.0/testing/_test_suite.ts:342:9)
-//     at async fn (https://deno.land/std@0.138.0/testing/_test_suite.ts:312:13)
-//     at async testStepSanitizer (deno:runtime/js/40_testing.js:445:7)
-//     at async asyncOpSanitizer (deno:runtime/js/40_testing.js:145:9)
-//     at async resourceSanitizer (deno:runtime/js/40_testing.js:371:7)
-//     at async exitSanitizer (deno:runtime/js/40_testing.js:428:9)
-//     at async TestContext.step (deno:runtime/js/40_testing.js:1322:13)
-//     at async Function.run (https://deno.land/std@0.138.0/testing/_test_suite.ts:319:7)
-// test updateMany updates multiple documents ... ok (3ms)
-// Collection successfully dropped.
-
-// Disconnected from Database.
