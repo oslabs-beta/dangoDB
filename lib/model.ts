@@ -28,7 +28,6 @@ class Model extends Query {
 
   constructor(collectionName: string, schema: Schema) {
     super(collectionName, schema);
-    //TODO: Can we delete these
     this.collectionName = collectionName;
     this.schema = schema;
   }

@@ -61,9 +61,11 @@ describe('core query methods - insertOne and insertMany', async () => {
 
   let queryObject: Record<string, unknown>;
 
+  const databaseName = 'testDB';
+
   beforeAll( async () => {
 
-    await dango.connect(CONNECTION_STRING);
+    await dango.connect(CONNECTION_STRING, databaseName);
 
     const addressSchemaTemplate = {
       type: 'string',
@@ -147,12 +149,13 @@ describe('Core query methods', async () => {
 
   let directoryQuery: any;
   let firstNameCount = 0;
+  const databaseName = 'testDB';
 
   let queryObject: Record<string, unknown>;
 
   beforeAll( async () => {
 
-    await dango.connect(CONNECTION_STRING);
+    await dango.connect(CONNECTION_STRING, databaseName);
 
     const addressSchemaTemplate = {
       type: 'string',

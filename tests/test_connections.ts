@@ -22,6 +22,7 @@ import { Connection } from '../lib/connections.ts';
 
 const env = await load();
 const CONNECTION_STRING = env["URI_STRING"];
+const databaseName = 'testDB';
 
 describe('Connection constructor', () => {
   let newObject: unknown;
@@ -35,7 +36,7 @@ describe('Connection constructor', () => {
   });
   describe('creating an instance of the class with a valid URI string', () => {
     beforeEach(() => {
-      newObject = new Connection(CONNECTION_STRING);
+      newObject = new Connection(CONNECTION_STRING, databaseName);
     });
     it('will create an instance of the class', () => {
       assertInstanceOf(newObject, Connection);
@@ -79,7 +80,7 @@ describe('Connection methods', () => {
   describe('using the connect method', () => {
     describe('creating a Connection object with a valid URI', () => {
       beforeEach(() => {
-        newObject = new Connection(CONNECTION_STRING);
+        newObject = new Connection(CONNECTION_STRING, databaseName);
       });
       afterEach(async () => {
         if (newObject instanceof Connection) {
@@ -108,7 +109,7 @@ describe('Connection methods', () => {
     });
     describe('creating a Connection object with an invalid URI', () => {
       beforeEach(() => {
-        newObject = new Connection('BAD_URI_STRING');
+        newObject = new Connection('BAD_URI_STRING', databaseName);
       });
       it('will throw an error', async () => {
         await assertRejects(async () => {
@@ -140,7 +141,7 @@ describe('Connection methods', () => {
   describe('using the disconnect method', () => {
     describe('invoking disconnect after a connection is established', () => {
       beforeEach(() => {
-        newObject = new Connection(CONNECTION_STRING);
+        newObject = new Connection(CONNECTION_STRING, databaseName);
       });
       it('should reset the value of the connected property', async () => {
         if (newObject instanceof Connection) {

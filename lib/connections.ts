@@ -10,12 +10,14 @@ class Connection {
   private client!: MongoClient;
   public connected: boolean;
   public db: Database | boolean;
+  public databaseName: string;
 
-  constructor(private connectionString: string) {
+  constructor(private connectionString: string, databaseName: string) {
     if (!connectionString)
       throw new Error('Connect method requires at least one argument');
     this.connected = false;
     this.connectionString = connectionString;
+    this.databaseName = databaseName;
     this.db = false;
   }
 
@@ -26,7 +28,8 @@ class Connection {
   public async connect() {
     try {
       this.client = new MongoClient();
-      const db = await this.client.connect(this.connectionString);
+      await this.client.connect(this.connectionString);
+      const db = this.client.database(this.databaseName);
       this.connected = true;
       console.log('Connected to Database.');
       this.db = db;

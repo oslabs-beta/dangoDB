@@ -28,11 +28,13 @@ describe('non-core query methods', async () => {
 
   let directoryQuery: any;
 
+  const databaseName = 'testDB';
+
   let queryObject: Record<string, unknown>;
 
   beforeAll( async () => {
 
-    await dango.connect(CONNECTION_STRING);
+    await dango.connect(CONNECTION_STRING, databaseName);
 
     const addressSchemaTemplate = {
       type: 'string',
