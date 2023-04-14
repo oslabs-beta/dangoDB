@@ -50,8 +50,8 @@ class Dango {
    *
    * @returns The connection object.
    */
-  async connect(connectionString: string) {
-    this.currentConnection = new Connection(connectionString);
+  async connect(connectionString: string, databaseName: string) {
+    this.currentConnection = new Connection(connectionString, databaseName);
     await this.currentConnection.connect();
     return this.currentConnection;
   }
