@@ -14,7 +14,7 @@ import {
 
 import { dango } from '../lib/dango.ts';
 import { load } from '../deps.ts';
-import { mockAddress } from './mock_address.js';
+import { mockAddress } from '../tests_data/mock_address.js';
 
 const env = await load();
 const CONNECTION_STRING = env["URI_STRING"];
