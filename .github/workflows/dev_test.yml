@@ -11,7 +11,7 @@ env:
 
 jobs:
   test:
-    runs_on: ubuntu-22.04
+    runs_on: ubuntu-latest
     strategy:
       matrix:
         mongodb-version: ['4.2', '4.4']
@@ -25,6 +25,6 @@ jobs:
       - name: Start MongoDB
         uses: supercharge/mongodb-github-action@1.8.0
         with:
-        mongodb-version: ${{matrix.mongodb-version}}
+          mongodb-version: ${{matrix.mongodb-version}}
       - name: Run Deno Tests
         run: deno test --allow-read --allow-env --allow-net tests/*.ts  
