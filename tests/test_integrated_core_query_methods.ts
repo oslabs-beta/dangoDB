@@ -13,7 +13,7 @@ import {
 // @ts-ignore
 } from '../deps.ts';
 
-import { mockAddress } from './mock_address.js';
+import { mockAddress } from '../tests_data/mock_address.js';
 
 import { Query } from '../lib/query.ts';
 
