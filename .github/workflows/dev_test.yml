@@ -26,5 +26,10 @@ jobs:
         uses: supercharge/mongodb-github-action@1.8.0
         with:
           mongodb-version: ${{matrix.mongodb-version}}
+      - name: Create env file
+        run: |
+          touch .env
+          echo URI_STRING=$URI_STRING >> .env
+          cat .env
       - name: Run Deno Tests
         run: deno test --allow-read --allow-env --allow-net tests/*.ts  
