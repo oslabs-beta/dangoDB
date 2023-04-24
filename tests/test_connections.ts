@@ -23,6 +23,7 @@ import { Connection } from '../lib/connections.ts';
 const env = await load();
 const CONNECTION_STRING = env["URI_STRING"];
 const databaseName = 'testDB';
+console.log('CONNECTION_STRING: ', CONNECTION_STRING);
 
 describe('Connection constructor', () => {
   let newObject: unknown;
