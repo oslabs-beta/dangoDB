@@ -11,7 +11,7 @@ env:
 
 jobs:
   test:
-    runs_on: ubuntu-latest
+    runs-on: ubuntu-22.04
     strategy:
       matrix:
         mongodb-version: ['4.2', '4.4']
