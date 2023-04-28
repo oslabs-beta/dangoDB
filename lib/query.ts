@@ -7,6 +7,7 @@ import { Connection } from './connections.ts';
 import { Bson } from '../deps.ts';
 import {
   CountOptions,
+  Database,
   InsertOptions,
   UpdateOptions,
   FindAndModifyOptions,
@@ -57,22 +58,14 @@ class Query {
     callback?: (input: unknown) => unknown
   ) {
     try {
-      if (
-        typeof this.connection === 'boolean' ||
-        typeof this.connection.db === 'boolean'
-      ) {
-        if (this.connection === false) {
-          throw new Error('No connection established before query.');
-        }
-      } else {
-        const collection = this.connection.db.collection(this.collectionName);
-        const data = await collection.find(allQueryObjects, options);
-        const dataRes = await data.toArray();
+      this.checkConnection();
+      const collection = this.getCollection();
+      const data = await collection.find(allQueryObjects, options);
+      const dataRes = await data.toArray();
 
-        if (callback) return callback(data);
+      if (callback) return callback(data);
 
-        return dataRes;
-      }
+      return dataRes;
     } catch (error) {
       throw new Error(`Error in find function. ${error}`);
     }
@@ -93,21 +86,13 @@ class Query {
     callback?: (input: unknown) => unknown
   ) {
     try {
-      if (
-        typeof this.connection === 'boolean' ||
-        typeof this.connection.db === 'boolean'
-      ) {
-        if (this.connection === false) {
-          throw new Error('No connection established before query.');
-        }
-      } else {
-        const collection = this.connection.db.collection(this.collectionName);
-        const data = await collection.findOne(queryObject, options);
+      this.checkConnection();
+      const collection = this.getCollection();
+      const data = await collection.findOne(queryObject, options);
 
-        if (callback) return callback(data);
+      if (callback) return callback(data);
 
-        return data;
-      }
+      return data;
     } catch (error) {
       throw new Error(`Error in findOne function. ${error}`);
     }
@@ -125,22 +110,14 @@ class Query {
     callback?: (input: unknown) => unknown
   ) {
     try {
-      if (
-        typeof this.connection === 'boolean' ||
-        typeof this.connection.db === 'boolean'
-      ) {
-        if (this.connection === false) {
-          throw new Error('No connection established before query.');
-        }
-      } else {
-        const collection = this.connection.db.collection(this.collectionName);
-        const data = await collection.countDocuments(queryObject);
+      this.checkConnection();
+      const collection = this.getCollection();
+      const data = await collection.countDocuments(queryObject);
 
-        if (callback) return callback(data);
-        console.log(data);
+      if (callback) return callback(data);
+      console.log(data);
 
-        return data;
-      }
+      return data;
     } catch (error) {
       throw new Error(`Error in countDocuments function. ${error}`);
     }
@@ -154,19 +131,11 @@ class Query {
     */
   public async estimatedDocumentCount() {
     try {
-      if (
-        typeof this.connection === 'boolean' ||
-        typeof this.connection.db === 'boolean'
-      ) {
-        if (this.connection === false) {
-          throw new Error('No connection established before query.');
-        }
-      } else {
-        const collection = this.connection.db.collection(this.collectionName);
-        const data = await collection.estimatedDocumentCount();
+      this.checkConnection();
+      const collection = this.getCollection();
+      const data = await collection.estimatedDocumentCount();
 
-        return data;
-      }
+      return data;
     } catch (error) {
       throw new Error(`Error in estimatedDocumentCount function. ${error}`);
     }
@@ -185,20 +154,12 @@ class Query {
   */
   public async aggregate(arg1: [MatchInterface, GroupInterface]) {
     try {
-      if (
-        typeof this.connection === 'boolean' ||
-        typeof this.connection.db === 'boolean'
-      ) {
-        if (this.connection === false) {
-          throw new Error('No connection established before query.');
-        }
-      } else {
-        const collection = this.connection.db.collection(this.collectionName);
-        const data = await collection.aggregate(arg1);
-        const dataRes = await data.toArray();
+      this.checkConnection();
+      const collection = this.getCollection();
+      const data = await collection.aggregate(arg1);
+      const dataRes = await data.toArray();
 
-        return dataRes;
-      }
+      return dataRes;
     } catch (error) {
       throw new Error(`Error in aggregate function. ${error}`);
     }
@@ -221,20 +182,12 @@ class Query {
     options?: FindAndModifyOptions
   ) {
     try {
-      if (
-        typeof this.connection === 'boolean' ||
-        typeof this.connection.db === 'boolean'
-      ) {
-        if (this.connection === false) {
-          throw new Error('No connection established before query.');
-        }
-      } else {
-        const collection = this.connection.db.collection(this.collectionName);
-        const data = await collection.findAndModify(filter, options);
+      this.checkConnection();
+      const collection = this.getCollection();
+      const data = await collection.findAndModify(filter, options);
 
-        console.log('findByIdAndModify Successful', data);
-        return data;
-      }
+      console.log('findByIdAndModify Successful', data);
+      return data;
     } catch (error) {
       throw new Error(`Error in findandModify function. ${error}`);
     }
@@ -254,29 +207,21 @@ class Query {
   ) {
     try {
       const stringId = new Bson.ObjectId(id);
-      if (
-        typeof this.connection === 'boolean' ||
-        typeof this.connection.db === 'boolean'
-      ) {
-        if (this.connection === false) {
-          throw new Error('No connection established before query.');
-        }
+      this.checkConnection();
+      const collection = this.getCollection();
+
+      if (typeof options === 'function') {
+        callback = options;
+        options = {};
+      }
+
+      const data = await collection.deleteOne({ _id: stringId }, options);
+      console.log('findByIdAndDelete Successful', data);
+
+      if (callback) {
+        return callback(data);
       } else {
-        const collection = this.connection.db.collection(this.collectionName);
-
-        if (typeof options === 'function') {
-          callback = options;
-          options = {};
-        }
-
-        const data = await collection.deleteOne({ _id: stringId }, options);
-        console.log('findByIdAndDelete Successful', data);
-
-        if (callback) {
-          return callback(data);
-        } else {
-          return data;
-        }
+        return data;
       }
     } catch (error) {
       throw new Error(`Error in findByIdAndDelete function. ${error}`);
@@ -296,26 +241,18 @@ class Query {
     callback?: (input: unknown) => unknown
   ) {
     try {
-      if (
-        typeof this.connection === 'boolean' ||
-        typeof this.connection.db === 'boolean'
-      ) {
-        if (this.connection === false) {
-          throw new Error('No connection established before query.');
-        }
+      this.checkConnection();
+      const collection = this.getCollection();
+      const data = await collection.findAndModify(queryObject, {
+        remove: true,
+      });
+
+      console.log('findOneAndRemove Successful', data);
+
+      if (callback) {
+        return callback(data);
       } else {
-        const collection = this.connection.db.collection(this.collectionName);
-        const data = await collection.findAndModify(queryObject, {
-          remove: true,
-        });
-
-        console.log('findOneAndRemove Successful', data);
-
-        if (callback) {
-          return callback(data);
-        } else {
-          return data;
-        }
+        return data;
       }
     } catch (error) {
       throw new Error(`Error in findOneAndRemove function. ${error}`);
@@ -336,27 +273,18 @@ class Query {
   ) {
     try {
       const stringId = new Bson.ObjectId(id);
+      this.checkConnection();
+      const collection = this.getCollection();
+      const data = await collection.findAndModify(
+        { _id: stringId },
+        { remove: true }
+      );
 
-      if (
-        typeof this.connection === 'boolean' ||
-        typeof this.connection.db === 'boolean'
-      ) {
-        if (this.connection === false) {
-          throw new Error('No connection established before query.');
-        }
-      } else {
-        const collection = this.connection.db.collection(this.collectionName);
-        const data = await collection.findAndModify(
-          { _id: stringId },
-          { remove: true }
-        );
+      console.log('findByIdAndRemove Successful', data);
 
-        console.log('findByIdAndRemove Successful', data);
+      if (callback) return callback(data);
 
-        if (callback) return callback(data);
-
-        return data;
-      }
+      return data;
     } catch (error) {
       throw new Error(`Error in findByIdAndRemove function. ${error}`);
     }
@@ -378,26 +306,18 @@ class Query {
     callback?: (input: unknown) => unknown
   ) {
     try {
-      if (
-        typeof this.connection === 'boolean' ||
-        typeof this.connection.db === 'boolean'
-      ) {
-        if (this.connection === false) {
-          throw new Error('No connection established before query.');
-        }
-      } else {
-        const collection = this.connection.db.collection(this.collectionName);
-        if (typeof options === 'function') callback = options;
-        options = {};
+      this.checkConnection();
+      const collection = this.getCollection();
+      if (typeof options === 'function') callback = options;
+      options = {};
 
-        const data = await collection.replaceOne(filter, document, options);
+      const data = await collection.replaceOne(filter, document, options);
 
-        console.log('Successfully executed replaceOne', data);
+      console.log('Successfully executed replaceOne', data);
 
-        if (callback) return callback(data);
+      if (callback) return callback(data);
 
-        return data;
-      }
+      return data;
     } catch (error) {
       throw new Error(`Error in replaceOne function. ${error}`);
     }
@@ -416,28 +336,20 @@ class Query {
     writeConcern?: InsertOptions
   ) {
     try {
-      if (
-        typeof this.connection === 'boolean' ||
-        typeof this.connection.db === 'boolean'
-      ) {
-        if (this.connection === false) {
-          throw new Error('No connection established before query.');
-        }
-      } else {
-        const collection = this.connection.db.collection(this.collectionName);
-        await this.validateInsertAgainstSchema(
-          document,
-          this.schema,
-          this.updatedQueryObject
-        );
-        const id = await collection.insertOne(
-          this.updatedQueryObject,
-          writeConcern
-        );
-        this.resetQueryObject();
-        console.log('Successfully insertedOne');
-        return id;
-      }
+      this.checkConnection();
+      const collection = this.getCollection();
+      await this.validateInsertAgainstSchema(
+        document,
+        this.schema,
+        this.updatedQueryObject
+      );
+      const id = await collection.insertOne(
+        this.updatedQueryObject,
+        writeConcern
+      );
+      this.resetQueryObject();
+      console.log('Successfully insertedOne');
+      return id;
     } catch (error) {
       throw new Error(`Error in insertOne function. ${error}`);
     }
@@ -458,15 +370,8 @@ class Query {
     callback?: (input: unknown) => unknown
   ) {
     try {
-      if (
-        typeof this.connection === 'boolean' ||
-        typeof this.connection.db === 'boolean'
-      ) {
-        if (this.connection === false) {
-          throw new Error('No connection established before query.');
-        }
-      } else {
-        const collection = this.connection.db.collection(this.collectionName);
+        this.checkConnection();
+        const collection = this.getCollection();
 
         if (typeof options === 'function') callback = options;
         options = {};
@@ -485,7 +390,6 @@ class Query {
         if (callback) return callback(ids);
 
         return ids;
-      }
     } catch (error) {
       throw new Error(`Error in insertMany function. ${error}`);
     }
@@ -508,29 +412,21 @@ class Query {
     callback?: (input: unknown) => unknown
   ) {
     try {
-      if (
-        typeof this.connection === 'boolean' ||
-        typeof this.connection.db === 'boolean'
-      ) {
-        if (this.connection === false) {
-          throw new Error('No connection established before query.');
-        }
-      } else {
-        const collection = this.connection.db.collection(this.collectionName);
-        await this.validateUpdateAgainstSchema(
-          update,
-          this.schema,
-          this.updatedQueryObject
-        );
-        const newUpdate = { $set: this.updatedQueryObject };
-        if (typeof options === 'function') callback = options;
-        options = {};
-        const data = await collection.updateOne(filter, newUpdate, options);
-        this.resetQueryObject();
-        if (callback) return callback(data);
+      this.checkConnection();
+      const collection = this.getCollection();
+      await this.validateUpdateAgainstSchema(
+        update,
+        this.schema,
+        this.updatedQueryObject
+      );
+      const newUpdate = { $set: this.updatedQueryObject };
+      if (typeof options === 'function') callback = options;
+      options = {};
+      const data = await collection.updateOne(filter, newUpdate, options);
+      this.resetQueryObject();
+      if (callback) return callback(data);
 
-        return data;
-      }
+      return data;
     } catch (error) {
       throw new Error(`Error in findOneAndUpdate function. ${error}`);
     }
@@ -552,33 +448,25 @@ class Query {
     callback?: (input: unknown) => unknown
   ) {
     try {
-      if (
-        typeof this.connection === 'boolean' ||
-        typeof this.connection.db === 'boolean'
-      ) {
-        if (this.connection === false) {
-          throw new Error('No connection established before query.');
-        }
-      } else {
-        const collection = this.connection.db.collection(this.collectionName);
-        if (typeof options === 'function') callback = options;
-        options = {};
-        await this.validateReplaceAgainstSchema(
-          filter,
-          replacement,
-          this.schema,
-          this.updatedQueryObject
-        );
-        const data = await collection.replaceOne(
-          filter,
-          this.updatedQueryObject,
-          options
-        );
-        this.resetQueryObject();
-        if (callback) return callback(data);
+      this.checkConnection();
+      const collection = this.getCollection();
+      if (typeof options === 'function') callback = options;
+      options = {};
+      await this.validateReplaceAgainstSchema(
+        filter,
+        replacement,
+        this.schema,
+        this.updatedQueryObject
+      );
+      const data = await collection.replaceOne(
+        filter,
+        this.updatedQueryObject,
+        options
+      );
+      this.resetQueryObject();
+      if (callback) return callback(data);
 
-        return data;
-      }
+      return data;
     } catch (error) {
       throw new Error(`Error in findOneAndReplace function. ${error}`);
     }
@@ -599,26 +487,17 @@ class Query {
   ) {
     try {
       const stringId = new Bson.ObjectId(id);
+      this.checkConnection();
+      const collection = this.getCollection();
 
-      if (
-        typeof this.connection === 'boolean' ||
-        typeof this.connection.db === 'boolean'
-      ) {
-        if (this.connection === false) {
-          throw new Error('No connection established before query.');
-        }
+      if (typeof options === 'function') callback = options;
+      options = {};
+
+      const data = await collection.findOne({ _id: stringId }, options);
+      if (callback) {
+        return callback(data);
       } else {
-        const collection = this.connection.db.collection(this.collectionName);
-
-        if (typeof options === 'function') callback = options;
-        options = {};
-
-        const data = await collection.findOne({ _id: stringId }, options);
-        if (callback) {
-          return callback(data);
-        } else {
-          return data;
-        }
+        return data;
       }
     } catch (error) {
       throw new Error(`Error in findById function. ${error}`);
@@ -642,35 +521,26 @@ class Query {
   ) {
     try {
       const filter = { _id: new Bson.ObjectId(id) };
-      console.log(filter);
 
-      if (
-        typeof this.connection === 'boolean' ||
-        typeof this.connection.db === 'boolean'
-      ) {
-        if (this.connection === false) {
-          throw new Error('No connection established before query.');
-        }
+      this.checkConnection();
+      const collection = this.getCollection();
+
+      await this.validateUpdateAgainstSchema(
+        update,
+        this.schema,
+        this.updatedQueryObject
+      );
+      const newUpdate = { $set: this.updatedQueryObject };
+
+      if (typeof options === 'function') callback = options;
+      options = {};
+
+      const data = await collection.updateOne(filter, newUpdate, options);
+      this.resetQueryObject();
+      if (callback) {
+        return callback(data);
       } else {
-        const collection = this.connection.db.collection(this.collectionName);
-
-        await this.validateUpdateAgainstSchema(
-          update,
-          this.schema,
-          this.updatedQueryObject
-        );
-        const newUpdate = { $set: this.updatedQueryObject };
-
-        if (typeof options === 'function') callback = options;
-        options = {};
-
-        const data = await collection.updateOne(filter, newUpdate, options);
-        this.resetQueryObject();
-        if (callback) {
-          return callback(data);
-        } else {
-          return data;
-        }
+        return data;
       }
     } catch (error) {
       throw new Error(`Error in findByIdAndUpdate function. ${error}`);
@@ -684,21 +554,13 @@ class Query {
    */
   public async dropCollection() {
     try {
-      if (
-        typeof this.connection === 'boolean' ||
-        typeof this.connection.db === 'boolean'
-      ) {
-        if (this.connection === false) {
-          throw new Error('No connection established before query.');
-        }
-      } else {
-        const collection = this.connection.db.collection(this.collectionName);
-        const data = await collection.drop();
+      this.checkConnection();
+      const collection = this.getCollection();
+      const data = await collection.drop();
 
-        console.log('Collection successfully dropped.');
+      console.log('Collection successfully dropped.');
 
-        return data;
-      }
+      return data;
     } catch (error) {
       throw new Error(`Error in dropCollection function. ${error}`);
     }
@@ -722,24 +584,16 @@ class Query {
         callback = options;
         options = {};
       }
-      if (
-        typeof this.connection === 'boolean' ||
-        typeof this.connection.db === 'boolean'
-      ) {
-        if (this.connection === false) {
-          throw new Error('No connection established before query.');
-        }
+      this.checkConnection();
+      const collection = this.getCollection();
+
+      const data = await collection.deleteOne(document, options);
+      if (callback) {
+        return callback(data);
       } else {
-        const collection = this.connection.db.collection(this.collectionName);
+        const formattedReturnObj = { deletedCount: data };
 
-        const data = await collection.deleteOne(document, options);
-        if (callback) {
-          return callback(data);
-        } else {
-          const formattedReturnObj = { deletedCount: data };
-
-          return formattedReturnObj;
-        }
+        return formattedReturnObj;
       }
     } catch (error) {
       throw new Error(`Error in deleteOne function. ${error}`);
@@ -760,28 +614,20 @@ class Query {
     callback?: (input: unknown) => unknown
   ) {
     try {
-      if (
-        typeof this.connection === 'boolean' ||
-        typeof this.connection.db === 'boolean'
-      ) {
-        if (this.connection === false) {
-          throw new Error('No connection established before query.');
-        }
-      } else {
-        const collection = this.connection.db.collection(this.collectionName);
-        if (typeof options === 'function') {
-          callback = options;
-          options = {};
-        }
-        
-        const data = await collection.deleteMany(document, options);
-        const formattedReturnObj = { deletedCount: data };
-        console.log(formattedReturnObj);
-        if (callback) return callback(data);
-
-        return formattedReturnObj;
-        
+      this.checkConnection();
+      const collection = this.getCollection();
+      if (typeof options === 'function') {
+        callback = options;
+        options = {};
       }
+      
+      const data = await collection.deleteMany(document, options);
+      const formattedReturnObj = { deletedCount: data };
+      console.log(formattedReturnObj);
+      if (callback) return callback(data);
+
+      return formattedReturnObj;
+        
     } catch (error) {
       throw new Error(`Error in deleteMany function. ${error}`);
     }
@@ -803,48 +649,40 @@ class Query {
     callback?: (input: unknown) => unknown
   ) {
     try {
-      if (
-        typeof this.connection === 'boolean' ||
-        typeof this.connection.db === 'boolean'
-      ) {
-        if (this.connection === false) {
-          throw new Error('No connection established before query.');
-        }
-      } else {
-        const collection = this.connection.db.collection(this.collectionName);
-        if (typeof options === 'function') {
-          callback = options;
-          options = {};
-        }
-
-        const setUpdateObject: Record<string, unknown> = {};
-        // iterate through update operators 
-        for(const operator in update) {
-          if(operator === '$set') {
-            setUpdateObject[operator] = await this.validateUpdateAgainstSchema(
-              update[operator] as Record<string, unknown>,
-              this.schema,
-              this.updatedQueryObject,
-              operator
-            );
-            this.resetQueryObject();
-
-          } else {
-            setUpdateObject[operator] = update[operator];
-          }
-        }
-
-        const data = await collection.updateOne(
-          document,
-          setUpdateObject,
-          options
-        );
-        this.resetQueryObject();
-
-        if (callback) return callback(data);
-
-        return data;
+      this.checkConnection();
+      const collection = this.getCollection();
+      if (typeof options === 'function') {
+        callback = options;
+        options = {};
       }
+
+      const setUpdateObject: Record<string, unknown> = {};
+      // iterate through update operators 
+      for(const operator in update) {
+        if(operator === '$set') {
+          setUpdateObject[operator] = await this.validateUpdateAgainstSchema(
+            update[operator] as Record<string, unknown>,
+            this.schema,
+            this.updatedQueryObject,
+            operator
+          );
+          this.resetQueryObject();
+
+        } else {
+          setUpdateObject[operator] = update[operator];
+        }
+      }
+
+      const data = await collection.updateOne(
+        document,
+        setUpdateObject,
+        options
+      );
+      this.resetQueryObject();
+
+      if (callback) return callback(data);
+
+      return data;
     } catch (error) {
       throw new Error(`Error in updateOne function. ${error}`);
     }
@@ -868,37 +706,29 @@ class Query {
   ) {
     // if upsert is true, and no matching documents are found, updateObject( regardless of how complete it is) will be inserted.
     try {
-      if (
-        typeof this.connection === 'boolean' ||
-        typeof this.connection.db === 'boolean'
-      ) {
-        if (this.connection === false) {
-          throw new Error('No connection established before query.');
-        }
-      } else {
-        const collection = this.connection.db.collection(this.collectionName);
-        if (typeof options === 'function') {
-          callback = options;
-          options = {};
-        }
-
-        await this.validateUpdateAgainstSchema(
-          update,
-          this.schema,
-          this.updatedQueryObject
-        );
-        const setUpdateObject = { $set: this.updatedQueryObject };
-        const data = await collection.updateMany(
-          document,
-          setUpdateObject,
-          options
-        );
-        this.resetQueryObject();
-
-        if (callback) return callback(data);
-
-        return data;
+      this.checkConnection();
+      const collection = this.getCollection();
+      if (typeof options === 'function') {
+        callback = options;
+        options = {};
       }
+
+      await this.validateUpdateAgainstSchema(
+        update,
+        this.schema,
+        this.updatedQueryObject
+      );
+      const setUpdateObject = { $set: this.updatedQueryObject };
+      const data = await collection.updateMany(
+        document,
+        setUpdateObject,
+        options
+      );
+      this.resetQueryObject();
+
+      if (callback) return callback(data);
+
+      return data;
     } catch (error) {
       throw new Error(`Error in updateMany function. ${error}`);
     }
@@ -1348,6 +1178,21 @@ class Query {
       string += `.${propertyName}`;
     }
     return string;
+  }
+
+  checkConnection() {
+    const isConnectionInactive = this.connection === false;
+    if((typeof this.connection === 'boolean' || typeof this.connection.db === 'boolean')
+      && isConnectionInactive) {
+        throw new Error('No connection established before query.');
+      }
+    return;
+  }
+
+  getCollection() {
+    const connection = this.connection as Connection;
+    const database = connection.db as Database;
+    return database.collection(this.collectionName);
   }
 }
 
