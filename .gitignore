@@ -1,3 +1,4 @@
 .env
 internal/*
 internal_tests
+cov_profile
